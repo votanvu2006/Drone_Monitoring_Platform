@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "snapshotTtlMinutes": 10,
+  "note": "Project safety policy for AeroVision X1 demonstration. It is not an official aviation standard.",
+  "thresholds": {
+    "windSpeedMps": {
+      "safeMax": 8,
+      "cautionMax": 12,
+      "unsafeAbove": 12
+    },
+    "visibilityM": {
+      "safeMin": 5000,
+      "cautionMin": 2000,
+      "unsafeBelow": 2000
+    },
+    "rain": {
+      "safeMaxMm": 0,
+      "cautionMaxMm": 0.5,
+      "unsafeAboveMm": 0.5
+    },
+    "thunderstorm": {
+      "unsafe": true
+    }
+  },
+  "precedence": [
+    "UNSAFE",
+    "CAUTION",
+    "SAFE"
+  ],
+  "routeDecision": {
+    "invalidRoute": "BLOCK",
+    "unsafeWeather": "BLOCK",
+    "cautionWeather": "ALLOW_WITH_WARNING",
+    "safeWeather": "ALLOW"
+  },
+  "checkMoments": [
+    "MISSION_VALIDATION",
+    "PRE_FLIGHT",
+    "EVERY_5_TO_10_MINUTES_DURING_FLIGHT"
+  ],
+  "representativeLocation": "ROUTE_CENTROID",
+  "requiredProviderFields": [
+    "condition_code",
+    "temperature_c",
+    "wind_speed_mps",
+    "wind_direction_deg",
+    "precipitation_mm",
+    "visibility_m",
+    "observed_at"
+  ]
+}
