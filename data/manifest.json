@@ -1,0 +1,30 @@
+{
+  "packageName": "Drone Monitoring Platform Data Pack",
+  "version": "1.0.0",
+  "generatedAt": "2026-09-12T12:00:00Z",
+  "database": "MySQL 8+",
+  "coordinateConvention": {
+    "tableFields": "latitude, longitude",
+    "geojson": "longitude, latitude"
+  },
+  "counts": {
+    "drones": 1,
+    "drone_components": 14,
+    "flight_zones": 8,
+    "missions": 20,
+    "waypoints": 90,
+    "weather_checks": 0,
+    "flights": 20,
+    "telemetry": 6000,
+    "alerts": 24
+  },
+  "importOrder": [
+    "01-schema/schema.sql",
+    "02-drone/seed.sql",
+    "03-flight-zones/seed.sql",
+    "04-missions/seed.sql",
+    "05-flights/seed.sql",
+    "06-alerts/seed.sql"
+  ],
+  "weather": "Runtime API snapshots only; no fake production weather rows are seeded."
+}
