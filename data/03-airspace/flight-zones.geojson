@@ -1,0 +1,353 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "zoneCode": "ZONE-A01",
+        "name": "Ho Chi Minh City Urban Demo Boundary",
+        "zoneType": "ALLOWED",
+        "reason": "Project operating boundary covering the wider HCMC urban area; not an official administrative boundary or aviation approval.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#22C55E"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.545,
+              10.72
+            ],
+            [
+              106.565,
+              10.685
+            ],
+            [
+              106.66,
+              10.675
+            ],
+            [
+              106.76,
+              10.68
+            ],
+            [
+              106.84,
+              10.72
+            ],
+            [
+              106.885,
+              10.77
+            ],
+            [
+              106.9,
+              10.85
+            ],
+            [
+              106.865,
+              10.905
+            ],
+            [
+              106.78,
+              10.925
+            ],
+            [
+              106.69,
+              10.915
+            ],
+            [
+              106.62,
+              10.9
+            ],
+            [
+              106.565,
+              10.85
+            ],
+            [
+              106.545,
+              10.78
+            ],
+            [
+              106.545,
+              10.72
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 2,
+        "zoneCode": "ZONE-R01",
+        "name": "Hospital Safety Demo Zone",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic hospital buffer used to test route rejection.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#EF4444"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.694,
+              10.771
+            ],
+            [
+              106.698,
+              10.771
+            ],
+            [
+              106.698,
+              10.775
+            ],
+            [
+              106.694,
+              10.775
+            ],
+            [
+              106.694,
+              10.771
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 3,
+        "zoneCode": "ZONE-R02",
+        "name": "Government Facility Demo Zone",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic government-facility buffer used to test route rejection.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#EF4444"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.706,
+              10.779
+            ],
+            [
+              106.711,
+              10.779
+            ],
+            [
+              106.711,
+              10.784
+            ],
+            [
+              106.706,
+              10.784
+            ],
+            [
+              106.706,
+              10.779
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 4,
+        "zoneCode": "ZONE-R03",
+        "name": "School Safety Demo Zone",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic school buffer used to test route rejection.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#F97316"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.686,
+              10.781
+            ],
+            [
+              106.69,
+              10.781
+            ],
+            [
+              106.69,
+              10.785
+            ],
+            [
+              106.686,
+              10.785
+            ],
+            [
+              106.686,
+              10.781
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 5,
+        "zoneCode": "ZONE-R04",
+        "name": "Temporary Event Demo Zone",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic temporary-event restriction.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#F97316"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7,
+              10.764
+            ],
+            [
+              106.705,
+              10.764
+            ],
+            [
+              106.705,
+              10.769
+            ],
+            [
+              106.7,
+              10.769
+            ],
+            [
+              106.7,
+              10.764
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 6,
+        "zoneCode": "ZONE-R05",
+        "name": "Dense Residential Demo Zone",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic residential buffer used for route testing.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#EF4444"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.713,
+              10.769
+            ],
+            [
+              106.718,
+              10.769
+            ],
+            [
+              106.718,
+              10.774
+            ],
+            [
+              106.713,
+              10.774
+            ],
+            [
+              106.713,
+              10.769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 7,
+        "zoneCode": "ZONE-R06",
+        "name": "Emergency Landing Demo Buffer",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic emergency landing buffer.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#F97316"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.692,
+              10.787
+            ],
+            [
+              106.697,
+              10.787
+            ],
+            [
+              106.697,
+              10.791
+            ],
+            [
+              106.692,
+              10.791
+            ],
+            [
+              106.692,
+              10.787
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 8,
+        "zoneCode": "ZONE-R07",
+        "name": "Infrastructure Demo Protection Zone",
+        "zoneType": "RESTRICTED",
+        "reason": "Synthetic infrastructure protection buffer.",
+        "dataAuthority": "DEMO_ONLY",
+        "displayColor": "#EF4444"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.703,
+              10.772
+            ],
+            [
+              106.707,
+              10.772
+            ],
+            [
+              106.707,
+              10.776
+            ],
+            [
+              106.703,
+              10.776
+            ],
+            [
+              106.703,
+              10.772
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "model_code": "AV-X1E",
+    "manufacturer": "AeroVision (fictional)",
+    "model_name": "AeroVision X1 Enterprise",
+    "description": "Fictional enterprise camera quadcopter whose high-level envelope references published DJI Mavic 3 Enterprise specifications. It is not a DJI aircraft model.",
+    "image_url": "/assets/drone/aerovision-x1.png",
+    "max_flight_time_minutes": 45,
+    "max_speed_mps": 15,
+    "manufacturer_max_wind_mps": 12,
+    "project_wind_limit_mps": 10,
+    "battery_capacity_mah": 5000,
+    "battery_nominal_voltage_v": 15.4,
+    "battery_max_voltage_v": 17.6,
+    "reference_source_url": "https://enterprise.dji.com/mavic-3-enterprise/specs",
+    "is_simulated_reference": true,
+    "created_at": "2026-07-01 08:55:00",
+    "updated_at": "2026-09-19 10:00:00"
+  }
+]

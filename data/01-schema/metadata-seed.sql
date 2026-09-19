@@ -1,0 +1,2 @@
+INSERT INTO `data_pack_metadata` (`id`, `pack_name`, `pack_version`, `data_revision`, `generated_at`, `build_id`, `schema_table_count`, `expected_telemetry_rows`, `notes`) VALUES
+  (1, 'Drone Monitoring Platform Data Pack', '2.0.0', 1, '2026-09-19 10:00:00', 'DRONE-DATA-2.0.0-R1-20260919', 18, 6000, 'Data Pack v2.0 release with five-drone demo coverage, four-arm propulsion faults, deterministic demo weather and import verification.');

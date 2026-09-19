@@ -1,0 +1,249 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2026-09-19T10:00:00Z",
+  "checks": [
+    {
+      "name": "Data pack identity is a valid singleton",
+      "passed": true,
+      "details": "build=DRONE-DATA-2.0.0-R1-20260919"
+    },
+    {
+      "name": "Metadata declares the complete schema and telemetry size",
+      "passed": true,
+      "details": "18 tables; 6000 telemetry rows"
+    },
+    {
+      "name": "Schema defines each simulation_scenarios column once",
+      "passed": true,
+      "details": "prevents duplicate-column import failure"
+    },
+    {
+      "name": "Legacy left-only propulsion scenario codes are absent",
+      "passed": true,
+      "details": "generic scenario plus flights.fault_position is required"
+    },
+    {
+      "name": "Exactly five drones",
+      "passed": true,
+      "details": "count=5"
+    },
+    {
+      "name": "All drones boot offline with no fabricated current position",
+      "passed": true,
+      "details": "location is populated only when a drone is switched on"
+    },
+    {
+      "name": "New drone rows default to OFFLINE at database level",
+      "passed": true,
+      "details": "omitting status cannot accidentally make a newly registered drone available"
+    },
+    {
+      "name": "Drone display names follow the required sequence",
+      "passed": true,
+      "details": "Drone - 001 through Drone - 005"
+    },
+    {
+      "name": "Each drone has the same 14-component quadcopter configuration",
+      "passed": true,
+      "details": "one 14-definition catalog × 5 drones = 70 installed component instances"
+    },
+    {
+      "name": "All foreign keys resolve",
+      "passed": true,
+      "details": "models/drones/catalog/components/missions/flights/telemetry/scenarios/weather/alerts"
+    },
+    {
+      "name": "Every alert matches its catalog definition",
+      "passed": true,
+      "details": "rule_code controls type, source and default severity"
+    },
+    {
+      "name": "Runtime scenario weights total 100 for Drone - 001 through Drone - 004",
+      "passed": true,
+      "details": "Drone 001 normal; Drone 002 power; Drone 003 propulsion; Drone 004 connectivity"
+    },
+    {
+      "name": "Drone - 005 has no random in-flight fault pool",
+      "passed": true,
+      "details": "route and weather are evaluated before flight creation; an approved launch uses NORMAL"
+    },
+    {
+      "name": "Historical flights are evenly distributed across all five drones",
+      "passed": true,
+      "details": "5 drones × 4 flights = 20"
+    },
+    {
+      "name": "Every flight belongs to the same drone as its mission",
+      "passed": true,
+      "details": "mission and flight ownership match"
+    },
+    {
+      "name": "Historical flight scenarios follow each drone assignment",
+      "passed": true,
+      "details": "Drone 001 normal; 002 power; 003 propulsion; 004 navigation/communication; 005 normal after pre-flight approval"
+    },
+    {
+      "name": "Every flight fault position agrees with its scenario contract",
+      "passed": true,
+      "details": "fixed-position scenarios inherit their position; runtime-selected scenarios persist the chosen arm; normal/link scenarios remain null"
+    },
+    {
+      "name": "Flight alerts reference components owned by the same drone",
+      "passed": true,
+      "details": "battery, motor, propeller and GPS alerts resolve to the correct aircraft component"
+    },
+    {
+      "name": "Exactly 300 ordered telemetry rows per flight",
+      "passed": true,
+      "details": "20 × 300 = 6,000"
+    },
+    {
+      "name": "Telemetry sequence numbers are complete for every flight",
+      "passed": true,
+      "details": "sequence 1 through 300 per flight"
+    },
+    {
+      "name": "Telemetry timestamps within flight intervals",
+      "passed": true,
+      "details": "inclusive interval check"
+    },
+    {
+      "name": "GPS-loss samples expose only last-known positions",
+      "passed": true,
+      "details": "Follow Drone must freeze while GNSS is unavailable"
+    },
+    {
+      "name": "Signal-loss samples are buffered without causing heartbeat timeout",
+      "passed": true,
+      "details": "history can replay buffered rows; live map waits for recovery"
+    },
+    {
+      "name": "Unexpected-offline flight ends after a telemetry gap",
+      "passed": true,
+      "details": "last known position remains on the map"
+    },
+    {
+      "name": "Drone - 003 historical flights cover every propulsion arm",
+      "passed": true,
+      "details": "seed coverage is deterministic while runtime position selection remains random"
+    },
+    {
+      "name": "Drone - 003 runtime scenarios select their arm per flight",
+      "passed": true,
+      "details": "scenario template and flight fault position are separated"
+    },
+    {
+      "name": "Propulsion alerts point to the flight-selected arm",
+      "passed": true,
+      "details": "telemetry channel, alert component and fault_position agree"
+    },
+    {
+      "name": "Failed hardware flights stop away from home instead of simulating return-to-home",
+      "passed": true,
+      "details": "emergency landing position is retained"
+    },
+    {
+      "name": "Drone - 005 flights record acknowledged CAUTION weather",
+      "passed": true,
+      "details": "unsafe and restricted missions do not create flights"
+    },
+    {
+      "name": "Blocked Drone - 005 missions have no flight or telemetry",
+      "passed": true,
+      "details": "restricted missions 3/4 and unsafe-weather mission 7 stop before take-off"
+    },
+    {
+      "name": "Alert lifecycle consistency",
+      "passed": true,
+      "details": "ACTIVE has no resolved_at; RESOLVED has resolved_at"
+    },
+    {
+      "name": "All seeded mission waypoints remain inside the expanded HCMC urban boundary",
+      "passed": true,
+      "details": "20 mission routes remain in ZONE-A01"
+    },
+    {
+      "name": "No safe mission intersects restricted rectangles",
+      "passed": true,
+      "details": "geometry test on all route segments"
+    },
+    {
+      "name": "Invalid missions intersect a restricted rectangle",
+      "passed": true,
+      "details": "geometry rejection fixtures"
+    },
+    {
+      "name": "Weather fixtures are expired and clearly labeled",
+      "passed": true,
+      "details": "cannot be reused for current take-off"
+    },
+    {
+      "name": "Demo weather is the only available project mode",
+      "passed": true,
+      "details": "current project uses deterministic simulated weather"
+    },
+    {
+      "name": "Live Open-Meteo mode is prepared but marked coming soon",
+      "passed": true,
+      "details": "UI must not allow LIVE selection yet"
+    },
+    {
+      "name": "Demo weather covers every drone deterministically",
+      "passed": true,
+      "details": "Drone 001–004 SAFE; Drone 005 CAUTION"
+    },
+    {
+      "name": "Demo weather assignment matches presentation plan",
+      "passed": true,
+      "details": "SAFE for Drone 001–004 and CAUTION for Drone 005"
+    },
+    {
+      "name": "Unsafe demo weather exists but cannot be overridden",
+      "passed": true,
+      "details": "reserved for blocked mission/history testing"
+    },
+    {
+      "name": "Every non-normal scenario used by historical flights produces an alert",
+      "passed": true,
+      "details": "includes UNEXPECTED_OFFLINE heartbeat coverage"
+    },
+    {
+      "name": "Latest Drone - 003 propeller fault remains linked to its components",
+      "passed": true,
+      "details": "rear-right propeller FAULT and motor WARNING; drone power state remains independently OFFLINE"
+    }
+  ],
+  "statistics": {
+    "buildId": "DRONE-DATA-2.0.0-R1-20260919",
+    "dataRevision": 1,
+    "counts": {
+      "data_pack_metadata": 1,
+      "drone_models": 1,
+      "drones": 5,
+      "component_catalog": 14,
+      "drone_components": 70,
+      "flight_zones": 8,
+      "simulation_scenarios": 9,
+      "drone_scenario_pool": 9,
+      "missions": 20,
+      "waypoints": 90,
+      "weather_runtime_config": 1,
+      "weather_demo_profiles": 3,
+      "drone_weather_demo_assignments": 5,
+      "weather_checks": 9,
+      "flights": 20,
+      "telemetry": 6000,
+      "alert_rule_catalog": 14,
+      "alerts": 24
+    },
+    "activeAlerts": 6,
+    "resolvedAlerts": 18,
+    "successfulFlights": 8,
+    "returnedSafelyFlights": 8,
+    "failedFlights": 4,
+    "telemetryIntervalSeconds": 2,
+    "minTelemetryTime": "2026-07-03 02:00:00.000",
+    "maxTelemetryTime": "2026-09-12 11:54:58.000"
+  },
+  "passed": true
+}

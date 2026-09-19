@@ -1,0 +1,12 @@
+# Normalize text files across Windows, Linux, and CI
+* text=auto
+
+# Keep the deterministic data package and checksums on LF
+/data/** text eol=lf
+
+# Protect possible binary assets from text conversion
+/data/**/*.png binary
+/data/**/*.jpg binary
+/data/**/*.jpeg binary
+/data/**/*.gif binary
+/data/**/*.pdf binary

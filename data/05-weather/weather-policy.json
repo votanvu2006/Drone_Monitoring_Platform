@@ -1,0 +1,122 @@
+{
+  "version": "2.0.0",
+  "policyType": "PROJECT_SIMULATION_POLICY_NOT_MANUFACTURER_LIMITS",
+  "disclaimer": "The weather variables and WMO codes follow the provider contract, but every SAFE/CAUTION/UNSAFE threshold below is an internal project policy—not an aviation authority or manufacturer limit.",
+  "sourceReferences": [
+    {
+      "name": "DJI Mavic 3 Enterprise specifications",
+      "url": "https://enterprise.dji.com/mavic-3-enterprise/specs",
+      "usedFor": "Reference aircraft wind-resistance envelope only (12 m/s published value)."
+    },
+    {
+      "name": "Open-Meteo forecast API documentation",
+      "url": "https://open-meteo.com/en/docs",
+      "usedFor": "Weather field names, units, heights and WMO weather-code meanings."
+    }
+  ],
+  "snapshotTtlMinutes": 10,
+  "defaultMode": "DEMO",
+  "modes": {
+    "DEMO": {
+      "status": "AVAILABLE",
+      "sourceKind": "SIMULATED_FIXTURE",
+      "behavior": "Use the selected drone demo profile and show a persistent simulated-weather banner."
+    },
+    "LIVE": {
+      "status": "COMING_SOON",
+      "sourceKind": "OPEN_METEO",
+      "provider": "OPEN_METEO",
+      "behavior": "Prepared integration contract; not selectable in the current project release."
+    }
+  },
+  "liveProviderRequest": {
+    "baseUrl": "https://api.open-meteo.com/v1/forecast",
+    "coordinateParameters": [
+      "latitude",
+      "longitude"
+    ],
+    "currentFields": [
+      "temperature_2m",
+      "relative_humidity_2m",
+      "precipitation",
+      "rain",
+      "weather_code",
+      "wind_speed_10m",
+      "wind_direction_10m",
+      "wind_gusts_10m"
+    ],
+    "hourlyFields": [
+      "visibility",
+      "wind_speed_80m"
+    ],
+    "fixedParameters": {
+      "wind_speed_unit": "ms",
+      "timezone": "UTC",
+      "forecast_days": 1
+    }
+  },
+  "samplingLocations": [
+    "START",
+    "ROUTE_MIDPOINT",
+    "DESTINATION"
+  ],
+  "decisionPrecedence": [
+    "UNSAFE",
+    "CAUTION",
+    "SAFE"
+  ],
+  "rules": {
+    "windSpeed10mMps": {
+      "safeMax": 7.9,
+      "cautionFrom": 8,
+      "cautionMax": 10,
+      "unsafeAbove": 10,
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Keeps the demo decision margin below the reference aircraft published 12 m/s wind-resistance value."
+    },
+    "windGust10mMps": {
+      "safeMax": 9.9,
+      "cautionFrom": 10,
+      "cautionMax": 12,
+      "unsafeAbove": 12,
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Conservative project rule for gusts; not a manufacturer-certified operating limit."
+    },
+    "precipitationMmPerHour": {
+      "safeMax": 0,
+      "cautionFrom": 0.01,
+      "cautionMax": 0.5,
+      "unsafeAbove": 0.5,
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Presentation rule that distinguishes dry, light precipitation, and blocked launch."
+    },
+    "visibilityM": {
+      "safeMin": 5000,
+      "cautionMin": 2000,
+      "unsafeBelow": 2000,
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Presentation rule for route visibility; not a legal VLOS determination."
+    },
+    "wmoWeatherCodesUnsafe": {
+      "values": [
+        65,
+        67,
+        75,
+        82,
+        86,
+        95,
+        96,
+        99
+      ],
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Uses provider WMO meanings; unsafe classification is decided by this project."
+    }
+  },
+  "routeDecision": {
+    "invalidRoute": "BLOCK",
+    "unsafeWeather": "BLOCK_WITHOUT_OVERRIDE",
+    "cautionWeather": "ALLOW_AFTER_USER_CONFIRMATION",
+    "safeWeather": "ALLOW"
+  },
+  "runtimeRule": "The current project release only allows DEMO mode and generates fresh SIMULATED_FIXTURE snapshots from assigned profiles. LIVE/Open-Meteo remains configured but cannot be selected while marked COMING_SOON."
+}
