@@ -1,30 +1,55 @@
 {
   "packageName": "Drone Monitoring Platform Data Pack",
-  "version": "1.0.0",
-  "generatedAt": "2026-09-12T12:00:00Z",
-  "database": "MySQL 8+",
-  "coordinateConvention": {
-    "tableFields": "latitude, longitude",
-    "geojson": "longitude, latitude"
+  "version": "2.0.0",
+  "dataRevision": 1,
+  "buildId": "DRONE-DATA-2.0.0-R1-20260919",
+  "generatedAt": "2026-09-19T10:00:00Z",
+  "compatibility": {
+    "database": "MySQL 8.0+",
+    "coordinateConvention": {
+      "columns": "latitude, longitude",
+      "geojson": "longitude, latitude"
+    },
+    "telemetryIntervalSeconds": 2
   },
   "counts": {
-    "drones": 1,
-    "drone_components": 14,
+    "data_pack_metadata": 1,
+    "drone_models": 1,
+    "drones": 5,
+    "component_catalog": 14,
+    "drone_components": 70,
     "flight_zones": 8,
+    "simulation_scenarios": 9,
+    "drone_scenario_pool": 9,
     "missions": 20,
     "waypoints": 90,
-    "weather_checks": 0,
+    "weather_runtime_config": 1,
+    "weather_demo_profiles": 3,
+    "drone_weather_demo_assignments": 5,
+    "weather_checks": 9,
     "flights": 20,
     "telemetry": 6000,
+    "alert_rule_catalog": 14,
     "alerts": 24
   },
   "importOrder": [
     "01-schema/schema.sql",
-    "02-drone/seed.sql",
-    "03-flight-zones/seed.sql",
+    "01-schema/metadata-seed.sql",
+    "02-fleet/seed.sql",
+    "03-airspace/seed.sql",
+    "06-simulation/seed.sql",
     "04-missions/seed.sql",
-    "05-flights/seed.sql",
-    "06-alerts/seed.sql"
+    "05-weather/seed.sql",
+    "07-flight-operations/seed.sql",
+    "08-alerts/seed.sql"
   ],
-  "weather": "Runtime API snapshots only; no fake production weather rows are seeded."
+  "importantNotes": [
+    "All five drones boot OFFLINE and receive a starting position only when switched ON.",
+    "Drone - 003 propulsion scenario and four-arm position are selected separately; historical seeds cover all four arms.",
+    "DEMO weather is available for the current project; LIVE/Open-Meteo is configured but marked COMING_SOON.",
+    "Weather seed rows are expired SIMULATED_FIXTURE records.",
+    "Flight zones are DEMO_ONLY.",
+    "Health thresholds are project simulation policy."
+  ],
+  "validationPassed": true
 }

@@ -1,0 +1,156 @@
+[
+  {
+    "rule_code": "BATTERY_PERCENT_LOW",
+    "alert_type": "LOW_BATTERY",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "Battery percentage remains at or below the critical project threshold for the required consecutive samples.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "BATTERY_VOLTAGE_LOW",
+    "alert_type": "BATTERY_VOLTAGE_LOW",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "Battery voltage remains at or below the critical project threshold under simulated load.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "BATTERY_OVERHEAT",
+    "alert_type": "BATTERY_OVERHEAT",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "Battery temperature reaches the critical project threshold for consecutive samples.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "MOTOR_OVERHEAT",
+    "alert_type": "MOTOR_OVERHEAT",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "At least one motor temperature reaches the critical project threshold for consecutive samples.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "MOTOR_RPM_ANOMALY",
+    "alert_type": "MOTOR_RPM_ANOMALY",
+    "source": "TELEMETRY",
+    "default_severity": "WARNING",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "One motor RPM deviates from the four-motor median beyond the configured project threshold.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "EXCESSIVE_VIBRATION",
+    "alert_type": "EXCESSIVE_VIBRATION",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "Synthetic airframe vibration exceeds the configured project threshold.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "PROPELLER_DAMAGE_SUSPECTED",
+    "alert_type": "PROPELLER_DAMAGE_SUSPECTED",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "Critical RPM imbalance and vibration occur together; operator inspection is required.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "GPS_LOST",
+    "alert_type": "GPS_LOST",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "GNSS quality remains LOST for the configured consecutive samples.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "COMMUNICATION_LOST",
+    "alert_type": "COMMUNICATION_LOST",
+    "source": "TELEMETRY",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "Control-link signal remains at or below the configured project threshold.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "HEARTBEAT_TIMEOUT",
+    "alert_type": "DRONE_OFFLINE",
+    "source": "SYSTEM",
+    "default_severity": "CRITICAL",
+    "authority": "SYSTEM_LIFECYCLE",
+    "description": "An online or in-flight drone misses the backend heartbeat timeout; deliberate power-off does not trigger this rule.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "MISSION_FAILED",
+    "alert_type": "MISSION_FAILED",
+    "source": "SYSTEM",
+    "default_severity": "CRITICAL",
+    "authority": "SYSTEM_LIFECYCLE",
+    "description": "A flight attempt ends before route completion because of a critical incident.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "RESTRICTED_FLIGHT_ZONE",
+    "alert_type": "RESTRICTED_FLIGHT_ZONE",
+    "source": "ROUTE",
+    "default_severity": "CRITICAL",
+    "authority": "SYSTEM_LIFECYCLE",
+    "description": "Route validation intersects an active restricted polygon or violates the allowed operating boundary.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "UNSAFE_WEATHER",
+    "alert_type": "UNSAFE_WEATHER",
+    "source": "WEATHER",
+    "default_severity": "CRITICAL",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "The worst route weather sample evaluates to UNSAFE and blocks flight creation.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "rule_code": "WEATHER_CAUTION",
+    "alert_type": "WEATHER_CAUTION",
+    "source": "WEATHER",
+    "default_severity": "WARNING",
+    "authority": "PROJECT_SIMULATION_POLICY",
+    "description": "The worst route weather sample evaluates to CAUTION and requires explicit user acknowledgement.",
+    "is_enabled": true,
+    "created_at": "2026-09-19 10:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  }
+]

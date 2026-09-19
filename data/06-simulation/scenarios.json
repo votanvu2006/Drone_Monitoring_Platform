@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "scenario_code": "NORMAL",
+    "name": "Normal flight",
+    "category": "NORMAL",
+    "expected_result": "SUCCESS",
+    "fault_start_progress": null,
+    "fault_end_progress": null,
+    "affected_position": "NONE",
+    "parameters_json": {},
+    "description": "All simulated health metrics remain within the project normal envelope.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 2,
+    "scenario_code": "LOW_BATTERY",
+    "name": "Low battery reserve",
+    "category": "POWER",
+    "expected_result": "RETURN_TO_HOME",
+    "fault_start_progress": 62,
+    "fault_end_progress": 100,
+    "affected_position": "CENTER_REAR",
+    "parameters_json": {
+      "targetEndPercent": 8
+    },
+    "description": "Battery reserve drops through warning and critical thresholds, triggering return-to-home.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 3,
+    "scenario_code": "BATTERY_VOLTAGE_DROP",
+    "name": "Battery voltage sag",
+    "category": "POWER",
+    "expected_result": "FAILED",
+    "fault_start_progress": 52,
+    "fault_end_progress": 100,
+    "affected_position": "CENTER_REAR",
+    "parameters_json": {
+      "warningV": 14,
+      "criticalV": 13.2
+    },
+    "description": "Pack voltage sags abnormally under load even though percentage remains non-zero.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 4,
+    "scenario_code": "BATTERY_OVERHEAT",
+    "name": "Battery overheating",
+    "category": "THERMAL",
+    "expected_result": "RETURN_TO_HOME",
+    "fault_start_progress": 45,
+    "fault_end_progress": 100,
+    "affected_position": "CENTER_REAR",
+    "parameters_json": {
+      "warningC": 50,
+      "criticalC": 60
+    },
+    "description": "Battery temperature rises beyond project warning and critical thresholds.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 5,
+    "scenario_code": "MOTOR_OVERHEAT",
+    "name": "Motor overheating",
+    "category": "THERMAL",
+    "expected_result": "RETURN_TO_HOME",
+    "fault_start_progress": 42,
+    "fault_end_progress": 100,
+    "affected_position": "RUNTIME_SELECTED",
+    "parameters_json": {
+      "allowedPositions": [
+        "FRONT_LEFT",
+        "FRONT_RIGHT",
+        "REAR_LEFT",
+        "REAR_RIGHT"
+      ],
+      "warningC": 70,
+      "criticalC": 80
+    },
+    "description": "One runtime-selected motor temperature rises abnormally and requires an early return.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 6,
+    "scenario_code": "PROPELLER_DAMAGE",
+    "name": "Propeller damage suspected",
+    "category": "PROPULSION",
+    "expected_result": "FAILED",
+    "fault_start_progress": 50,
+    "fault_end_progress": 100,
+    "affected_position": "RUNTIME_SELECTED",
+    "parameters_json": {
+      "allowedPositions": [
+        "FRONT_LEFT",
+        "FRONT_RIGHT",
+        "REAR_LEFT",
+        "REAR_RIGHT"
+      ],
+      "rpmImbalanceWarningPercent": 15,
+      "rpmImbalanceCriticalPercent": 25,
+      "vibrationCriticalG": 2.5
+    },
+    "description": "A runtime-selected arm develops RPM loss plus excessive vibration and is treated as suspected propeller damage.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 7,
+    "scenario_code": "GPS_LOSS",
+    "name": "Temporary GNSS loss",
+    "category": "NAVIGATION",
+    "expected_result": "RETURN_TO_HOME",
+    "fault_start_progress": 48,
+    "fault_end_progress": 61,
+    "affected_position": "TOP_CENTER",
+    "parameters_json": {
+      "lostSamples": 20
+    },
+    "description": "GNSS data becomes unavailable, then recovers before landing.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 8,
+    "scenario_code": "SIGNAL_LOSS",
+    "name": "Temporary communication loss",
+    "category": "COMMUNICATION",
+    "expected_result": "RETURN_TO_HOME",
+    "fault_start_progress": 55,
+    "fault_end_progress": 57,
+    "affected_position": "NONE",
+    "parameters_json": {
+      "lostSamples": 6
+    },
+    "description": "Control-link signal falls to zero for less than the heartbeat-timeout window, then recovers before landing.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  },
+  {
+    "id": 9,
+    "scenario_code": "UNEXPECTED_OFFLINE",
+    "name": "Unexpected heartbeat timeout",
+    "category": "COMMUNICATION",
+    "expected_result": "FAILED",
+    "fault_start_progress": 58,
+    "fault_end_progress": 100,
+    "affected_position": "NONE",
+    "parameters_json": {
+      "heartbeatTimeoutSeconds": 15
+    },
+    "description": "The backend stops receiving heartbeats while the drone is online or in flight; this is different from a user-requested power-off.",
+    "is_enabled": true,
+    "created_at": "2026-07-02 09:00:00",
+    "updated_at": "2026-09-19 10:00:00"
+  }
+]

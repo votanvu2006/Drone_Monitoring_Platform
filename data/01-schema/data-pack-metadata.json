@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "pack_name": "Drone Monitoring Platform Data Pack",
+  "pack_version": "2.0.0",
+  "data_revision": 1,
+  "generated_at": "2026-09-19 10:00:00",
+  "build_id": "DRONE-DATA-2.0.0-R1-20260919",
+  "schema_table_count": 18,
+  "expected_telemetry_rows": 6000,
+  "notes": "Data Pack v2.0 release with five-drone demo coverage, four-arm propulsion faults, deterministic demo weather and import verification."
+}

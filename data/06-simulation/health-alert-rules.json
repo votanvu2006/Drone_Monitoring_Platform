@@ -1,0 +1,219 @@
+{
+  "version": "2.0.0",
+  "disclaimer": "These thresholds are an internal simulation policy for this course project. They are not DJI limits, maintenance instructions, or real-world flight-safety certification.",
+  "sourceReferences": [
+    {
+      "name": "DJI Mavic 3 Enterprise specifications",
+      "url": "https://enterprise.dji.com/mavic-3-enterprise/specs",
+      "usedFor": "Reference battery capacity, voltage, speed, flight-time and wind-resistance envelope."
+    },
+    {
+      "name": "PX4 safety documentation",
+      "url": "https://docs.px4.io/main/en/config/safety#battery-failsafes",
+      "usedFor": "General concepts such as configurable warning/critical battery actions; not the numeric thresholds in this pack."
+    }
+  ],
+  "evaluationIntervalSeconds": 2,
+  "rules": [
+    {
+      "ruleCode": "BATTERY_PERCENT_LOW",
+      "metric": "battery_percent",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Configurable reserve/failsafe concept; numeric values selected for visible demo behavior.",
+      "warning": {
+        "operator": "<=",
+        "value": 20,
+        "consecutiveSamples": 3
+      },
+      "critical": {
+        "operator": "<=",
+        "value": 10,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": ">",
+        "value": 25,
+        "consecutiveSamples": 5
+      },
+      "unit": "%"
+    },
+    {
+      "ruleCode": "BATTERY_VOLTAGE_LOW",
+      "metric": "battery_voltage_v",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Synthetic four-cell pack voltage-sag scenario; not a DJI service threshold.",
+      "warning": {
+        "operator": "<=",
+        "value": 14,
+        "consecutiveSamples": 3
+      },
+      "critical": {
+        "operator": "<=",
+        "value": 13.2,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": ">",
+        "value": 14.4,
+        "consecutiveSamples": 10
+      },
+      "unit": "V"
+    },
+    {
+      "ruleCode": "BATTERY_OVERHEAT",
+      "metric": "battery_temperature_c",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Synthetic thermal scenario for the dashboard.",
+      "warning": {
+        "operator": ">=",
+        "value": 50,
+        "consecutiveSamples": 5
+      },
+      "critical": {
+        "operator": ">=",
+        "value": 60,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": "<",
+        "value": 45,
+        "consecutiveSamples": 10
+      },
+      "unit": "°C"
+    },
+    {
+      "ruleCode": "MOTOR_OVERHEAT",
+      "metric": "max_motor_temperature_c",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Synthetic motor-temperature scenario for the dashboard.",
+      "warning": {
+        "operator": ">=",
+        "value": 70,
+        "consecutiveSamples": 5
+      },
+      "critical": {
+        "operator": ">=",
+        "value": 80,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": "<",
+        "value": 65,
+        "consecutiveSamples": 10
+      },
+      "unit": "°C"
+    },
+    {
+      "ruleCode": "MOTOR_RPM_ANOMALY",
+      "metric": "max_motor_rpm_deviation_from_median_percent",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Relative four-motor comparison chosen for reproducible anomaly detection.",
+      "warning": {
+        "operator": ">=",
+        "value": 15,
+        "consecutiveSamples": 3
+      },
+      "critical": {
+        "operator": ">=",
+        "value": 25,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": "<",
+        "value": 10,
+        "consecutiveSamples": 10
+      },
+      "unit": "%"
+    },
+    {
+      "ruleCode": "EXCESSIVE_VIBRATION",
+      "metric": "vibration_g",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Synthetic vibration signal; not a calibrated airframe limit.",
+      "warning": {
+        "operator": ">=",
+        "value": 1.8,
+        "consecutiveSamples": 3
+      },
+      "critical": {
+        "operator": ">=",
+        "value": 2.5,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": "<",
+        "value": 1.2,
+        "consecutiveSamples": 10
+      },
+      "unit": "g"
+    },
+    {
+      "ruleCode": "PROPELLER_DAMAGE_SUSPECTED",
+      "metric": "composite",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Requires RPM imbalance plus vibration to avoid claiming damage from one signal alone.",
+      "critical": {
+        "all": [
+          "motor RPM deviation >= 25% for 3 samples",
+          "vibration_g >= 2.5 for 3 samples"
+        ]
+      },
+      "recovery": {
+        "manualInspectionRequired": true
+      }
+    },
+    {
+      "ruleCode": "GPS_LOST",
+      "metric": "gps_quality",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Consecutive-sample debounce for simulated GNSS loss.",
+      "critical": {
+        "operator": "=",
+        "value": "LOST",
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": "=",
+        "value": "GOOD",
+        "consecutiveSamples": 5
+      }
+    },
+    {
+      "ruleCode": "COMMUNICATION_LOST",
+      "metric": "signal_percent",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Synthetic signal-strength scenario distinct from heartbeat timeout.",
+      "critical": {
+        "operator": "<=",
+        "value": 5,
+        "consecutiveSamples": 3
+      },
+      "recovery": {
+        "operator": ">=",
+        "value": 30,
+        "consecutiveSamples": 5
+      },
+      "unit": "%"
+    },
+    {
+      "ruleCode": "HEARTBEAT_TIMEOUT",
+      "metric": "heartbeat_age_seconds",
+      "authority": "PROJECT_SIMULATION_POLICY",
+      "basis": "Backend liveness timeout chosen for the demo runtime.",
+      "critical": {
+        "operator": ">=",
+        "value": 15,
+        "consecutiveSamples": 1
+      },
+      "recovery": {
+        "manualReconnectRequired": true
+      },
+      "unit": "s"
+    }
+  ],
+  "lifecycle": {
+    "deduplicationKey": "flight_id + rule_code + ACTIVE",
+    "onTrigger": "Create one ACTIVE alert; update last_observed_at and peak observed_value on repeats.",
+    "onRecovery": "Set RESOLVED and resolved_at. A manual-inspection rule remains ACTIVE until operator action."
+  }
+}
