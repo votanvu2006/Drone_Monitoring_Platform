@@ -13,7 +13,7 @@ async function main(): Promise<void> {
     throw new Error('Could not connect to MySQL. Check database settings and that MySQL is running.');
   }
 
-  const server = createApp().listen(config.port, () => {
+  const server = createApp(database).listen(config.port, () => {
     console.info(`API listening on port ${config.port}`);
   });
 
