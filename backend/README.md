@@ -24,7 +24,9 @@ Copy-Item .env.example .env
 
 Edit `.env` and set `DB_PASSWORD` to the `MYSQL_PASSWORD` configured for the `data/` container. The data pack's sample configuration uses `drone_app` and `drone_monitoring`; if you changed them, update `DB_USER` and `DB_NAME` too. `.env` is ignored by Git.
 
-Run `npm run dev`. Open `http://localhost:3000/api/health`; a running API returns `{ "status": "ok" }`. The server verifies its database connection before listening. If MySQL is unavailable or credentials are wrong, startup exits with a clear error.
+Run `npm run dev`. Open `http://localhost:3000/api/health`; a running API returns `{ "status": "ok" }`. Interactive OpenAPI documentation is available at `http://localhost:3000/api/docs`, with its JSON document at `/api/openapi.json`. The server verifies its database connection before listening. If MySQL is unavailable or credentials are wrong, startup exits with a clear error.
+
+The backend provides airspace validation, fresh DEMO weather checks, a two-second flight simulation loop, and alert lifecycle APIs. Flight creation remains owned by Flight Operations: create a `READY` flight with a scenario selected through `selectScenarioForDrone`, then call `POST /api/flights/{id}/simulation/start`.
 
 ## Checks
 

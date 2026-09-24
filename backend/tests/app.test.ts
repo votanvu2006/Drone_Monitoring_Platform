@@ -22,4 +22,15 @@ describe('API boundary', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: { code: 'INVALID_JSON', message: 'Invalid JSON body' } });
   });
+
+  it('publishes interactive API documentation', async () => {
+    const document = await request(app).get('/api/openapi.json');
+    expect(document.status).toBe(200);
+    expect(document.body.openapi).toBe('3.0.3');
+    expect(document.body.paths['/flights/{id}/simulation/start']).toBeDefined();
+
+    const docs = await request(app).get('/api/docs/');
+    expect(docs.status).toBe(200);
+    expect(docs.type).toContain('html');
+  });
 });

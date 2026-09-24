@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { createApp } from './app';
 import { createDatabase } from './config/database';
 import { readConfig } from './config/env';
+import { SimulationEngine } from './modules/simulation';
 
 async function main(): Promise<void> {
   const config = readConfig(process.env);
@@ -13,11 +14,14 @@ async function main(): Promise<void> {
     throw new Error('Could not connect to MySQL. Check database settings and that MySQL is running.');
   }
 
-  const server = createApp(database).listen(config.port, () => {
+  const simulationEngine = new SimulationEngine(database);
+  await simulationEngine.resumeActiveFlights();
+  const server = createApp(database, simulationEngine).listen(config.port, () => {
     console.info(`API listening on port ${config.port}`);
   });
 
   function shutdown(): void {
+    simulationEngine.shutdown();
     server.close(() => {
       void database.end();
     });
