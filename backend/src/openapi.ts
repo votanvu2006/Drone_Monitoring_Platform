@@ -41,6 +41,18 @@ export const openApiDocument = {
         },
       },
     },
+    '/missions/{missionId}': {
+      get: {
+        tags: ['Mission'],
+        summary: 'Get a mission with its assigned drone and ordered waypoints',
+        parameters: [{ $ref: '#/components/parameters/MissionId' }],
+        responses: {
+          '200': { description: 'Mission details', content: { 'application/json': { schema: { $ref: '#/components/schemas/MissionDetailResponse' } } } },
+          '400': { description: 'Invalid mission ID', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          '404': { description: 'Mission not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
     '/flight-zones': {
       get: { tags: ['Airspace'], summary: 'List active flight zones as GeoJSON', responses: { '200': { description: 'GeoJSON FeatureCollection' } } },
     },
@@ -104,8 +116,61 @@ export const openApiDocument = {
   components: {
     parameters: {
       Id: { name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } },
+      MissionId: { name: 'missionId', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } },
     },
     schemas: {
+      MissionWaypoint: {
+        type: 'object',
+        required: ['id', 'sequenceNumber', 'waypointType', 'latitude', 'longitude', 'altitudeM', 'holdTimeSec'],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          sequenceNumber: { type: 'integer', minimum: 1 },
+          waypointType: { type: 'string', enum: ['START', 'INTERMEDIATE', 'DESTINATION'] },
+          latitude: { type: 'number', minimum: -90, maximum: 90 },
+          longitude: { type: 'number', minimum: -180, maximum: 180 },
+          altitudeM: { type: 'number' },
+          holdTimeSec: { type: 'integer', minimum: 0 },
+        },
+      },
+      MissionDetail: {
+        type: 'object',
+        required: [
+          'id', 'missionCode', 'name', 'description', 'drone', 'status', 'validationStatus',
+          'validationMessage', 'plannedAltitudeM', 'plannedSpeedMps', 'estimatedDistanceM',
+          'estimatedDurationSec', 'progressPercent', 'createdAt', 'updatedAt', 'waypoints',
+        ],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          missionCode: { type: 'string' },
+          name: { type: 'string' },
+          description: { type: 'string', nullable: true },
+          drone: {
+            type: 'object',
+            required: ['id', 'droneCode', 'displayName'],
+            properties: {
+              id: { type: 'integer', format: 'int64' },
+              droneCode: { type: 'string' },
+              displayName: { type: 'string' },
+            },
+          },
+          status: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+          validationStatus: { type: 'string', enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
+          validationMessage: { type: 'string', nullable: true },
+          plannedAltitudeM: { type: 'number' },
+          plannedSpeedMps: { type: 'number' },
+          estimatedDistanceM: { type: 'number', minimum: 0 },
+          estimatedDurationSec: { type: 'integer', minimum: 0 },
+          progressPercent: { type: 'integer', minimum: 0, maximum: 100 },
+          createdAt: { type: 'string', description: 'Stored database DATETIME in YYYY-MM-DD HH:mm:ss format.' },
+          updatedAt: { type: 'string', description: 'Stored database DATETIME in YYYY-MM-DD HH:mm:ss format.' },
+          waypoints: { type: 'array', items: { $ref: '#/components/schemas/MissionWaypoint' } },
+        },
+      },
+      MissionDetailResponse: {
+        type: 'object',
+        required: ['data'],
+        properties: { data: { $ref: '#/components/schemas/MissionDetail' } },
+      },
       MissionListItem: {
         type: 'object',
         required: ['id', 'missionCode', 'name', 'drone', 'status', 'validationStatus', 'progressPercent', 'estimatedDistanceM', 'createdAt'],

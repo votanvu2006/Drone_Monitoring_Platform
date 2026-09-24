@@ -25,6 +25,42 @@ function missionRow(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function missionDetailRow(overrides: Record<string, unknown> = {}) {
+  return {
+    id: '4',
+    mission_code: 'MSN-004',
+    name: 'Riverside Survey',
+    description: null,
+    assigned_drone_id: '1',
+    assigned_drone_code: 'DRONE-001',
+    assigned_drone_display_name: 'Drone - 001',
+    status: 'READY',
+    validation_status: 'VALID',
+    validation_message: 'Route passed validation.',
+    planned_altitude_m: '55.00',
+    planned_speed_mps: '6.20',
+    estimated_distance_m: '1420.33',
+    estimated_duration_sec: 230,
+    progress_percent: 0,
+    created_at: '2026-07-08 08:00:00',
+    updated_at: '2026-09-19 10:00:00',
+    ...overrides,
+  };
+}
+
+function waypointRow(overrides: Record<string, unknown> = {}) {
+  return {
+    id: '11',
+    sequence_number: 1,
+    waypoint_type: 'START',
+    latitude: '10.7769000',
+    longitude: '106.7009000',
+    altitude_m: '55.00',
+    hold_time_sec: 0,
+    ...overrides,
+  };
+}
+
 describe('Missions list API', () => {
   it('documents the list endpoint, filters, and response schema', () => {
     const operation = openApiDocument.paths['/missions'].get;
@@ -126,5 +162,122 @@ describe('Missions list API', () => {
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe('INVALID_ARGUMENT');
     expect(query).not.toHaveBeenCalled();
+  });
+});
+
+describe('Mission detail API', () => {
+  it('documents the detail endpoint and response schema', () => {
+    const operation = openApiDocument.paths['/missions/{missionId}'].get;
+
+    expect(operation.tags).toEqual(['Mission']);
+    expect(operation.parameters).toEqual([{ $ref: '#/components/parameters/MissionId' }]);
+    expect(operation.responses).toHaveProperty('200');
+    expect(operation.responses).toHaveProperty('400');
+    expect(operation.responses).toHaveProperty('404');
+    expect(openApiDocument.components.schemas.MissionDetail.properties.waypoints).toEqual({
+      type: 'array',
+      items: { $ref: '#/components/schemas/MissionWaypoint' },
+    });
+  });
+
+  it('returns stored mission details and waypoints in sequence order', async () => {
+    const query = vi.fn()
+      .mockResolvedValueOnce([[missionDetailRow()], []])
+      .mockResolvedValueOnce([[
+        waypointRow(),
+        waypointRow({
+          id: '12',
+          sequence_number: 2,
+          waypoint_type: 'DESTINATION',
+          latitude: '10.7800000',
+          longitude: '106.6900000',
+          altitude_m: '60.00',
+          hold_time_sec: 15,
+        }),
+      ], []]);
+    const app = createTestApp(query);
+
+    const response = await request(app).get('/api/missions/4');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      data: {
+        id: 4,
+        missionCode: 'MSN-004',
+        name: 'Riverside Survey',
+        description: null,
+        drone: { id: 1, droneCode: 'DRONE-001', displayName: 'Drone - 001' },
+        status: 'READY',
+        validationStatus: 'VALID',
+        validationMessage: 'Route passed validation.',
+        plannedAltitudeM: 55,
+        plannedSpeedMps: 6.2,
+        estimatedDistanceM: 1420.33,
+        estimatedDurationSec: 230,
+        progressPercent: 0,
+        createdAt: '2026-07-08 08:00:00',
+        updatedAt: '2026-09-19 10:00:00',
+        waypoints: [
+          {
+            id: 11,
+            sequenceNumber: 1,
+            waypointType: 'START',
+            latitude: 10.7769,
+            longitude: 106.7009,
+            altitudeM: 55,
+            holdTimeSec: 0,
+          },
+          {
+            id: 12,
+            sequenceNumber: 2,
+            waypointType: 'DESTINATION',
+            latitude: 10.78,
+            longitude: 106.69,
+            altitudeM: 60,
+            holdTimeSec: 15,
+          },
+        ],
+      },
+    });
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(query.mock.calls[0]?.[0]).toContain('FROM missions m');
+    expect(query.mock.calls[0]?.[1]).toEqual([4]);
+    expect(query.mock.calls[1]?.[0]).toContain('ORDER BY sequence_number ASC');
+    expect(query.mock.calls[1]?.[1]).toEqual([4]);
+    expect(query.mock.calls.every(([sql]) => String(sql).trimStart().startsWith('SELECT'))).toBe(true);
+  });
+
+  it('returns an empty waypoint list when a mission has none', async () => {
+    const query = vi.fn()
+      .mockResolvedValueOnce([[missionDetailRow()], []])
+      .mockResolvedValueOnce([[], []]);
+    const app = createTestApp(query);
+
+    const response = await request(app).get('/api/missions/4');
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.waypoints).toEqual([]);
+  });
+
+  it.each(['0', 'not-a-number', '9007199254740992'])('rejects an invalid mission ID: %s', async (missionId) => {
+    const query = vi.fn();
+    const app = createTestApp(query);
+
+    const response = await request(app).get(`/api/missions/${missionId}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe('INVALID_ARGUMENT');
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('returns MISSION_NOT_FOUND without querying waypoints when the mission is absent', async () => {
+    const query = vi.fn().mockResolvedValueOnce([[], []]);
+    const app = createTestApp(query);
+
+    const response = await request(app).get('/api/missions/404');
+
+    expect(response.status).toBe(404);
+    expect(response.body.error.code).toBe('MISSION_NOT_FOUND');
+    expect(query).toHaveBeenCalledTimes(1);
   });
 });
