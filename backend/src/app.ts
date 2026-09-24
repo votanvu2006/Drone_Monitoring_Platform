@@ -1,6 +1,7 @@
 import express from 'express';
 import type { Pool } from 'mysql2/promise';
 import { errorHandler } from './middleware/error-handler';
+import { createAirspaceRouter } from './modules/airspace';
 import { createAlertsRouter } from './modules/alerts';
 import { healthRouter } from './routes/health';
 
@@ -11,6 +12,7 @@ export function createApp(database?: Pool): express.Express {
 
   app.use('/api/health', healthRouter);
   if (database) {
+    app.use('/api', createAirspaceRouter(database));
     app.use('/api/alerts', createAlertsRouter(database));
   }
 
