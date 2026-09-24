@@ -3,11 +3,11 @@ export const openApiDocument = {
   info: {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
-    description: 'Backend APIs for fleet, airspace, demo weather, flight simulation and alert lifecycle management.',
+    description: 'Backend APIs for fleet, mission planning, airspace, demo weather, flight simulation and alert lifecycle management.',
   },
   servers: [{ url: '/api' }],
   tags: [
-    { name: 'Fleet' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
+    { name: 'Fleet' }, { name: 'Mission' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
   ],
   paths: {
     '/drones': {
@@ -22,6 +22,22 @@ export const openApiDocument = {
         responses: {
           '200': { description: 'Paginated drone list', content: { 'application/json': { schema: { $ref: '#/components/schemas/DroneListResponse' } } } },
           '400': { description: 'Invalid pagination or status filter', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+    '/missions': {
+      get: {
+        tags: ['Mission'],
+        summary: 'List missions with pagination and optional drone and status filters',
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
+          { name: 'droneId', in: 'query', schema: { type: 'integer', minimum: 1 } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] } },
+        ],
+        responses: {
+          '200': { description: 'Paginated mission list', content: { 'application/json': { schema: { $ref: '#/components/schemas/MissionListResponse' } } } },
+          '400': { description: 'Invalid pagination or filter', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
         },
       },
     },
@@ -90,6 +106,39 @@ export const openApiDocument = {
       Id: { name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } },
     },
     schemas: {
+      MissionListItem: {
+        type: 'object',
+        required: ['id', 'missionCode', 'name', 'drone', 'status', 'validationStatus', 'progressPercent', 'estimatedDistanceM', 'createdAt'],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          missionCode: { type: 'string' },
+          name: { type: 'string' },
+          drone: {
+            type: 'object',
+            required: ['id', 'droneCode', 'displayName'],
+            properties: {
+              id: { type: 'integer', format: 'int64' },
+              droneCode: { type: 'string' },
+              displayName: { type: 'string' },
+            },
+          },
+          status: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+          validationStatus: { type: 'string', enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
+          progressPercent: { type: 'integer', minimum: 0, maximum: 100 },
+          estimatedDistanceM: { type: 'number', minimum: 0 },
+          createdAt: { type: 'string', description: 'Stored database DATETIME in YYYY-MM-DD HH:mm:ss format.' },
+        },
+      },
+      MissionListResponse: {
+        type: 'object',
+        required: ['data', 'page', 'pageSize', 'total'],
+        properties: {
+          data: { type: 'array', items: { $ref: '#/components/schemas/MissionListItem' } },
+          page: { type: 'integer' },
+          pageSize: { type: 'integer' },
+          total: { type: 'integer' },
+        },
+      },
       HomeLocation: {
         type: 'object', required: ['label', 'latitude', 'longitude'],
         properties: {

@@ -5,6 +5,7 @@ import { errorHandler } from './middleware/error-handler';
 import { createAirspaceRouter } from './modules/airspace';
 import { createAlertsRouter } from './modules/alerts';
 import { createFleetRouter } from './modules/fleet';
+import { createMissionsRouter } from './modules/missions';
 import { createWeatherRouter } from './modules/weather';
 import { SimulationEngine } from './modules/simulation';
 import { openApiDocument } from './openapi';
@@ -21,6 +22,7 @@ export function createApp(database?: Pool, simulationEngine?: SimulationEngine):
   if (database) {
     app.use('/api', createAirspaceRouter(database));
     app.use('/api', createFleetRouter(database));
+    app.use('/api', createMissionsRouter(database));
     app.use('/api', createWeatherRouter(database));
     app.use('/api/alerts', createAlertsRouter(database));
     app.use('/api', (simulationEngine ?? new SimulationEngine(database)).router());
