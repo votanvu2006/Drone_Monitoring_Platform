@@ -3,13 +3,28 @@ export const openApiDocument = {
   info: {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
-    description: 'Backend APIs for airspace, demo weather, flight simulation and alert lifecycle management.',
+    description: 'Backend APIs for fleet, airspace, demo weather, flight simulation and alert lifecycle management.',
   },
   servers: [{ url: '/api' }],
   tags: [
-    { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
+    { name: 'Fleet' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
   ],
   paths: {
+    '/drones': {
+      get: {
+        tags: ['Fleet'],
+        summary: 'List drones with pagination and an optional status filter',
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['AVAILABLE', 'IN_FLIGHT', 'MAINTENANCE', 'OFFLINE'] } },
+        ],
+        responses: {
+          '200': { description: 'Paginated drone list', content: { 'application/json': { schema: { $ref: '#/components/schemas/DroneListResponse' } } } },
+          '400': { description: 'Invalid pagination or status filter', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
     '/flight-zones': {
       get: { tags: ['Airspace'], summary: 'List active flight zones as GeoJSON', responses: { '200': { description: 'GeoJSON FeatureCollection' } } },
     },
@@ -75,6 +90,49 @@ export const openApiDocument = {
       Id: { name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } },
     },
     schemas: {
+      HomeLocation: {
+        type: 'object', required: ['label', 'latitude', 'longitude'],
+        properties: {
+          label: { type: 'string' },
+          latitude: { type: 'number' },
+          longitude: { type: 'number' },
+        },
+      },
+      LastKnownLocation: {
+        type: 'object', nullable: true,
+        required: ['label', 'latitude', 'longitude', 'altitudeM', 'source', 'updatedAt'],
+        properties: {
+          label: { type: 'string', nullable: true },
+          latitude: { type: 'number' },
+          longitude: { type: 'number' },
+          altitudeM: { type: 'number', nullable: true },
+          source: { type: 'string', enum: ['BROWSER_GEOLOCATION', 'DEVICE_GPS', 'FLIGHT_TELEMETRY', 'HOME_BASE', 'MANUAL', 'UNKNOWN'] },
+          updatedAt: { type: 'string', format: 'date-time', nullable: true },
+        },
+      },
+      DroneListItem: {
+        type: 'object', required: ['id', 'droneCode', 'displayName', 'status', 'isSimulated', 'model', 'homeLocation', 'lastKnownLocation'],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          droneCode: { type: 'string' },
+          displayName: { type: 'string' },
+          status: { type: 'string', enum: ['AVAILABLE', 'IN_FLIGHT', 'MAINTENANCE', 'OFFLINE'] },
+          isSimulated: { type: 'boolean' },
+          model: {
+            type: 'object', required: ['modelCode', 'manufacturer', 'modelName'],
+            properties: { modelCode: { type: 'string' }, manufacturer: { type: 'string' }, modelName: { type: 'string' } },
+          },
+          homeLocation: { $ref: '#/components/schemas/HomeLocation' },
+          lastKnownLocation: { $ref: '#/components/schemas/LastKnownLocation' },
+        },
+      },
+      DroneListResponse: {
+        type: 'object', required: ['data', 'page', 'pageSize', 'total'],
+        properties: {
+          data: { type: 'array', items: { $ref: '#/components/schemas/DroneListItem' } },
+          page: { type: 'integer' }, pageSize: { type: 'integer' }, total: { type: 'integer' },
+        },
+      },
       ResolveAlert: {
         type: 'object', required: ['resolutionNote'],
         properties: {
