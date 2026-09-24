@@ -29,6 +29,7 @@ describe('API boundary', () => {
     expect(document.body.openapi).toBe('3.0.3');
     expect(document.body.paths['/drones']).toBeDefined();
     expect(document.body.paths['/missions']).toBeDefined();
+    expect(document.body.paths['/missions/{missionId}']).toBeDefined();
     expect(document.body.paths['/flights/{id}/simulation/start']).toBeDefined();
 
     const docs = await request(app).get('/api/docs/');
