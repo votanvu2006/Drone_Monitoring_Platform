@@ -39,6 +39,20 @@ npm test
 npm run build
 ```
 
+`npm test` runs the unit tests and does not require MySQL. To run the MySQL-backed integration tests, first make sure the v2.0.0 data-pack database is available. From the repository root, start it with:
+
+```powershell
+docker compose -f data/docker-compose.yml up -d --wait
+```
+
+Then, from `backend/`, run:
+
+```powershell
+npm run test:integration
+```
+
+The integration tests load the database settings from `.env`, check the data-pack build ID and Fleet seed count, and read the seeded drone list through the API. They do not modify the seed data or reset/delete the MySQL volume. If the precondition check fails, confirm the configured database before changing or resetting any local data.
+
 `npm start` runs the compiled `dist/server.js` after building. Unknown routes return `404` with `{ "error": { "code": "NOT_FOUND", "message": "Route not found" } }`. Malformed JSON returns `400` with code `INVALID_JSON`. Unhandled failures return `500` with code `INTERNAL_ERROR`.
 
 `/api/health` checks whether the API process is responding. It is not a database health report; the database is checked during startup.
