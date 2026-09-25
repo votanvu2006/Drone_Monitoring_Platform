@@ -7,7 +7,7 @@ export const openApiDocument = {
   },
   servers: [{ url: '/api' }],
   tags: [
-    { name: 'Fleet' }, { name: 'Mission' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
+    { name: 'Fleet' }, { name: 'Mission' }, { name: 'Flight Operations' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
   ],
   paths: {
     '/drones': {
@@ -50,6 +50,24 @@ export const openApiDocument = {
           '200': { description: 'Mission details', content: { 'application/json': { schema: { $ref: '#/components/schemas/MissionDetailResponse' } } } },
           '400': { description: 'Invalid mission ID', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
           '404': { description: 'Mission not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+    '/flights': {
+      get: {
+        tags: ['Flight Operations'],
+        summary: 'List flight attempts with pagination and optional filters',
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
+          { name: 'droneId', in: 'query', schema: { type: 'integer', minimum: 1 } },
+          { name: 'missionId', in: 'query', schema: { type: 'integer', minimum: 1 } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['READY', 'FLYING', 'PAUSED', 'RETURNING', 'LANDED', 'ABORTED'] } },
+          { name: 'result', in: 'query', schema: { type: 'string', enum: ['SUCCESS', 'RETURNED_SAFELY', 'FAILED'] } },
+        ],
+        responses: {
+          '200': { description: 'Paginated flight list', content: { 'application/json': { schema: { $ref: '#/components/schemas/FlightListResponse' } } } },
+          '400': { description: 'Invalid pagination or filter', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
         },
       },
     },
@@ -119,6 +137,60 @@ export const openApiDocument = {
       MissionId: { name: 'missionId', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } },
     },
     schemas: {
+      FlightDroneSummary: {
+        type: 'object',
+        required: ['id', 'droneCode', 'displayName'],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          droneCode: { type: 'string' },
+          displayName: { type: 'string' },
+        },
+      },
+      FlightMissionSummary: {
+        type: 'object',
+        required: ['id', 'missionCode', 'name'],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          missionCode: { type: 'string' },
+          name: { type: 'string' },
+        },
+      },
+      FlightListItem: {
+        type: 'object',
+        required: [
+          'id', 'flightCode', 'status', 'result', 'drone', 'mission', 'scenarioCode',
+          'startedAt', 'endedAt', 'durationSec', 'distanceM',
+        ],
+        properties: {
+          id: { type: 'integer', format: 'int64' },
+          flightCode: { type: 'string' },
+          status: { type: 'string', enum: ['READY', 'FLYING', 'PAUSED', 'RETURNING', 'LANDED', 'ABORTED'] },
+          result: { type: 'string', enum: ['SUCCESS', 'RETURNED_SAFELY', 'FAILED'], nullable: true },
+          drone: { $ref: '#/components/schemas/FlightDroneSummary' },
+          mission: { $ref: '#/components/schemas/FlightMissionSummary' },
+          scenarioCode: { type: 'string' },
+          startedAt: {
+            type: 'string', nullable: true,
+            description: 'Stored database DATETIME(3) in YYYY-MM-DD HH:mm:ss.ffffff format; no timezone is implied.',
+          },
+          endedAt: {
+            type: 'string', nullable: true,
+            description: 'Stored database DATETIME(3) in YYYY-MM-DD HH:mm:ss.ffffff format; no timezone is implied.',
+          },
+          durationSec: { type: 'integer', minimum: 0 },
+          distanceM: { type: 'number', minimum: 0 },
+        },
+      },
+      FlightListResponse: {
+        type: 'object',
+        required: ['data', 'page', 'pageSize', 'total'],
+        properties: {
+          data: { type: 'array', items: { $ref: '#/components/schemas/FlightListItem' } },
+          page: { type: 'integer' },
+          pageSize: { type: 'integer' },
+          total: { type: 'integer' },
+        },
+      },
       MissionWaypoint: {
         type: 'object',
         required: ['id', 'sequenceNumber', 'waypointType', 'latitude', 'longitude', 'altitudeM', 'holdTimeSec'],
