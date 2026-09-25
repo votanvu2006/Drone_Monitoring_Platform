@@ -39,5 +39,20 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Start MySQL with the v2.0.0 data pack
+        run: docker compose -f ../data/docker-compose.yml up --detach --wait --wait-timeout 120
+
+      - name: Run data-pack verification queries
+        run: docker compose -f ../data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --user=root' < ../data/database/verify-import.sql
+
+      - name: MySQL integration tests
+        run: npm run test:integration
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: drone_monitoring
+          DB_USER: drone_app
+          DB_PASSWORD: drone_app_password
+
       - name: Build
         run: npm run build
