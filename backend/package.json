@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "test": "vitest run --exclude=tests/integration/**",
     "test:integration": "vitest run --dir tests/integration",
+    "wait:data-pack": "node scripts/wait-for-data-pack.mjs",
     "build": "tsc"
   },
   "dependencies": {
