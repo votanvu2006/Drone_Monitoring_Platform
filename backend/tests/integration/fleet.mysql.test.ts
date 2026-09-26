@@ -2,20 +2,20 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../src/app';
 import {
-  assertV2FleetDataPack,
-  closeIntegrationDatabase,
-  integrationDatabase,
+  assertV2DataPack,
+  createIntegrationDatabase,
 } from './support/database';
 
+const integrationDatabase = createIntegrationDatabase();
 const app = createApp(integrationDatabase);
 
 describe('Fleet MySQL integration', () => {
   beforeAll(async () => {
-    await assertV2FleetDataPack();
+    await assertV2DataPack(integrationDatabase);
   });
 
   afterAll(async () => {
-    await closeIntegrationDatabase();
+    await integrationDatabase.end();
   });
 
   it('reads the v2.0.0 seeded drones through the paginated API', async () => {
