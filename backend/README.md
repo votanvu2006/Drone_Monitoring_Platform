@@ -48,10 +48,11 @@ docker compose -f data/docker-compose.yml up -d --wait
 Then, from `backend/`, run:
 
 ```powershell
+npm run wait:data-pack
 npm run test:integration
 ```
 
-The integration tests load the database settings from `.env`, check the data-pack build ID and Fleet seed count, and read the seeded drone list through the API. They do not modify the seed data or reset/delete the MySQL volume. If the precondition check fails, confirm the configured database before changing or resetting any local data.
+`wait:data-pack` waits for the v2.0.0 build ID and expected seed counts before the tests run. This matters with a fresh database volume: MySQL may respond before the data-pack initialization script has finished. The command does not modify seed data or reset/delete the MySQL volume. The integration tests then load database settings from `.env`, check the Fleet baseline, and read the seeded drone list through the API. If the readiness check times out, inspect the configured database before changing or resetting any local data.
 
 `npm start` runs the compiled `dist/server.js` after building. Unknown routes return `404` with `{ "error": { "code": "NOT_FOUND", "message": "Route not found" } }`. Malformed JSON returns `400` with code `INVALID_JSON`. Unhandled failures return `500` with code `INTERNAL_ERROR`.
 

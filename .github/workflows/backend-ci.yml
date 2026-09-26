@@ -40,7 +40,17 @@ jobs:
         run: npm test
 
       - name: Start MySQL with the v2.0.0 data pack
+        id: mysql
         run: docker compose -f ../data/docker-compose.yml up --detach --wait --wait-timeout 120
+
+      - name: Wait for the v2.0.0 data-pack import
+        run: npm run wait:data-pack
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: drone_monitoring
+          DB_USER: drone_app
+          DB_PASSWORD: drone_app_password
 
       - name: Run data-pack verification queries
         run: docker compose -f ../data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --user=root' < ../data/database/verify-import.sql
@@ -56,3 +66,7 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Show MySQL logs after backend failure
+        if: failure() && steps.mysql.outcome != 'skipped'
+        run: docker compose -f ../data/docker-compose.yml logs --no-color mysql || true
