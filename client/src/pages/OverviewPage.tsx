@@ -34,7 +34,10 @@ export function OverviewPage() {
     return { drones: drones.data, flights: flights.data, alerts: alerts.data, alertCount: alerts.total, criticalAlertCount: criticalAlerts.total, readyMissionCount: readyMissions.total };
   }, []);
   const { data, error, loading, refresh } = usePolling(load, 15_000);
-  const drone = data?.drones[0];
+  const drones = data?.drones ?? [];
+  const availableAircraft = drones.filter((drone) => drone.status === 'AVAILABLE').length;
+  const aircraftInFlight = drones.filter((drone) => drone.status === 'IN_FLIGHT').length;
+  const unavailableAircraft = drones.filter((drone) => ['MAINTENANCE', 'OFFLINE'].includes(drone.status)).length;
   const activeFlight = data?.flights.find((flight) => ['FLYING', 'PAUSED', 'RETURNING'].includes(flight.status));
   const availableMissions = data?.readyMissionCount ?? 0;
   const criticalAlerts = data?.criticalAlertCount ?? 0;
@@ -44,12 +47,12 @@ export function OverviewPage() {
     {error && <ErrorState message={error.message} onRetry={refresh} />}
     {loading && !data ? <LoadingState label="Connecting to fleet API" /> : <>
       <section className="hero-panel">
-        <div className="hero-copy"><div className="hero-kicker"><span className="hero-kicker-line" /> YOUR FLEET · LIVE OVERVIEW</div><h2>{drone?.displayName || 'Fleet overview'}<br /><em>ready for flight.</em></h2><p>{drone ? `${drone.model.manufacturer} ${drone.model.modelName} · ${drone.droneCode}` : 'Live operations, clearly in view.'}</p><div className="hero-actions"><Link className="button primary" to="/drones">View drone <ArrowRight size={16} /></Link><Link className="button ghost" to="/live-flight">Open live flight <ArrowUpRight size={15} /></Link></div><div className="hero-status">{drone && <StatusBadge value={drone.status} />}{drone?.isSimulated && <span className="demo-chip">SIMULATED AIRCRAFT</span>}</div></div>
-        <div className="hero-art"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-coordinate">{drone ? <>HOME BASE<br />{drone.homeLocation.latitude.toFixed(4)}, {drone.homeLocation.longitude.toFixed(4)}</> : <>LOCATION<br />AWAITING API</>}</div><DroneMark /><div className="art-tag"><span className="pulse" /> FLEET API CONNECTED</div></div>
-        <div className="hero-index">Nº 001 <span>QUADCOPTER</span></div>
+        <div className="hero-copy"><div className="hero-kicker"><span className="hero-kicker-line" /> YOUR FLEET · LIVE OVERVIEW</div><h2>Fleet overview<br /><em>operations, in focus.</em></h2><p>{drones.length} aircraft · {availableAircraft} available · {aircraftInFlight} in flight · {unavailableAircraft} maintenance or offline</p><div className="hero-actions"><Link className="button primary" to="/drones">View fleet <ArrowRight size={16} /></Link><Link className="button ghost" to="/live-flight">Open live flight <ArrowUpRight size={15} /></Link></div><div className="hero-status"><span className="demo-chip">LIVE FLEET STATUS</span></div></div>
+        <div className="hero-art"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-coordinate">FLEET<br />{drones.length} AIRCRAFT</div><DroneMark /><div className="art-tag"><span className="pulse" /> FLEET API CONNECTED</div></div>
+        <div className="hero-index">Nº {String(drones.length).padStart(3, '0')} <span>AIRCRAFT</span></div>
       </section>
       <div className="metric-grid overview-metrics">
-        <MetricCard label="AIRCRAFT STATUS" value={drone ? drone.status.replace('_', ' ') : '—'} icon={<Plane size={17} />} tone="green" detail={drone?.model.modelCode || 'Fleet endpoint'} />
+        <MetricCard label="AIRCRAFT IN FLEET" value={drones.length} icon={<Plane size={17} />} tone="green" detail={`${availableAircraft} available · ${aircraftInFlight} in flight · ${unavailableAircraft} maintenance/offline`} />
         <MetricCard label="ACTIVE FLIGHT" value={activeFlight?.flightCode || 'None'} icon={<Wind size={17} />} tone="blue" detail={activeFlight ? activeFlight.status : 'No active simulation'} />
         <MetricCard label="READY MISSIONS" value={availableMissions} icon={<Route size={17} />} tone="amber" detail="Validated missions" />
         <MetricCard label="ACTIVE ALERTS" value={data?.alertCount ?? '—'} icon={<ShieldAlert size={17} />} tone={criticalAlerts ? 'red' : 'green'} detail={criticalAlerts ? `${criticalAlerts} critical · review now` : 'No critical alerts'} />

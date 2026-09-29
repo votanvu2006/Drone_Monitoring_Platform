@@ -12,9 +12,9 @@ export function MissionDetailPage() {
   const { missionId = '' } = useParams();
   const id = Number(missionId);
   const loadMission = useCallback(() => api.mission(id), [id]);
-  const loadZones = useCallback(() => api.zones(), []);
+  const loadZones = useCallback(async () => (await api.zones()).features, []);
   const missionResource = usePolling<MissionDetail>(loadMission);
-  const zoneResource = usePolling<FlightZone[]>(async () => (await loadZones()).features);
+  const zoneResource = usePolling<FlightZone[]>(loadZones);
   const [weather, setWeather] = useState<WeatherCheck | null>(null);
   const [busy, setBusy] = useState<'validate' | 'weather' | null>(null);
   const [actionError, setActionError] = useState('');

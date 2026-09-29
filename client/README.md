@@ -26,11 +26,11 @@ npm run build
 ## API-backed screens
 
 - Overview: fleet, mission, flight, active-alert and health endpoints.
-- Aircraft: fleet identity and last-known position. Component-level health is not shown because there is no component-list endpoint yet.
-- Live flight: `/api/flights` and `/api/flights/:id/simulation/status`, polled every two seconds. Its route and flight trail are drawn over active flight zones. Trail samples are held only in the current browser session because the API exposes only the latest telemetry sample.
+- Aircraft: paginated fleet identity and last-known positions for every backend aircraft. Component-level health is not shown because there is no component-list endpoint yet.
+- Live flight: paginated `/api/flights` sessions, optionally filtered by aircraft, and `/api/flights/:id/simulation/status`, polled every two seconds. Only valid GPS fixes update the map; the last valid fix is retained during GPS loss. Trail samples are held only in the current browser session because the API exposes only the latest telemetry sample.
 - Missions: persisted mission detail, route validation, weather check and active flight zones. Creation/editing are not exposed by the current API.
 - Alerts: filtering and alert resolution, including the required component-health result for propeller inspections.
-- Flight history: persisted flight list and result filters. Historical replay and export are not exposed by the current API.
+- Flight history: all paginated `LANDED` and `ABORTED` records, combined with aircraft and result filters. Historical replay and export are not exposed by the current API.
 
 The start action can start an existing `READY` simulation flight. It does not create a flight. A `CAUTION` weather result remains blocked unless the backend already records an acknowledgement; the current API has no endpoint to submit that acknowledgement. Backend conflicts are shown as returned instead of bypassed.
 

@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, ArrowRight, BatteryCharging, CircleStop, Gauge, Navigation, Play, Radio, ShieldCheck, Signal } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { MapView } from '../components/MapView';
-import { EmptyState, ErrorState, LoadingState, MetricCard, PageHeading, Panel, StatusBadge } from '../components/ui';
+import { EmptyState, ErrorState, LoadingState, MetricCard, PageHeading, Pagination, Panel, StatusBadge } from '../components/ui';
 import { usePolling } from '../hooks/usePolling';
 import { api, errorMessage } from '../lib/api';
 import { formatDate, formatDuration } from '../lib/format';
-import type { FlightZone, MissionDetail, SimulationStatus, Telemetry } from '../types/api';
+import { flightDurationSeconds, hasValidPosition } from './liveFlightLogic';
+import type { Drone, Flight, FlightZone, MissionDetail, SimulationStatus, Telemetry } from '../types/api';
+
+const sessionPageSize = 20;
 
 type ChartMetric = 'battery_percent' | 'speed_mps' | 'altitude_m';
 const chartOptions: { key: ChartMetric; label: string; unit: string; color: string }[] = [
@@ -27,45 +30,62 @@ function TelemetryChart({ samples, metric, onMetric }: { samples: Telemetry[]; m
 }
 
 export function LiveFlightPage() {
-  const loadFlights = useCallback(() => api.flights({ page: 1, pageSize: 100 }), []);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawDroneId = Number(searchParams.get('droneId'));
+  const selectedDroneId = Number.isSafeInteger(rawDroneId) && rawDroneId > 0 ? rawDroneId : null;
+  const [flightsPage, setFlightsPage] = useState(1);
+  const loadFlights = useCallback(() => api.flights({ page: flightsPage, pageSize: sessionPageSize, ...(selectedDroneId ? { droneId: selectedDroneId } : {}) }), [flightsPage, selectedDroneId]);
   const flightsResource = usePolling(loadFlights, 15_000);
-  const [selectedFlightId, setSelectedFlightId] = useState<number | null>(null);
+  const loadDrones = useCallback(() => api.drones({ page: 1, pageSize: 100 }), []);
+  const dronesResource = usePolling(loadDrones, 60_000);
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  const selectedFlightId = selectedFlight?.id ?? null;
   const [trail, setTrail] = useState<[number, number][]>([]);
   const [samples, setSamples] = useState<Telemetry[]>([]);
+  const [lastValidPosition, setLastValidPosition] = useState<{ flightId: number; latitude: number; longitude: number; heading: number } | null>(null);
   const [metric, setMetric] = useState<ChartMetric>('battery_percent');
   const [actionBusy, setActionBusy] = useState(false);
   const [actionError, setActionError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const flights = useMemo(() => flightsResource.data?.data ?? [], [flightsResource.data]);
+  const flights = useMemo(() => {
+    if (flightsResource.data?.page !== flightsPage) return [];
+    return flightsResource.data.data.filter((flight) => selectedDroneId == null || flight.drone.id === selectedDroneId);
+  }, [flightsResource.data, flightsPage, selectedDroneId]);
   useEffect(() => {
-    if (!flights.length) { setSelectedFlightId(null); return; }
-    const selectedExists = selectedFlightId != null && flights.some((flight) => flight.id === selectedFlightId);
-    if (!selectedExists) {
-      const candidate = flights.find((flight) => ['FLYING', 'PAUSED', 'RETURNING'].includes(flight.status))
-        || flights.find((flight) => flight.status === 'READY');
-      setSelectedFlightId(candidate?.id ?? null);
+    if (selectedFlight || !flights.length) return;
+    const candidate = flights.find((flight) => ['FLYING', 'PAUSED', 'RETURNING'].includes(flight.status))
+      || flights.find((flight) => flight.status === 'READY')
+      || flights[0];
+    if (candidate) setSelectedFlight(candidate);
+  }, [flights, selectedFlight]);
+  useEffect(() => {
+    if (selectedDroneId != null && selectedFlight && selectedFlight.drone.id !== selectedDroneId) {
+      setSelectedFlight(null);
+      setFlightsPage(1);
     }
-  }, [flights, selectedFlightId]);
+  }, [selectedDroneId, selectedFlight]);
 
   const loadStatus = useCallback(() => selectedFlightId == null ? Promise.resolve(null) : api.simulationStatus(selectedFlightId), [selectedFlightId]);
   const statusResource = usePolling<SimulationStatus | null>(loadStatus, selectedFlightId == null ? 0 : 2_000);
   const status = statusResource.data?.flight.id === selectedFlightId ? statusResource.data : null;
-  const flight = flights.find((item) => item.id === selectedFlightId) ?? null;
+  const flight = flights.find((item) => item.id === selectedFlightId) ?? selectedFlight;
   const missionId = status?.flight.mission_id ?? flight?.mission.id;
   const loadMission = useCallback(() => missionId == null ? Promise.resolve(null) : api.mission(missionId), [missionId]);
   const missionResource = usePolling<MissionDetail | null>(loadMission);
   const loadZones = useCallback(async () => (await api.zones()).features, []);
   const zonesResource = usePolling<FlightZone[]>(loadZones);
 
-  useEffect(() => { setTrail([]); setSamples([]); setActionError(''); setNotice(''); }, [selectedFlightId]);
+  useEffect(() => { setTrail([]); setSamples([]); setLastValidPosition(null); setActionError(''); setNotice(''); }, [selectedFlightId]);
   useEffect(() => {
     const telemetry = status?.latestTelemetry;
-    if (!telemetry || !Number.isFinite(Number(telemetry.latitude)) || !Number.isFinite(Number(telemetry.longitude))) return;
+    if (!telemetry) return;
+    setSamples((current) => current.at(-1)?.sequence_number === telemetry.sequence_number ? current : [...current, telemetry].slice(-60));
+    if (!hasValidPosition(telemetry)) return;
     const point: [number, number] = [telemetry.latitude, telemetry.longitude];
     setTrail((current) => current.at(-1)?.[0] === point[0] && current.at(-1)?.[1] === point[1] ? current : [...current, point].slice(-120));
-    setSamples((current) => current.at(-1)?.sequence_number === telemetry.sequence_number ? current : [...current, telemetry].slice(-60));
-  }, [status?.latestTelemetry]);
+    if (selectedFlightId != null) setLastValidPosition({ flightId: selectedFlightId, latitude: telemetry.latitude, longitude: telemetry.longitude, heading: telemetry.heading_deg });
+  }, [status?.latestTelemetry, selectedFlightId]);
 
   const visibleFlight = status?.flight ?? null;
   const currentTelemetry = status?.latestTelemetry ?? null;
@@ -87,17 +107,36 @@ export function LiveFlightPage() {
     finally { setActionBusy(false); }
   };
 
-  const duration = visibleFlight?.started_at ? Math.max(0, Math.floor((Date.now() - new Date(visibleFlight.started_at.replace(' ', 'T') + (visibleFlight.started_at.includes('Z') ? '' : 'Z')).getTime()) / 1000)) : flight?.durationSec ?? 0;
+  const duration = visibleFlight ? flightDurationSeconds(visibleFlight) : flightDurationSeconds(flight);
+  const mapPosition = lastValidPosition?.flightId === selectedFlightId ? lastValidPosition : null;
+
+  const changeAircraft = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setFlightsPage(1);
+    setSelectedFlight(null);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (value) next.set('droneId', value);
+      else next.delete('droneId');
+      return next;
+    });
+  };
+  const chooseFlight = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = Number(event.target.value);
+    const choice = flights.find((item) => item.id === id);
+    if (choice) setSelectedFlight(choice);
+  };
 
   return <>
     <PageHeading eyebrow="LIVE OPERATIONS" title="Live flight" description="Simulation state and latest telemetry polled directly from the operations API." action={<div className="live-poll"><span className="pulse" /> 2 SEC POLLING</div>} />
     {flightsResource.error && <ErrorState message={flightsResource.error.message} onRetry={flightsResource.refresh} />}
-    {flightsResource.loading && !flightsResource.data ? <LoadingState label="Finding an active or ready flight" /> : !selectedFlightId ? <EmptyState title="No flight ready to monitor" description="Create or seed a READY flight using the backend workflow. The frontend does not create flight attempts." action={<Link className="button secondary" to="/missions">Review missions <ArrowRight size={15} /></Link>} /> : <>
-      <section className="live-flight-banner"><div className="live-flight-id"><span className="live-flight-icon"><Navigation size={18} /></span><div><span className="eyebrow">FLIGHT SESSION</span><b>{flight?.flightCode || `Flight #${selectedFlightId}`}</b><small>{flight?.mission.name || `Mission #${missionId || '—'}`} · {flight?.drone.displayName || `Drone #${visibleFlight?.drone_id || '—'}`}</small></div></div><div className="flight-select-wrap"><label htmlFor="flight-select">MONITOR SESSION</label><select id="flight-select" className="select-field" value={selectedFlightId} onChange={(event) => setSelectedFlightId(Number(event.target.value))}>{flights.map((item) => <option value={item.id} key={item.id}>{item.flightCode} · {item.status}</option>)}</select></div><div className="live-flight-state">{visibleFlight && <StatusBadge value={visibleFlight.status} />}<span className="flight-time"><Activity size={14} />{formatDuration(duration)}</span></div><div className="live-flight-actions">{visibleFlight?.status === 'READY' && <button className="button primary" disabled={!canStart || actionBusy} onClick={() => void runSimulationAction('start')}><Play size={15} />{actionBusy ? 'Starting…' : 'Start simulation'}</button>}{active && <button className="button danger" disabled={actionBusy} onClick={() => void runSimulationAction('stop')}><CircleStop size={15} />{actionBusy ? 'Stopping…' : 'Stop simulation'}</button>}{cautionBlocked && <span className="launch-warning">Weather CAUTION · acknowledgement unavailable</span>}{unsafe && <span className="launch-warning">UNSAFE weather blocks launch</span>}</div></section>
+    {flightsResource.loading && !selectedFlightId ? <LoadingState label="Loading flight sessions" /> : !selectedFlightId ? <EmptyState title="No flight sessions found" description={selectedDroneId ? 'This aircraft has no flight attempts to monitor.' : 'Create or seed a flight using the backend workflow. The frontend does not create flight attempts.'} action={<Link className="button secondary" to="/missions">Review missions <ArrowRight size={15} /></Link>} /> : <>
+      <section className="live-flight-banner"><div className="live-flight-id"><span className="live-flight-icon"><Navigation size={18} /></span><div><span className="eyebrow">FLIGHT SESSION</span><b>{flight?.flightCode || `Flight #${selectedFlightId}`}</b><small>{flight?.mission.name || `Mission #${missionId || '—'}`} · {flight?.drone.displayName || `Drone #${visibleFlight?.drone_id || '—'}`}</small></div></div><div className="flight-select-wrap"><label htmlFor="aircraft-select">AIRCRAFT</label><select id="aircraft-select" className="select-field" value={selectedDroneId ?? ''} onChange={changeAircraft}><option value="">All aircraft</option>{selectedFlight && !dronesResource.data?.data.some((drone) => drone.id === selectedFlight.drone.id) && <option value={selectedFlight.drone.id}>{selectedFlight.drone.displayName}</option>}{(dronesResource.data?.data ?? []).map((drone: Drone) => <option value={drone.id} key={drone.id}>{drone.displayName}</option>)}</select></div><div className="flight-select-wrap"><label htmlFor="flight-select">MONITOR SESSION</label><select id="flight-select" className="select-field" value={selectedFlightId} onChange={chooseFlight}>{selectedFlight && !flights.some((item) => item.id === selectedFlight.id) && <option value={selectedFlight.id}>{selectedFlight.flightCode} · {selectedFlight.status}</option>}{flights.map((item) => <option value={item.id} key={item.id}>{item.flightCode} · {item.status}</option>)}</select></div><div className="live-flight-state">{visibleFlight && <StatusBadge value={visibleFlight.status} />}<span className="flight-time"><Activity size={14} />{formatDuration(duration)}</span></div><div className="live-flight-actions">{visibleFlight?.status === 'READY' && <button className="button primary" disabled={!canStart || actionBusy} onClick={() => void runSimulationAction('start')}><Play size={15} />{actionBusy ? 'Starting…' : 'Start simulation'}</button>}{active && <button className="button danger" disabled={actionBusy} onClick={() => void runSimulationAction('stop')}><CircleStop size={15} />{actionBusy ? 'Stopping…' : 'Stop simulation'}</button>}{cautionBlocked && <span className="launch-warning">Weather CAUTION · acknowledgement unavailable</span>}{unsafe && <span className="launch-warning">UNSAFE weather blocks launch</span>}</div></section>
+      {flightsResource.data?.page === flightsPage && <div className="table-panel panel flight-session-pagination"><Pagination page={flightsPage} pageSize={flightsResource.data.pageSize} total={flightsResource.data.total} onPage={setFlightsPage} /></div>}
       {(actionError || notice || statusResource.error) && <div className={actionError || statusResource.error ? 'inline-error' : 'inline-notice'}>{actionError || statusResource.error?.message || notice}{statusResource.error && <button className="text-button" onClick={statusResource.refresh}>Retry</button>}</div>}
       {cautionBlocked && <div className="caution-banner"><ShieldCheck size={17} /><div><b>Launch is blocked by the backend safety policy.</b><span>The preflight weather recommendation is CAUTION, but this API has no acknowledgement endpoint. The interface will not bypass that requirement.</span></div></div>}
       <div className="live-metrics-grid"><MetricCard label="BATTERY" value={currentTelemetry ? Math.round(currentTelemetry.battery_percent) : '—'} unit="%" icon={<BatteryCharging size={17} />} tone={currentTelemetry && currentTelemetry.battery_percent <= 20 ? 'red' : 'green'} detail={currentTelemetry ? `${currentTelemetry.battery_voltage_v.toFixed(1)} V · ${currentTelemetry.battery_temperature_c.toFixed(0)}°C` : 'Waiting for telemetry'} /><MetricCard label="ALTITUDE" value={currentTelemetry ? currentTelemetry.altitude_m.toFixed(1) : '—'} unit="m" icon={<Navigation size={17} />} tone="blue" detail={currentTelemetry ? `Vertical ${currentTelemetry.vertical_speed_mps.toFixed(1)} m/s` : 'Above ground'} /><MetricCard label="GROUND SPEED" value={currentTelemetry ? currentTelemetry.speed_mps.toFixed(1) : '—'} unit="m/s" icon={<Gauge size={17} />} tone="amber" detail={currentTelemetry ? `Heading ${Math.round(currentTelemetry.heading_deg)}°` : 'No current sample'} /><MetricCard label="LINK & GPS" value={currentTelemetry ? `${Math.round(currentTelemetry.signal_percent)}%` : '—'} icon={<Signal size={17} />} tone={currentTelemetry?.gps_quality === 'LOST' ? 'red' : 'green'} detail={currentTelemetry ? `${currentTelemetry.gps_quality} · ${currentTelemetry.gps_satellites} satellites · ${currentTelemetry.transmission_state}` : 'Awaiting link state'} /></div>
-      <div className="live-content-grid"><Panel title="Flight map" eyebrow="LIVE POSITION & AIRSPACE" action={<span className="map-live-tag"><span className="pulse" /> LIVE POSITION</span>} className="live-map-panel">{zonesResource.error && <div className="map-warning">Flight-zone overlay unavailable: {zonesResource.error.message}</div>}<MapView waypoints={missionResource.data && missionResource.data.id === missionId ? missionResource.data.waypoints : []} zones={zonesResource.data || []} trail={trail} current={currentTelemetry ? { latitude: currentTelemetry.latitude, longitude: currentTelemetry.longitude, heading: currentTelemetry.heading_deg } : null} /></Panel><Panel title="Telemetry trend" eyebrow="SESSION DATA"><TelemetryChart samples={samples} metric={metric} onMetric={setMetric} /><div className="signal-summary"><div><span>GPS QUALITY</span><b><i className={`signal-dot ${currentTelemetry?.gps_quality === 'LOST' ? 'danger' : ''}`} />{currentTelemetry?.gps_quality || 'NO DATA'}</b></div><div><span>TRANSMISSION</span><b>{currentTelemetry?.transmission_state || 'NO DATA'}</b></div><div><span>LAST RECEIVED</span><b>{formatDate(currentTelemetry?.recorded_at)}</b></div></div></Panel></div>
+      <div className="live-content-grid"><Panel title="Flight map" eyebrow="LIVE POSITION & AIRSPACE" action={<span className="map-live-tag"><span className="pulse" /> LIVE POSITION</span>} className="live-map-panel">{zonesResource.error && <div className="map-warning">Flight-zone overlay unavailable: {zonesResource.error.message}</div>}<MapView waypoints={missionResource.data && missionResource.data.id === missionId ? missionResource.data.waypoints : []} zones={zonesResource.data || []} trail={trail} current={mapPosition} fitKey={selectedFlightId} /></Panel><Panel title="Telemetry trend" eyebrow="SESSION DATA"><TelemetryChart samples={samples} metric={metric} onMetric={setMetric} /><div className="signal-summary"><div><span>GPS QUALITY</span><b><i className={`signal-dot ${currentTelemetry?.gps_quality === 'LOST' ? 'danger' : ''}`} />{currentTelemetry?.gps_quality || 'NO DATA'}</b></div><div><span>TRANSMISSION</span><b>{currentTelemetry?.transmission_state || 'NO DATA'}</b></div><div><span>LAST RECEIVED</span><b>{formatDate(currentTelemetry?.recorded_at)}</b></div></div></Panel></div>
       {missionResource.error && <div className="subtle-callout"><span className="callout-mark">i</span><span>Mission route unavailable: {missionResource.error.message}. Telemetry remains live.</span></div>}
       <div className="live-data-caption"><Radio size={14} /> Status from <code>/api/flights/{selectedFlightId}/simulation/status</code><span>·</span> {status?.timerActive ? 'Server simulation timer active' : 'No active server timer'}</div>
     </>}

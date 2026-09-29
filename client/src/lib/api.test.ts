@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, api } from './api';
+import { allFlights, ApiError, api } from './api';
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
@@ -11,6 +11,23 @@ describe('API client', () => {
     await api.drones({ page: 2, pageSize: 10, status: '' });
 
     expect(fetchMock).toHaveBeenCalledWith('/api/drones?page=2&pageSize=10', expect.objectContaining({ headers: {} }));
+  });
+
+  it('loads every page of a filtered flight result set', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input), 'http://localhost');
+      const page = Number(url.searchParams.get('page'));
+      const data = page === 1 ? Array.from({ length: 100 }, (_, index) => ({ id: index + 1 })) : Array.from({ length: 3 }, (_, index) => ({ id: index + 101 }));
+      return new Response(JSON.stringify({ data, page, pageSize: 100, total: 103 }), { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const flights = await allFlights({ status: 'LANDED', droneId: 7, result: 'SUCCESS' });
+
+    expect(flights).toHaveLength(103);
+    expect(flights.at(-1)).toEqual({ id: 103 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/flights?status=LANDED&droneId=7&result=SUCCESS&page=2&pageSize=100', expect.any(Object));
   });
 
   it('surfaces structured backend errors without losing the error code', async () => {
