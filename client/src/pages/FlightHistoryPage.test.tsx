@@ -8,7 +8,13 @@ describe('FlightHistoryPage', () => {
   it('combines every LANDED and ABORTED page before applying search and table pagination', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = new URL(String(input), 'http://localhost');
-      if (url.pathname.endsWith('/drones')) return new Response(JSON.stringify({ data: [], page: 1, pageSize: 100, total: 0 }), { status: 200 });
+      if (url.pathname.endsWith('/drones')) {
+        const page = Number(url.searchParams.get('page') || 1);
+        const data = page === 1
+          ? Array.from({ length: 100 }, (_, index) => ({ id: index + 1, droneCode: `DRN-${String(index + 1).padStart(3, '0')}`, displayName: `Drone ${index + 1}` }))
+          : [{ id: 101, droneCode: 'DRN-101', displayName: 'Drone 101' }];
+        return new Response(JSON.stringify({ data, page, pageSize: 100, total: 101 }), { status: 200 });
+      }
       const status = url.searchParams.get('status') || 'LANDED';
       const page = Number(url.searchParams.get('page') || 1);
       const total = status === 'ABORTED' ? 102 : 101;
@@ -37,6 +43,10 @@ describe('FlightHistoryPage', () => {
     render(<FlightHistoryPage />);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('status=ABORTED&page=2'), expect.any(Object)));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/drones?page=2&pageSize=100', expect.any(Object)));
+    expect(screen.getByRole('option', { name: 'Drone 101 · DRN-101' })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter flights by aircraft' }), { target: { value: '101' } });
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('droneId=101'), expect.any(Object)));
     fireEvent.change(screen.getByRole('textbox', { name: 'Search flight history' }), { target: { value: 'ABORTED-101' } });
     expect(await screen.findByText('ABORTED-101')).toBeInTheDocument();
     expect(screen.getByText(/across all backend pages/)).toBeInTheDocument();

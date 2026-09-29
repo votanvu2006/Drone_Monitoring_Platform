@@ -88,16 +88,24 @@ export const api = {
   }),
 };
 
-export async function allFlights(params: Record<string, string | number | undefined> = {}): Promise<Flight[]> {
+async function allPages<T>(loadPage: (params: Record<string, string | number | undefined>) => Promise<Page<T>>, params: Record<string, string | number | undefined> = {}): Promise<T[]> {
   const pageSize = 100;
-  const firstPage = await api.flights({ ...params, page: 1, pageSize });
+  const firstPage = await loadPage({ ...params, page: 1, pageSize });
   const pageCount = Math.ceil(firstPage.total / pageSize);
   if (pageCount <= 1) return firstPage.data;
 
   const remainingPages = await Promise.all(Array.from({ length: pageCount - 1 }, (_, index) =>
-    api.flights({ ...params, page: index + 2, pageSize }),
+    loadPage({ ...params, page: index + 2, pageSize }),
   ));
   return [firstPage, ...remainingPages].flatMap((page) => page.data);
+}
+
+export function allDrones(params: Record<string, string | number | undefined> = {}): Promise<Drone[]> {
+  return allPages((pageParams) => api.drones(pageParams), params);
+}
+
+export function allFlights(params: Record<string, string | number | undefined> = {}): Promise<Flight[]> {
+  return allPages((pageParams) => api.flights(pageParams), params);
 }
 
 export function errorMessage(error: unknown): string {

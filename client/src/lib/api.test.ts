@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { allFlights, ApiError, api } from './api';
+import { allDrones, allFlights, ApiError, api } from './api';
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
@@ -11,6 +11,25 @@ describe('API client', () => {
     await api.drones({ page: 2, pageSize: 10, status: '' });
 
     expect(fetchMock).toHaveBeenCalledWith('/api/drones?page=2&pageSize=10', expect.objectContaining({ headers: {} }));
+  });
+
+  it('loads every backend page of drones for fleet-wide selectors', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input), 'http://localhost');
+      const page = Number(url.searchParams.get('page'));
+      const data = page === 1
+        ? Array.from({ length: 100 }, (_, index) => ({ id: index + 1 }))
+        : [{ id: 101 }, { id: 102 }];
+      return new Response(JSON.stringify({ data, page, pageSize: 100, total: 102 }), { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const drones = await allDrones();
+
+    expect(drones).toHaveLength(102);
+    expect(drones.at(-1)).toEqual({ id: 102 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/drones?page=2&pageSize=100', expect.any(Object));
   });
 
   it('loads every page of a filtered flight result set', async () => {

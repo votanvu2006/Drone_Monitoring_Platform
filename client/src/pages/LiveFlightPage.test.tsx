@@ -10,10 +10,15 @@ describe('LiveFlightPage', () => {
   it('paginates session choices beyond page one and filters sessions by aircraft', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = new URL(String(input), 'http://localhost');
-      if (url.pathname === '/api/drones') return new Response(JSON.stringify({ data: [
-        { id: 1, droneCode: 'DRN-001', displayName: 'Survey One', status: 'AVAILABLE', isSimulated: true, model: { modelCode: 'Q1', manufacturer: 'Northstar', modelName: 'Survey' }, homeLocation: { label: 'Base 1', latitude: 21, longitude: 105 }, lastKnownLocation: null },
-        { id: 2, droneCode: 'DRN-002', displayName: 'Survey Two', status: 'AVAILABLE', isSimulated: true, model: { modelCode: 'Q1', manufacturer: 'Northstar', modelName: 'Survey' }, homeLocation: { label: 'Base 2', latitude: 22, longitude: 106 }, lastKnownLocation: null },
-      ], page: 1, pageSize: 100, total: 2 }), { status: 200 });
+      if (url.pathname === '/api/drones') {
+        const page = Number(url.searchParams.get('page') || 1);
+        const count = page === 1 ? 100 : 1;
+        const data = Array.from({ length: count }, (_, index) => {
+          const id = (page - 1) * 100 + index + 1;
+          return { id, droneCode: `DRN-${String(id).padStart(3, '0')}`, displayName: `Survey ${id}`, status: 'AVAILABLE' };
+        });
+        return new Response(JSON.stringify({ data, page, pageSize: 100, total: 101 }), { status: 200 });
+      }
       if (url.pathname === '/api/flights') {
         const page = Number(url.searchParams.get('page') || 1);
         const droneId = Number(url.searchParams.get('droneId') || 1);
@@ -39,6 +44,7 @@ describe('LiveFlightPage', () => {
     render(<MemoryRouter initialEntries={['/live-flight']}><LiveFlightPage /></MemoryRouter>);
 
     expect(await screen.findByText('FLT-001')).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: 'Survey 101' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/flights?page=2&pageSize=20', expect.any(Object)));
     fireEvent.change(screen.getByRole('combobox', { name: 'MONITOR SESSION' }), { target: { value: '21' } });
