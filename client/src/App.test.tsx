@@ -35,6 +35,47 @@ describe('operations console', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/drones?page=1&pageSize=100', expect.any(Object));
   });
 
+  it('counts the full fleet and finds an active flight beyond the first page', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input), 'http://localhost');
+      if (url.pathname === '/api/health') return new Response(JSON.stringify({ status: 'ok' }), { status: 200 });
+      if (url.pathname === '/api/drones') {
+        const page = Number(url.searchParams.get('page') || 1);
+        const count = page === 1 ? 100 : 1;
+        const data = Array.from({ length: count }, (_, index) => {
+          const id = (page - 1) * 100 + index + 1;
+          return { id, droneCode: `DRN-${id}`, displayName: `Drone ${id}`, status: page === 1 ? 'AVAILABLE' : 'IN_FLIGHT' };
+        });
+        return new Response(JSON.stringify({ data, page, pageSize: 100, total: 101 }), { status: 200 });
+      }
+      if (url.pathname === '/api/flights' && url.searchParams.get('status') === 'FLYING') {
+        const page = Number(url.searchParams.get('page') || 1);
+        const count = page === 1 ? 100 : 1;
+        const data = Array.from({ length: count }, (_, index) => {
+          const id = (page - 1) * 100 + index + 1;
+          return {
+            id, flightCode: `FLIGHT-${id}`, status: 'FLYING', result: null,
+            drone: { id: 1, droneCode: 'DRN-001', displayName: 'Drone 1' },
+            mission: { id: 1, missionCode: 'MSN-001', name: 'Survey mission' },
+            scenarioCode: 'NORMAL', startedAt: '2026-09-29 10:00:00', endedAt: null, durationSec: 60, distanceM: 120,
+          };
+        });
+        return new Response(JSON.stringify({ data, page, pageSize: 100, total: 101 }), { status: 200 });
+      }
+      if (url.pathname === '/api/flights') return new Response(JSON.stringify({ data: [], page: 1, pageSize: 4, total: 0 }), { status: 200 });
+      if (url.pathname === '/api/alerts' || url.pathname === '/api/missions') return new Response(JSON.stringify({ data: [], page: 1, pageSize: 5, total: 0 }), { status: 200 });
+      return new Response(JSON.stringify({ data: [], page: 1, pageSize: 100, total: 0 }), { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<MemoryRouter><App /></MemoryRouter>);
+
+    expect(await screen.findByText(/101 aircraft · 100 available · 1 in flight · 0 maintenance or offline/)).toBeInTheDocument();
+    expect(await screen.findByText('FLIGHT-101')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith('/api/drones?page=2&pageSize=100', expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith('/api/flights?status=FLYING&page=2&pageSize=100', expect.any(Object));
+  });
+
   it('shows every drone on the aircraft page and links monitoring to that aircraft', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const path = String(input);

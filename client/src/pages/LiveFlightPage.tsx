@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { MapView } from '../components/MapView';
 import { EmptyState, ErrorState, LoadingState, MetricCard, PageHeading, Pagination, Panel, StatusBadge } from '../components/ui';
 import { usePolling } from '../hooks/usePolling';
-import { api, errorMessage } from '../lib/api';
+import { allDrones, api, errorMessage } from '../lib/api';
 import { formatDate, formatDuration } from '../lib/format';
 import { flightDurationSeconds, hasValidPosition } from './liveFlightLogic';
 import type { Drone, Flight, FlightZone, MissionDetail, SimulationStatus, Telemetry } from '../types/api';
@@ -36,7 +36,7 @@ export function LiveFlightPage() {
   const [flightsPage, setFlightsPage] = useState(1);
   const loadFlights = useCallback(() => api.flights({ page: flightsPage, pageSize: sessionPageSize, ...(selectedDroneId ? { droneId: selectedDroneId } : {}) }), [flightsPage, selectedDroneId]);
   const flightsResource = usePolling(loadFlights, 15_000);
-  const loadDrones = useCallback(() => api.drones({ page: 1, pageSize: 100 }), []);
+  const loadDrones = useCallback(async () => ({ data: await allDrones() }), []);
   const dronesResource = usePolling(loadDrones, 60_000);
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const selectedFlightId = selectedFlight?.id ?? null;

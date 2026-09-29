@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Check, CloudSun, Compass, Route, ShieldCheck, Wind } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { MapView } from '../components/MapView';
@@ -19,23 +19,43 @@ export function MissionDetailPage() {
   const [busy, setBusy] = useState<'validate' | 'weather' | null>(null);
   const [actionError, setActionError] = useState('');
   const [validationMessage, setValidationMessage] = useState('');
+  const activeMissionId = useRef(id);
   const mission = missionResource.data?.id === id ? missionResource.data : null;
 
+  useEffect(() => {
+    activeMissionId.current = id;
+    setWeather(null);
+    setBusy(null);
+    setActionError('');
+    setValidationMessage('');
+  }, [id]);
+
   const runValidation = async () => {
+    const actionMissionId = id;
     setBusy('validate'); setActionError('');
     try {
-      const result = await api.validateMission(id);
+      const result = await api.validateMission(actionMissionId);
+      if (activeMissionId.current !== actionMissionId) return;
       setValidationMessage(result.message);
       missionResource.refresh();
-    } catch (error) { setActionError(errorMessage(error)); }
-    finally { setBusy(null); }
+    } catch (error) {
+      if (activeMissionId.current === actionMissionId) setActionError(errorMessage(error));
+    } finally {
+      if (activeMissionId.current === actionMissionId) setBusy(null);
+    }
   };
 
   const runWeatherCheck = async () => {
+    const actionMissionId = id;
     setBusy('weather'); setActionError(''); setWeather(null);
-    try { setWeather(await api.checkWeather(id)); }
-    catch (error) { setActionError(errorMessage(error)); }
-    finally { setBusy(null); }
+    try {
+      const result = await api.checkWeather(actionMissionId);
+      if (activeMissionId.current === actionMissionId) setWeather(result);
+    } catch (error) {
+      if (activeMissionId.current === actionMissionId) setActionError(errorMessage(error));
+    } finally {
+      if (activeMissionId.current === actionMissionId) setBusy(null);
+    }
   };
 
   if (!Number.isSafeInteger(id) || id < 1) return <EmptyState title="Invalid mission" description="The mission id in this URL is not valid." />;

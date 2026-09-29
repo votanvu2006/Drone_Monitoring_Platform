@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 import { MetricCard, PageHeading, Panel, StatusBadge, EmptyState, ErrorState, LoadingState } from '../components/ui';
 import { usePolling } from '../hooks/usePolling';
 import { formatDate, formatDistance } from '../lib/format';
-import { api } from '../lib/api';
+import { allDrones, allFlights, api } from '../lib/api';
 import type { Alert, Drone, Flight } from '../types/api';
 
-interface OverviewData { drones: Drone[]; flights: Flight[]; alerts: Alert[]; alertCount: number; criticalAlertCount: number; readyMissionCount: number }
+interface OverviewData { drones: Drone[]; flights: Flight[]; activeFlights: Flight[]; alerts: Alert[]; alertCount: number; criticalAlertCount: number; readyMissionCount: number }
 
 function DroneMark() {
   return <svg className="drone-illustration" viewBox="0 0 560 300" role="img" aria-label="Quadcopter drone illustration">
@@ -25,20 +25,23 @@ function DroneMark() {
 export function OverviewPage() {
   const today = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: '2-digit', year: 'numeric' }).format(new Date()).toUpperCase();
   const load = useCallback(async (): Promise<OverviewData> => {
-    const [drones, flights, alerts, criticalAlerts, readyMissions] = await Promise.all([
-      api.drones({ page: 1, pageSize: 100 }),
-      api.flights({ page: 1, pageSize: 100 }), api.alerts({ status: 'ACTIVE', page: 1, pageSize: 5 }),
+    const [drones, recentFlights, activeFlightPages, alerts, criticalAlerts, readyMissions] = await Promise.all([
+      allDrones(),
+      api.flights({ page: 1, pageSize: 4 }),
+      Promise.all((['FLYING', 'PAUSED', 'RETURNING'] as const).map((status) => allFlights({ status }))),
+      api.alerts({ status: 'ACTIVE', page: 1, pageSize: 5 }),
       api.alerts({ status: 'ACTIVE', severity: 'CRITICAL', page: 1, pageSize: 1 }),
       api.missions({ status: 'READY', page: 1, pageSize: 1 }),
     ]);
-    return { drones: drones.data, flights: flights.data, alerts: alerts.data, alertCount: alerts.total, criticalAlertCount: criticalAlerts.total, readyMissionCount: readyMissions.total };
+    const activeFlights = activeFlightPages.flat().sort((left, right) => (right.startedAt || '').localeCompare(left.startedAt || '') || right.id - left.id);
+    return { drones, flights: recentFlights.data, activeFlights, alerts: alerts.data, alertCount: alerts.total, criticalAlertCount: criticalAlerts.total, readyMissionCount: readyMissions.total };
   }, []);
   const { data, error, loading, refresh } = usePolling(load, 15_000);
   const drones = data?.drones ?? [];
   const availableAircraft = drones.filter((drone) => drone.status === 'AVAILABLE').length;
   const aircraftInFlight = drones.filter((drone) => drone.status === 'IN_FLIGHT').length;
   const unavailableAircraft = drones.filter((drone) => ['MAINTENANCE', 'OFFLINE'].includes(drone.status)).length;
-  const activeFlight = data?.flights.find((flight) => ['FLYING', 'PAUSED', 'RETURNING'].includes(flight.status));
+  const activeFlight = data?.activeFlights[0];
   const availableMissions = data?.readyMissionCount ?? 0;
   const criticalAlerts = data?.criticalAlertCount ?? 0;
 

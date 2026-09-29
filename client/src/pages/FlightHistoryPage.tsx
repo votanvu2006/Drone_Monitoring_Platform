@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Clock3, Download, Plane, Route, Search } from 'lucide-react';
 import { EmptyState, ErrorState, LoadingState, PageHeading, Pagination, StatusBadge } from '../components/ui';
 import { usePolling } from '../hooks/usePolling';
-import { allFlights, api } from '../lib/api';
+import { allDrones, allFlights } from '../lib/api';
 import { formatDate, formatDistance, formatDuration, titleCase } from '../lib/format';
 import type { Flight } from '../types/api';
 
@@ -15,7 +15,7 @@ export function FlightHistoryPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const queryKey = `${droneId}:${filter}`;
-  const loadDrones = useCallback(() => api.drones({ page: 1, pageSize: 100 }), []);
+  const loadDrones = useCallback(async () => ({ data: await allDrones() }), []);
   const dronesResource = usePolling(loadDrones, 60_000);
   const load = useCallback(async () => {
     const result = filter ? { result: filter } : {};
