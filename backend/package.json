@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run --exclude=tests/integration/**",
-    "test:integration": "vitest run --dir tests/integration",
+    "test:integration": "vitest run --dir tests/integration --no-file-parallelism",
     "wait:data-pack": "node scripts/wait-for-data-pack.mjs",
     "build": "tsc"
   },
