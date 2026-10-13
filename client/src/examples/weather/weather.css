@@ -1,0 +1,17 @@
+.weather-points { display: grid; }
+.weather-point { display: flex; gap: 15px; padding: 22px 0; border-bottom: 1px solid var(--border); }
+.weather-point:first-child { padding-top: 4px; }
+.weather-point:last-child { border: 0; padding-bottom: 22px; }
+.weather-point-icon { display: grid; place-items: center; width: 41px; height: 41px; flex-shrink: 0;
+  border: 1px solid currentColor; border-radius: 11px; }
+.weather-point-content { min-width: 0; flex: 1; }
+.weather-point-title { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 7px; }
+.weather-point-title h3 { margin: 0; font-size: 16px; font-weight: 550; letter-spacing: -.015em; }
+.weather-point-index { font: 9px ui-monospace, monospace; color: var(--muted); letter-spacing: .09em; }
+.weather-point-content p { margin: 11px 0 0; color: #b9c9d9; font-size: 12px; line-height: 1.8; }
+@media (max-width: 480px) {
+  .weather-point { gap: 12px; }
+  .weather-point-icon { width: 34px; height: 34px; border-radius: 9px; }
+  .weather-point-icon svg { width: 19px; height: 19px; }
+  .weather-point-title h3 { font-size: 15px; }
+}
