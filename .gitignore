@@ -1,0 +1,6 @@
+**/node_modules/
+**/dist/
+**/*.tsbuildinfo
+client/test-results/
+client/playwright-report/
+.ui-qa/
