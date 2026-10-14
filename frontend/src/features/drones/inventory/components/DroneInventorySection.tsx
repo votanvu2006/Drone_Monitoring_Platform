@@ -1,6 +1,12 @@
 import type { Drone } from "../droneInventory.types";
 import { DroneCard } from "./DroneCard";
 
+type DroneInventorySectionProps = {
+  drones: Drone[];
+  modelNames: string[];
+  onViewDetails: (droneCode: string) => void;
+};
+
 function SearchIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -13,10 +19,8 @@ function SearchIcon() {
 export function DroneInventorySection({
   drones,
   modelNames,
-}: {
-  drones: Drone[];
-  modelNames: string[];
-}) {
+  onViewDetails,
+}: DroneInventorySectionProps) {
   return (
     <section className="inventory-panel" aria-labelledby="inventory-title">
       <div className="panel-heading">
@@ -53,7 +57,11 @@ export function DroneInventorySection({
 
       <div className="drone-row">
         {drones.map((drone) => (
-          <DroneCard key={drone.code} drone={drone} />
+          <DroneCard
+            key={drone.code}
+            drone={drone}
+            onViewDetails={onViewDetails}
+          />
         ))}
       </div>
     </section>
