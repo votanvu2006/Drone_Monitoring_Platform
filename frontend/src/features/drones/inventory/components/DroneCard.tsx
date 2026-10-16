@@ -1,7 +1,13 @@
 import type { Drone, DroneStatus } from "../droneInventory.types";
+import { DroneIllustration } from "../../shared/DroneIllustration";
 import "../styles/drone-card.css";
 
 const BATTERY_PREVIEW_LEVEL = 100;
+
+type DroneCardProps = {
+  drone: Drone;
+  onViewDetails: (droneCode: string) => void;
+};
 
 function formatStatus(status: DroneStatus) {
   return status
@@ -13,25 +19,6 @@ function formatStatus(status: DroneStatus) {
 
 function getStatusClass(status: DroneStatus) {
   return status.toLowerCase().replace(/_/g, "-");
-}
-
-function DroneIcon() {
-  return (
-    <svg
-      className="drone-icon"
-      viewBox="0 0 48 48"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path d="M21 21 10 15M27 21l11-6M21 27l-11 6M27 27l11 6" />
-      <path d="M24 17v14M17 24h14" />
-      <rect x="20" y="20" width="8" height="8" rx="2" />
-      <ellipse cx="9" cy="14" rx="6" ry="2.5" />
-      <ellipse cx="39" cy="14" rx="6" ry="2.5" />
-      <ellipse cx="9" cy="34" rx="6" ry="2.5" />
-      <ellipse cx="39" cy="34" rx="6" ry="2.5" />
-    </svg>
-  );
 }
 
 function ArrowIcon() {
@@ -74,12 +61,15 @@ function PowerSwitch({ droneCode }: { droneCode: string }) {
   );
 }
 
-export function DroneCard({ drone }: { drone: Drone }) {
+export function DroneCard({
+  drone,
+  onViewDetails,
+}: DroneCardProps) {
   return (
     <article className="drone-card">
       <div className="drone-art">
         <span className="drone-art-glow" />
-        <DroneIcon />
+        <DroneIllustration className="drone-icon" />
 
         <span
           className={`status-badge status--${getStatusClass(drone.status)}`}
@@ -97,9 +87,7 @@ export function DroneCard({ drone }: { drone: Drone }) {
       <div className="drone-meta">
         <div>
           <span>Location</span>
-          <strong>
-            {drone.lastKnownLocation ?? "No location reported"}
-          </strong>
+          <strong>{drone.lastKnownLocation ?? "No location reported"}</strong>
         </div>
         <div>
           <span>Active mission</span>
@@ -117,7 +105,13 @@ export function DroneCard({ drone }: { drone: Drone }) {
 
       <div className="drone-card-actions">
         <PowerSwitch droneCode={drone.code} />
-        <button className="details-button" type="button" disabled>
+
+        <button
+          className="details-button"
+          type="button"
+          onClick={() => onViewDetails(drone.code)}
+          aria-label={`View details for ${drone.code}`}
+        >
           View details
           <ArrowIcon />
         </button>

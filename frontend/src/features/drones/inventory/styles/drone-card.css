@@ -276,6 +276,25 @@
   white-space: nowrap;
 }
 
+.details-button:not(:disabled) {
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.details-button:not(:disabled):hover {
+  border-color: var(--accent-fg);
+  background: var(--canvas-default);
+  color: var(--accent-fg);
+}
+
+.details-button:focus-visible {
+  outline: 2px solid var(--accent-fg);
+  outline-offset: 2px;
+}
+
 .details-button svg {
   width: 14px;
   height: 14px;
