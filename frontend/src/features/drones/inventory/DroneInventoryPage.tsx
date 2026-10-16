@@ -5,6 +5,10 @@ import { DroneInventorySection } from "./components/DroneInventorySection";
 import { FleetSummary } from "./components/FleetSummary";
 import "./styles/inventory.css";
 
+type DroneInventoryPageProps = {
+  onViewDetails: (droneCode: string) => void;
+};
+
 function AddDronesControl() {
   return (
     <span className="add-drones-control">
@@ -42,7 +46,9 @@ function AddDronesControl() {
   );
 }
 
-function DroneInventoryPage() {
+function DroneInventoryPage({
+  onViewDetails,
+}: DroneInventoryPageProps) {
   const [snapshot, setSnapshot] = useState<FleetSnapshot>(mockSnapshot);
 
   useEffect(() => {
@@ -51,7 +57,9 @@ function DroneInventoryPage() {
     fleetDataSource
       .loadSnapshot()
       .then((data) => {
-        if (isActive) setSnapshot(data);
+        if (isActive) {
+          setSnapshot(data);
+        }
       })
       .catch((error: unknown) => {
         console.error("Failed to load fleet data:", error);
@@ -76,6 +84,7 @@ function DroneInventoryPage() {
               Manage and monitor your drone fleet
             </p>
           </div>
+
           <AddDronesControl />
         </header>
 
@@ -88,6 +97,7 @@ function DroneInventoryPage() {
         <DroneInventorySection
           drones={snapshot.drones}
           modelNames={modelNames}
+          onViewDetails={onViewDetails}
         />
       </div>
     </main>

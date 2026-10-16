@@ -1,4 +1,7 @@
-export type DroneStatus = "OFFLINE" | "AVAILABLE" | "IN_FLIGHT" | "MAINTENANCE";
+import type { DroneStatus } from "../drone.types";
+
+export type { DroneStatus } from "../drone.types";
+
 export type FindingSeverity = "WARNING" | "FAULT";
 
 export type Drone = {
