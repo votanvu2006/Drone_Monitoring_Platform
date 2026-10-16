@@ -124,9 +124,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
           <div>
             <h2 id="drone-components-title">Drone components</h2>
             <p>
-              {drone.isActivated
-                ? "Current component health"
-                : "Component specifications"}
+              Seed component health
             </p>
           </div>
           <span className="component-total">
@@ -140,7 +138,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
               key={group.type}
               type={group.type}
               components={group.components}
-              showHealthStatus={drone.isActivated}
+              showHealthStatus
             />
           ))}
         </div>
