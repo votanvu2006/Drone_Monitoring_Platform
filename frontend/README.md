@@ -1,32 +1,33 @@
-# React + TypeScript + Vite
+# Drone Monitoring Platform frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + TypeScript + Vite, based on the existing Fleet frontend from issues #28 and #43. All shared UI and feature modules live in `frontend/`.
 
-Currently, two official plugins are available:
+## Commands
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Use Node.js 24 and run these commands in this directory:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+npm ci
+npm run dev
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npm run test:browser
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The existing CI runs type checking, Oxlint, unit checks, a production build and browser checks on pull requests, including dependent PRs. Install Chromium with `npx playwright install chromium` before running the browser suite locally.
+
+## Shared shell and previews
+
+- The root page preserves Fleet Inventory and its existing View details / Back to fleet flow.
+- `/?screen=drones` opens the same Fleet view inside the shared shell.
+- `/?screen=shell` shows the shared shell sample. Unknown screens fall back to this sample.
+- Feature modules register their preview metadata in `src/examples/**/*.preview.tsx`, discovered through `import.meta.glob`.
+- Each preview can define its allowed `state` values. Unknown states use its default.
+
+The shared frame uses Fleet's GitHub-inspired light colors, system typography, spacing, borders and corner radii. Six navigation items, a header theme switch and a bottom Log out control are visual only, as required by current issue #27. The header uses a fixed sample avatar and username; it does not imply live authentication. No theme switching, logout, session storage or backend calls are implemented by the shell.
+
+Fleet Inventory and Drone Detail retain their existing feature components. Detail specifications and component health come directly from the canonical data-pack JSON, including the offline Drone 003 seed faults. Other operational previews use explicitly fixed training snapshots and reusable components for later integration.
+
+PR #25 is an older API-connected prototype in `client/`. Reconcile that separate proposal with this shared `frontend/` approach before merging it.
