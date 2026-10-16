@@ -1,5 +1,5 @@
 export type IconName = 'overview' | 'drone' | 'mission' | 'flight' | 'history'
-  | 'alert' | 'check' | 'shield' | 'weather' | 'route' | 'arrow' | 'battery';
+  | 'alert' | 'check' | 'shield' | 'weather' | 'route' | 'arrow' | 'battery' | 'logout';
 
 const paths: Record<IconName, string> = {
   overview: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
@@ -14,6 +14,7 @@ const paths: Record<IconName, string> = {
   route: 'M6 7a3 3 0 1 0 0-.01 M18 20a3 3 0 1 0 0-.01 M6 10v3c0 2 12 0 12 3',
   arrow: 'M4 12h16 M14 6l6 6-6 6',
   battery: 'M3 7h16v10H3z M19 10h2v4 M7 10v4 M11 10v4',
+  logout: 'M9 4H4v16h5 M14 8l4 4-4 4 M8 12h10',
 };
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {

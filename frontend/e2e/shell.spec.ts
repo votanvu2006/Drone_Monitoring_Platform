@@ -1,7 +1,7 @@
 import { test, expect, checkLayout, capture } from './support';
 
 test('shell is readable and navigation remains static', async ({ page }, info) => {
-  await page.goto('/');
+  await page.goto('/?screen=shell');
   const nav = page.getByRole('navigation', { name: 'Primary navigation' });
   for (const name of ['Overview', 'Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']) {
     await expect(nav.getByText(name, { exact: true })).toBeVisible();

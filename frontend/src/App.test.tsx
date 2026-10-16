@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { AppShell } from './components/AppShell';
 import { navigation } from './app/examples';
 
 describe('shared application shell', () => {
+  beforeEach(() => window.history.replaceState({}, '', '/?screen=shell'));
   it('renders the shared frame, all six navigation entries and the static selected state', () => {
     render(<App />);
     const nav = screen.getByRole('navigation', { name: 'Primary navigation' });

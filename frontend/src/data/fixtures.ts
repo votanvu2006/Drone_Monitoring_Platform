@@ -1,9 +1,11 @@
+export const operatorProfile = { username: 'operator', initials: 'OP' } as const;
+
 export const drones = [
-  { id: 'DRN-001', name: 'Drone - 001', status: 'IN_FLIGHT' },
-  { id: 'DRN-002', name: 'Drone - 002', status: 'AVAILABLE' },
-  { id: 'DRN-003', name: 'Drone - 003', status: 'AVAILABLE' },
-  { id: 'DRN-004', name: 'Drone - 004', status: 'OFFLINE' },
-  { id: 'DRN-005', name: 'Drone - 005', status: 'AVAILABLE' },
+  { id: 'DRONE-001', name: 'Drone - 001', status: 'IN_FLIGHT' },
+  { id: 'DRONE-002', name: 'Drone - 002', status: 'AVAILABLE' },
+  { id: 'DRONE-003', name: 'Drone - 003', status: 'AVAILABLE' },
+  { id: 'DRONE-004', name: 'Drone - 004', status: 'OFFLINE' },
+  { id: 'DRONE-005', name: 'Drone - 005', status: 'AVAILABLE' },
 ] as const;
 export const missions = [
   { id: 'MSN-001', name: 'Riverside inspection', status: 'RUNNING' },
@@ -11,7 +13,7 @@ export const missions = [
   { id: 'MSN-003', name: 'Industrial site mapping', status: 'DRAFT' },
 ] as const;
 export const activeFlight = {
-  id: 'FLT-001', missionId: 'MSN-001', droneId: 'DRN-001',
+  id: 'FLT-001', missionId: 'MSN-001', droneId: 'DRONE-001',
   status: 'FLYING', progress: 64, elapsed: '08:42', distance: '1.8 km',
 };
 export const alerts = [
