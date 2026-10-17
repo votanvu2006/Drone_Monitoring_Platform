@@ -1,0 +1,42 @@
+.overview-snapshot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+  color: var(--muted); font: 10px ui-monospace, monospace; letter-spacing: .05em; }
+.overview-lower-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; }
+.overview-flight-intro { display: flex; align-items: center; gap: 19px; padding: 4px 0 26px; }
+.overview-aircraft { display: grid; place-items: center; width: 83px; height: 83px; flex-shrink: 0;
+  color: var(--green); background: #17362b; border: 1px solid #315d4c; border-radius: 20px; }
+.overview-flight-intro h3 { font-size: 20px; font-weight: 550; margin: 8px 0; letter-spacing: -.025em; }
+.overview-flight-intro p { color: var(--muted); font-size: 12px; margin: 0; }
+.overview-flight-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; gap: 14px;
+  padding: 21px 0; border-top: 1px solid var(--border); }
+.overview-flight-stats dt { font-size: 11px; color: var(--muted); }
+.overview-flight-stats dd { margin: 8px 0 0; font: 550 23px ui-monospace, monospace; letter-spacing: -.045em; }
+.overview-progress { height: 5px; border-radius: 4px; background: #23362e; overflow: hidden; }
+.overview-progress > span { display: block; height: 100%; background: var(--green); border-radius: inherit; }
+.overview-flight-footer { display: flex; justify-content: space-between; gap: 15px; margin-top: 11px; color: var(--muted); font-size: 10px; }
+.activity-list { padding: 0; margin: 0; list-style: none; }
+.activity-list li { display: flex; align-items: flex-start; gap: 13px; padding: 17px 0; border-bottom: 1px solid var(--border); }
+.activity-list li:first-child { padding-top: 3px; }
+.activity-list li:last-child { border: 0; padding-bottom: 3px; }
+.activity-icon { display: grid; place-items: center; flex-shrink: 0; width: 33px; height: 33px; border: 1px solid #34495c;
+  border-radius: 9px; color: #a1c9ed; background: #1a2b3b; }
+.activity-list li:first-child .activity-icon { color: var(--red); border-color: #6a3b49; background: #32212b; }
+.activity-list strong { font-size: 12px; font-weight: 550; }
+.activity-list p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+.activity-list time { margin-left: auto; color: var(--muted); font: 10px ui-monospace, monospace; white-space: nowrap; }
+.overview-activity-footer { display: flex; align-items: center; gap: 7px; margin-top: 24px; padding-top: 16px;
+  border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; }
+@media (max-width: 1150px) {
+  .overview-lower-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .overview-lower-grid { gap: 16px; }
+  .overview-flight-intro { gap: 14px; }
+  .overview-aircraft { width: 60px; height: 60px; border-radius: 14px; }
+  .overview-aircraft svg { width: 36px; height: 36px; }
+  .overview-flight-intro h3 { font-size: 18px; }
+  .overview-flight-stats { gap: 9px; }
+  .overview-flight-stats dt { font-size: 10px; }
+  .overview-flight-stats dd { font-size: 19px; }
+  .activity-list li { gap: 9px; }
+  .activity-list time { font-size: 9px; }
+}
