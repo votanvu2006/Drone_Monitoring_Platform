@@ -16,11 +16,12 @@ export default defineConfig({
     { name: 'compact', use: { viewport: { width: 1280, height: 720 } } },
     { name: 'tablet', use: { viewport: { width: 768, height: 1024 } } },
     { name: 'mobile', use: { viewport: { width: 390, height: 844 } } },
+    { name: 'landscape', use: { viewport: { width: 844, height: 390 } } },
   ],
   webServer: {
-    command: 'npm run dev -- --port 4173',
+    command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',
     url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 30000,
+    reuseExistingServer: false,
+    timeout: 60000,
   },
 });

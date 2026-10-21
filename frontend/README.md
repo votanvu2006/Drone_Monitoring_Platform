@@ -1,33 +1,24 @@
 # Drone Monitoring Platform frontend
 
-React + TypeScript + Vite, based on the existing Fleet frontend from issues #28 and #43. All shared UI and feature modules live in `frontend/`.
+React + TypeScript + Vite, built on the existing Fleet Inventory and Drone Detail from issues #28 and #43. Shared UI and feature modules live in `frontend/`.
 
-## Commands
+## Development and verification
 
-Use Node.js 24 and run these commands in this directory:
-
-```sh
-npm ci
-npm run dev
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npm run test:browser
-```
-
-The existing CI runs type checking, Oxlint, unit checks, a production build and browser checks on pull requests, including dependent PRs. Install Chromium with `npx playwright install chromium` before running the browser suite locally.
+Use Node.js 24. Run `npm ci`, then `npm run dev` from this directory.
+Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`.
+Install Chromium with `npx playwright install chromium`, then run `npm run test:browser`.
+Browser checks cover desktop, tablet, mobile and short landscape layouts, console errors and unexpected fetch/XHR requests. Screenshots are saved in the ignored test-results directory.
 
 ## Shared shell and previews
 
-- The root page preserves Fleet Inventory and its existing View details / Back to fleet flow.
-- `/?screen=drones` opens the same Fleet view inside the shared shell.
-- `/?screen=shell` shows the shared shell sample. Unknown screens fall back to this sample.
-- Feature modules register their preview metadata in `src/examples/**/*.preview.tsx`, discovered through `import.meta.glob`.
-- Each preview can define its allowed `state` values. Unknown states use its default.
+- The root page and `/?screen=drones` preserve Fleet Inventory and its View details / Back to fleet flow.
+- `/?screen=shell` demonstrates the shared frame. Unknown screen names fall back to this sample.
+- Features register metadata in `src/examples/**/*.preview.tsx`. Unknown state names use the feature's default.
+- The header shows a fixed sample avatar and username. Navigation and Log out are visual controls.
+- The theme switch works with mouse, Enter and Space. It defaults to light on each page load and never saves a preference or follows the operating system theme.
+- Both themes use shared semantic tokens for surfaces, text, focus, status badges, Fleet and Drone Detail.
+- The fixed desktop navigation scrolls independently in short windows, while Log out stays visible. Compact layouts use navigation in normal document flow.
 
-The shared frame uses Fleet's GitHub-inspired light colors, system typography, spacing, borders and corner radii. Six navigation items, a header theme switch and a bottom Log out control are visual only, as required by current issue #27. The header uses a fixed sample avatar and username; it does not imply live authentication. No theme switching, logout, session storage or backend calls are implemented by the shell.
+The switch behavior is an explicitly requested extension to issue #27's original static-control scope. No live authentication, logout, session handling or backend requests are implemented.
 
-Fleet Inventory and Drone Detail retain their existing feature components. Detail specifications and component health come directly from the canonical data-pack JSON, including the offline Drone 003 seed faults. Other operational previews use explicitly fixed training snapshots and reusable components for later integration.
-
-PR #25 is an older API-connected prototype in `client/`. Reconcile that separate proposal with this shared `frontend/` approach before merging it.
+Fleet specifications and component health use canonical data-pack JSON, including Drone 003's seed faults. Other operational samples are static training fixtures. PR #25 is a separate API-connected prototype in `client/`; it is not a dependency of this frontend.

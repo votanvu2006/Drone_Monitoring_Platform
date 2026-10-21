@@ -28,4 +28,18 @@ describe('shared application shell', () => {
     expect(screen.getByRole('main')).toHaveTextContent('Example module');
     expect(screen.getByRole('navigation').querySelector('[aria-current="page"]')).toHaveTextContent('Alerts');
   });
+  it('switches both themes without saving a preference and cleans up when unmounted', () => {
+    const localWrite = vi.spyOn(Storage.prototype, 'setItem');
+    const { unmount } = render(<App />);
+    const toggle = screen.getByRole('switch', { name: 'Dark theme' });
+    expect(toggle).not.toBeChecked();
+    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    fireEvent.click(toggle);
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localWrite).not.toHaveBeenCalled();
+    unmount();
+    expect(document.documentElement).not.toHaveAttribute('data-theme');
+  });
 });

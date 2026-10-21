@@ -1,18 +1,12 @@
-/* ---------- Theme and reset ---------- */
-
 :root {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
-    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   font-size: 14px;
-  letter-spacing: 0.18px;
   line-height: 1.5;
-  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
+  color-scheme: light;
   --canvas-default: #ffffff;
   --canvas-subtle: #f6f8fa;
   --border-default: #d1d9e0;
@@ -21,72 +15,81 @@
   --fg-muted: #59636e;
   --accent-fg: #0969da;
   --success-fg: #1a7f37;
+  --success-bg: #dafbe1;
+  --success-border: #1a7f3766;
+  --warning-fg: #9a6700;
+  --warning-bg: #fff8c5;
+  --warning-border: #9a670066;
+  --danger-fg: #cf222e;
+  --danger-bg: #ffebe9;
+  --danger-border: #cf222e66;
+  --info-fg: #0969da;
+  --info-bg: #ddf4ff;
+  --info-border: #0969da66;
   --button-primary: #1f883d;
   --button-primary-hover: #1c8139;
+  --button-border: #1f232826;
+  --on-emphasis: #ffffff;
+  --switch-bg: #818b98;
+  --tooltip-bg: #1f2328;
+  --tooltip-fg: #ffffff;
   --radius-default: 8px;
   --radius-full: 999px;
-
+  --background: var(--canvas-default);
+  --surface: var(--canvas-default);
+  --surface-raised: var(--canvas-subtle);
+  --border: var(--border-default);
+  --text: var(--fg-default);
+  --muted: var(--fg-muted);
+  --green: var(--success-fg);
+  --amber: var(--warning-fg);
+  --red: var(--danger-fg);
+  --blue: var(--info-fg);
   color: var(--fg-default);
   background: var(--canvas-default);
 }
-
-* {
-  box-sizing: border-box;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas-default: #0d1117;
+  --canvas-subtle: #161b22;
+  --border-default: #3d444d;
+  --border-muted: #3d444db3;
+  --fg-default: #f0f6fc;
+  --fg-muted: #9198a1;
+  --accent-fg: #79c0ff;
+  --success-fg: #3fb950;
+  --success-bg: #12261e;
+  --success-border: #2ea04380;
+  --warning-fg: #e3b341;
+  --warning-bg: #302713;
+  --warning-border: #d2992280;
+  --danger-fg: #ff7b72;
+  --danger-bg: #301a20;
+  --danger-border: #f8514980;
+  --info-fg: #79c0ff;
+  --info-bg: #12253b;
+  --info-border: #388bfd80;
+  --button-primary: #238636;
+  --button-primary-hover: #2ea043;
+  --button-border: #ffffff26;
+  --switch-bg: #59636e;
+  --tooltip-bg: #f0f6fc;
+  --tooltip-fg: #0d1117;
 }
-
-html,
-body {
-  width: 100%;
-  min-width: 320px;
-  min-height: 100%;
-  margin: 0;
+* { box-sizing: border-box; }
+html, body { width: 100%; min-width: 320px; min-height: 100%; margin: 0; }
+body { min-height: 100vh; background: var(--canvas-default); }
+#root { width: 100%; min-width: 320px; min-height: 100vh; text-align: left; }
+button, input, select { font: inherit; }
+button { cursor: default; }
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent-fg);
+  outline-offset: 3px;
 }
-
-body {
-  display: block;
-  min-height: 100vh;
-  background: var(--canvas-default);
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 320px;
-  max-width: none;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  border-inline: 1px solid #e5e4e7;
-  text-align: left;
-}
-
-button,
-input,
-select {
-  font: inherit;
-}
-
-button {
-  cursor: default;
-}
-
-/* ---------- Heading and paragraph defaults ---------- */
-
-h1,
-h2 {
-  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
-}
-
-h1 {
-  letter-spacing: -1.68px;
-}
-
-h2 {
-  line-height: 118%;
-  letter-spacing: -0.24px;
-}
-
-p {
-  margin: 0;
+h1, h2, h3, p { margin-top: 0; }
+h1, h2 { font-family: inherit; letter-spacing: 0; }
+p { margin-bottom: 0; }
+svg { flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
