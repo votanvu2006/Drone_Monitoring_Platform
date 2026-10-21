@@ -1,7 +1,8 @@
 import type { ExampleDefinition } from '../../app/examples';
-import { AlertsPage } from './AlertsPage';
+import { AlertsPreview } from './AlertsPage';
 
-export default {
-  id: 'alerts', title: 'Alerts', activeNav: 'Alerts', component: AlertsPage,
-  states: ['list', 'detail-active', 'detail-resolved'],
-} satisfies ExampleDefinition;
+const alertsPreview: ExampleDefinition = {
+  id: 'alerts', title: 'Alerts', component: AlertsPreview, standalone: true,
+  states: ['list', 'detail-active', 'detail-resolved', 'detail'],
+};
+export default alertsPreview;
