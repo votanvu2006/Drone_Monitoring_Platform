@@ -1,12 +1,7 @@
-# Login UI — issue #26
+# Default login screen — issue #26
 
-Open these URLs on the Vite development server:
+Open `/?screen=login` or `/?screen=login&state=default`.
 
-- /?screen=login&state=default
-- /?screen=login&state=validation-error
-- /?screen=login&state=loading
-- /?screen=login&state=login-error
+The standalone screen uses the shared light appearance, with the application name centered above Username, Password and Sign In. Fields are readonly and the button is disabled. No form, authentication request, validation, loading, login-error or redirect is implemented.
 
-LoginPage is standalone and accepts the fixed state through ExampleProps.
-Fields are readonly. There is no form submission, credential validation,
-authentication request, session handling or redirect.
+Legacy state URLs (`validation-error`, `loading`, `login-error`) render the default screen through the preview registry's normal fallback. The page has no application navigation or signed-in global header.
