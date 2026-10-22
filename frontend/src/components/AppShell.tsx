@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { navigation } from '../app/examples';
-import type { NavigationItem } from '../app/examples';
+import { moduleNavigation } from '../app/navigation';
+import type { NavigationItem } from '../app/navigation';
 import { operatorProfile } from '../data/fixtures';
 import { Icon } from './Icon';
-import type { IconName } from './Icon';
-
-const icons: Record<NavigationItem, IconName> = {
-  Overview: 'overview', Drones: 'drone', Missions: 'mission',
-  'Live Flight': 'flight', 'Flight History': 'history', Alerts: 'alert',
-};
 
 export function AppShell({ title, activeNav = 'Overview', children, contentHasMain = false }: {
   title: string; activeNav?: NavigationItem; children: ReactNode; contentHasMain?: boolean;
@@ -26,10 +20,10 @@ export function AppShell({ title, activeNav = 'Overview', children, contentHasMa
         <strong>Drone Monitoring<br />Platform</strong></div>
       <div className="workspace-label">Workspace</div>
       <nav aria-label="Primary navigation"><ul className="primary-nav">
-        {navigation.map((item) => <li key={item}>
-          <span className={'nav-item' + (item === activeNav ? ' is-selected' : '')}
-            aria-current={item === activeNav ? 'page' : undefined}>
-            <Icon name={icons[item]} /><span>{item}</span>
+        {moduleNavigation.map((item) => <li key={item.id}>
+          <span className={'nav-item' + (item.label === activeNav ? ' is-selected' : '')}
+            aria-current={item.label === activeNav ? 'page' : undefined}>
+            <Icon name={item.icon} /><span>{item.label}</span>
           </span>
         </li>)}
       </ul></nav>

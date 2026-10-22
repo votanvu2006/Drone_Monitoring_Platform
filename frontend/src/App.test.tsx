@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { AppShell } from './components/AppShell';
-import { navigation } from './app/examples';
+import { navigation } from './app/navigation';
 
 describe('shared application shell', () => {
   beforeEach(() => window.history.replaceState({}, '', '/?screen=shell'));

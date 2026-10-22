@@ -191,7 +191,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
   );
 }
 
-function DroneDetailPage({
+function DroneDetailRequest({
   droneCode,
   onBack,
 }: DroneDetailPageProps) {
@@ -200,9 +200,6 @@ function DroneDetailPage({
 
   useEffect(() => {
     let isActive = true;
-
-    setDrone(null);
-    setLoadState("loading");
 
     droneDetailDataSource
       .loadByCode(droneCode)
@@ -259,6 +256,10 @@ function DroneDetailPage({
       </div>
     </main>
   );
+}
+
+function DroneDetailPage(props: DroneDetailPageProps) {
+  return <DroneDetailRequest key={props.droneCode} {...props} />;
 }
 
 export default DroneDetailPage;
