@@ -2,9 +2,9 @@
   padding: 20px 0 26px; margin: 0 0 24px; list-style: none; border-bottom: 1px solid var(--border); }
 .preflight-steps li { display: flex; align-items: center; gap: 11px; color: var(--muted); font-size: 11px; }
 .preflight-step-number { display: grid; place-items: center; width: 29px; height: 29px; flex-shrink: 0;
-  border-radius: 50%; border: 1px solid #345044; background: #192b24; color: #94c7ac; font: 12px ui-monospace, monospace; }
+  border-radius: 50%; border: 1px solid var(--success-border); background: var(--success-bg); color: var(--success-fg); font: 12px ui-monospace, monospace; }
 .preflight-steps .is-current { color: var(--green); font-weight: 600; }
-.preflight-steps .is-current .preflight-step-number { color: #0d2519; background: var(--green); border-color: var(--green); }
+.preflight-steps .is-current .preflight-step-number { color: var(--on-emphasis); background: var(--green); border-color: var(--green); }
 .preflight-grid { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start; }
 .preflight-grid.has-weather { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .preflight-weather-slot { min-width: 0; }
@@ -14,11 +14,11 @@
   padding: 23px 0; border-bottom: 1px solid var(--border); }
 .airspace-check:first-child { padding-top: 4px; }
 .airspace-check:last-child { border: 0; }
-.preflight-check-icon { display: grid; place-items: center; width: 43px; height: 43px; border: 1px solid #355444;
-  border-radius: 11px; color: var(--green); background: #192e25; }
+.preflight-check-icon { display: grid; place-items: center; width: 43px; height: 43px; border: 1px solid var(--success-border);
+  border-radius: 11px; color: var(--green); background: var(--success-bg); }
 .airspace-check h3 { margin: 0 0 9px; font-size: 16px; font-weight: 550; letter-spacing: -.015em; }
 .airspace-check p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.8; max-width: 620px; }
-.airspace-check .status-badge { margin-top: 3px; }
+.airspace-check .ui-status-badge { margin-top: 3px; }
 .preflight-panel-note { display: flex; align-items: flex-start; gap: 8px; margin: 6px 0 0; padding-top: 19px;
   border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; }
 @media (max-width: 1150px) {
@@ -29,6 +29,6 @@
   .preflight-steps li { gap: 9px; font-size: 10px; }
   .airspace-check { grid-template-columns: 34px 1fr; gap: 12px; }
   .preflight-check-icon { width: 34px; height: 34px; border-radius: 9px; }
-  .airspace-check .status-badge { grid-column: 2; margin-top: 0; }
+  .airspace-check .ui-status-badge { grid-column: 2; margin-top: 0; }
   .airspace-check h3 { font-size: 15px; }
 }
