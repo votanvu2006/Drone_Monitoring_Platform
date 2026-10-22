@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
-import type { ExampleProps } from '../../app/examples';
 import { Icon } from '../../components/Icon';
 import { PageHeading, Panel, StatusBadge } from '../../components/ui';
 import {
-  alertCounts, alerts, alertsByCode, formatAlertTime, formatMeasurement, toUtcIso,
+  alertCounts, alerts, alertsByCode,
 } from './alerts.data';
 import type { AlertViewModel } from './alerts.data';
 import './alerts.css';
@@ -14,9 +13,8 @@ function Severity({ alert }: { alert: AlertViewModel }) {
 function AlertStatus({ alert }: { alert: AlertViewModel }) {
   return <StatusBadge tone={alert.status === 'RESOLVED' ? 'success' : 'info'}>{alert.status}</StatusBadge>;
 }
-function AlertTime({ value }: { value: string | null }) {
-  return value === null ? <>Not recorded</>
-    : <time dateTime={toUtcIso(value)}>{formatAlertTime(value)}</time>;
+function AlertTime({ value }: { value: AlertViewModel['times']['detected'] }) {
+  return value === null ? <>Not recorded</> : <time dateTime={value.iso}>{value.text}</time>;
 }
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return <div><dt>{label}</dt><dd>{children}</dd></div>;
@@ -25,9 +23,9 @@ function missingRelation(id: number | null, entity: string) {
   return id === null ? 'No associated ' + entity : 'Record unavailable (ID ' + id + ')';
 }
 
-export function AlertsPage({ state, alertCode }: ExampleProps & { alertCode?: string }) {
-  const detail = state === 'detail' || state === 'detail-active' || state === 'detail-resolved';
-  const selectedCode = alertCode ?? (state === 'detail-resolved' ? 'ALT-016' : 'ALT-014');
+export function AlertsPage({ view = 'list', alertCode = 'ALT-014' }: { view?: 'list' | 'detail'; alertCode?: string }) {
+  const detail = view === 'detail';
+  const selectedCode = alertCode;
   const selected = alertsByCode.get(selectedCode);
   return <>
     <PageHeading eyebrow="OPERATIONS / ALERTS" title={detail ? 'Alert details' : 'Alerts'}
@@ -38,13 +36,6 @@ export function AlertsPage({ state, alertCode }: ExampleProps & { alertCode?: st
         : <Panel title="Alert not found"><p>No alert matches {selectedCode}.</p></Panel>
       : <AlertList />}
   </>;
-}
-
-export function AlertsPreview({ state }: ExampleProps) {
-  const alertCode = new URLSearchParams(window.location.search).get('alert') ?? undefined;
-  return <main className="alerts-page"><div className="alerts-container">
-    <AlertsPage state={state} alertCode={alertCode} />
-  </div></main>;
 }
 
 export function AlertList() {
@@ -77,12 +68,12 @@ export function AlertList() {
               <span className="alert-code">{alert.alert_code}</span>
               <strong>{alert.title}</strong>
               <p>{alert.message}</p>
-              <span className="alert-context">{[alert.drone?.drone_code, alert.mission?.mission_code].filter(Boolean).join(' · ')}</span>
+              <span className="alert-context">{alert.contextLabel}</span>
             </th>
             <td><span className="alert-cell-label" aria-hidden="true">Severity</span><Severity alert={alert} /></td>
             <td><span className="alert-cell-label" aria-hidden="true">Status</span><AlertStatus alert={alert} /></td>
             <td><span className="alert-cell-label" aria-hidden="true">Source</span>{alert.sourceGroup}</td>
-            <td className="alert-time"><span className="alert-cell-label" aria-hidden="true">Detected</span><AlertTime value={alert.detected_at} /></td>
+            <td className="alert-time"><span className="alert-cell-label" aria-hidden="true">Detected</span><AlertTime value={alert.times.detected} /></td>
           </tr>)}</tbody>
         </table>
       </div>
@@ -107,15 +98,15 @@ export function AlertDetail({ alert }: { alert: AlertViewModel }) {
           <Field label="Mission">{alert.mission ? <>{alert.mission.mission_code}<small>{alert.mission.name} · ID {alert.mission_id}</small></> : missingRelation(alert.mission_id, 'mission')}</Field>
           <Field label="Flight">{alert.flight ? <>{alert.flight.flight_code}<small>ID {alert.flight_id}</small></> : missingRelation(alert.flight_id, 'flight')}</Field>
           <Field label="Component">{alert.component ? <>{alert.component.name}<small>{alert.component.component_code} · ID {alert.component_id}</small></> : missingRelation(alert.component_id, 'component')}</Field>
-          <Field label="Component position">{alert.component?.position.replaceAll('_', ' ') ?? 'Not recorded'}</Field>
+          <Field label="Component position">{alert.componentPositionLabel}</Field>
           <Field label="Component serial number">{alert.component?.installation.component_serial_number ?? 'Not recorded'}</Field>
         </dl>
       </Panel>
       <Panel title="Measurements">
         <dl className="alert-metadata alert-metadata-pairs">
           <Field label="Metric">{alert.metric_name ?? 'Not recorded'}</Field>
-          <Field label="Observed value">{formatMeasurement(alert.observed_value, alert.unit)}</Field>
-          <Field label="Threshold value">{formatMeasurement(alert.threshold_value, alert.unit)}</Field>
+          <Field label="Observed value">{alert.observedText}</Field>
+          <Field label="Threshold value">{alert.thresholdText}</Field>
           <Field label="Unit">{alert.unit ?? 'Not recorded'}</Field>
         </dl>
       </Panel>
@@ -133,11 +124,11 @@ export function AlertDetail({ alert }: { alert: AlertViewModel }) {
       </Panel>
       <Panel title="Lifecycle">
         <dl className="alert-metadata">
-          <Field label="Detected time"><AlertTime value={alert.detected_at} /></Field>
-          <Field label="Last observed"><AlertTime value={alert.last_observed_at} /></Field>
-          <Field label="Resolved time"><AlertTime value={alert.resolved_at} /></Field>
-          <Field label="Created time"><AlertTime value={alert.created_at} /></Field>
-          <Field label="Updated time"><AlertTime value={alert.updated_at} /></Field>
+          <Field label="Detected time"><AlertTime value={alert.times.detected} /></Field>
+          <Field label="Last observed"><AlertTime value={alert.times.lastObserved} /></Field>
+          <Field label="Resolved time"><AlertTime value={alert.times.resolved} /></Field>
+          <Field label="Created time"><AlertTime value={alert.times.created} /></Field>
+          <Field label="Updated time"><AlertTime value={alert.times.updated} /></Field>
         </dl>
       </Panel>
       <Panel title="Resolution note">

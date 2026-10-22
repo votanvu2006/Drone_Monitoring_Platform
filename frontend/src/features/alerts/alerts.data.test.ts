@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import seedAlerts from '../../../../data/08-alerts/alerts.json';
+import { alertSeeds as seedAlerts } from '../../data/seeds';
 import {
   alertCounts, alerts, alertsByCode, compareAlertPriority, formatAlertTime, formatMeasurement, toUtcIso,
 } from './alerts.data';

@@ -1,5 +1,5 @@
 import type { ExampleDefinition } from '../../app/examples';
-import { AlertsPreview } from './AlertsPage';
+import { AlertsPreview } from './AlertsPreview';
 
 const alertsPreview: ExampleDefinition = {
   id: 'alerts', title: 'Alerts', component: AlertsPreview, standalone: true,

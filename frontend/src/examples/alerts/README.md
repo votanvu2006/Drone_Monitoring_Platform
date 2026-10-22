@@ -15,3 +15,5 @@ The adapter reads canonical data-pack JSON and joins mission, flight, drone and 
 Order is CRITICAL before WARNING, ACTIVE before RESOLVED within severity, newest detection first, then descending numeric ID. Counts are derived. All record fields, relationship IDs, measurements and lifecycle dates are displayed in the detail. Null values are explicit and zero measurements are preserved. Pack timestamps are UTC and displayed in ICT (UTC+07), independent of the browser timezone.
 
 Both list and details use shared semantic theme tokens. The default standalone preview is light. Search is readonly and filters are disabled. There is no record selection, navigation, acknowledgement, resolution, pagination or API request.
+
+Feature content and read models live in src/features/alerts. Preview state and URL parsing stay in src/examples/alerts. Seed imports and ICT formatting are shared.

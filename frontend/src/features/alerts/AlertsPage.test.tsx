@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
 import { AppShell } from '../../components/AppShell';
-import { alerts, alertsByCode, formatAlertTime, formatMeasurement } from './alerts.data';
+import { alerts, alertsByCode, buildAlertView, formatAlertTime, formatMeasurement } from './alerts.data';
 import { AlertDetail, AlertsPage } from './AlertsPage';
 
 function show(query = 'state=list') {
@@ -101,12 +101,12 @@ describe('standalone alert list and details', () => {
     expect(screen.getByRole('region', { name: 'Related records' })).toHaveTextContent('No associated component');
     expect(screen.getByRole('region', { name: 'Measurements' })).toHaveTextContent('Not recorded');
     empty.unmount();
-    render(<AlertDetail alert={{ ...alerts[0], observed_value: 0, threshold_value: 0, unit: '%' }} />);
+    render(<AlertDetail alert={buildAlertView({ ...alerts[0], observed_value: 0, threshold_value: 0, unit: '%' })} />);
     expect(within(screen.getByRole('region', { name: 'Measurements' })).getAllByText('0 %')).toHaveLength(2);
   });
 
   it('exports content that fits one shared shell when composed later', () => {
-    render(<AppShell title="Alerts" activeNav="Alerts"><AlertsPage state="list" /></AppShell>);
+    render(<AppShell title="Alerts" activeNav="Alerts"><AlertsPage /></AppShell>);
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     fireEvent.click(screen.getByRole('switch', { name: 'Dark theme' }));

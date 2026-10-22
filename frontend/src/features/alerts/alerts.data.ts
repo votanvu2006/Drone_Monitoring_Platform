@@ -1,9 +1,7 @@
-import alertSeeds from '../../../../data/08-alerts/alerts.json';
-import missionSeeds from '../../../../data/04-missions/missions.json';
-import flightSeeds from '../../../../data/07-flight-operations/flights.json';
-import droneSeeds from '../../../../data/02-fleet/drones.json';
-import installedSeeds from '../../../../data/02-fleet/drone-components.json';
-import componentSeeds from '../../../../data/02-fleet/component-catalog.json';
+import { alertSeeds, missionSeeds, flightSeeds, droneSeeds, installedSeeds, componentSeeds } from '../../data/seeds';
+import { formatSeedTime, toUtcIso } from '../../data/format';
+export { toUtcIso };
+export const formatAlertTime = formatSeedTime;
 
 type SeedAlert = typeof alertSeeds[number];
 // Normalize the heterogeneous JSON rows into one nullable record shape.
@@ -27,6 +25,10 @@ const rules: Record<string, { title: string; sourceGroup: AlertSourceGroup }> = 
   MISSION_FAILED: { title: 'Mission failed', sourceGroup: 'System' },
 };
 
+function presentTime(value: string | null) {
+  return value === null ? null : { iso: toUtcIso(value), text: formatSeedTime(value) };
+}
+
 export function buildAlertView(record: AlertRecord) {
   const rule = rules[record.rule_code];
   if (!rule) throw new Error('Missing alert presentation for ' + record.rule_code);
@@ -35,12 +37,21 @@ export function buildAlertView(record: AlertRecord) {
   const installed = installedSeeds.find(item => item.id === record.component_id);
   const component = componentSeeds.find(item => item.id === installed?.component_catalog_id);
   const droneId = flight?.drone_id ?? mission?.drone_id ?? installed?.drone_id;
+  const drone = droneSeeds.find(item => item.id === droneId);
   return {
     ...record,
     ...rule,
     mission,
     flight,
-    drone: droneSeeds.find(item => item.id === droneId),
+    drone,
+    contextLabel: [drone?.drone_code, mission?.mission_code].filter(Boolean).join(' · '),
+    componentPositionLabel: component?.position.replaceAll('_', ' ') ?? 'Not recorded',
+    observedText: formatMeasurement(record.observed_value, record.unit),
+    thresholdText: formatMeasurement(record.threshold_value, record.unit),
+    times: {
+      detected: presentTime(record.detected_at), lastObserved: presentTime(record.last_observed_at),
+      resolved: presentTime(record.resolved_at), created: presentTime(record.created_at), updated: presentTime(record.updated_at),
+    },
     component: component && installed ? { ...component, installation: installed } : null,
   };
 }
@@ -64,17 +75,6 @@ export const alertCounts = {
   resolved: alerts.filter(alert => alert.status === 'RESOLVED').length,
 };
 
-const timeFormat = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: 'short', year: 'numeric',
-  hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
-});
-export function toUtcIso(value: string): string {
-  // Pack DATETIME values are generated in UTC, independent of the browser timezone.
-  return new Date(value.replace(' ', 'T') + 'Z').toISOString();
-}
-export function formatAlertTime(value: string | null): string {
-  return value === null ? 'Not recorded' : timeFormat.format(new Date(toUtcIso(value))) + ' ICT';
-}
 export function formatMeasurement(value: number | null, unit: string | null): string {
   if (value === null) return 'Not recorded';
   return new Intl.NumberFormat('en-GB', { maximumFractionDigits: 3 }).format(value)
