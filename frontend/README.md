@@ -21,4 +21,4 @@ Browser checks cover desktop, tablet, mobile and short landscape layouts, consol
 
 The switch behavior is an explicitly requested extension to issue #27's original static-control scope. No live authentication, logout, session handling or backend requests are implemented.
 
-Fleet specifications and component health use canonical data-pack JSON, including Drone 003's seed faults. Other operational samples are static training fixtures. PR #25 is a separate API-connected prototype in `client/`; it is not a dependency of this frontend.
+All canonical data-pack JSON is imported through src/data/seeds.ts. Domain mappers derive display models; datetime formatting uses UTC input and stable ICT output. Fleet inventory and component health use those records, including Drone 003's seed faults. Preview-only samples belong to their feature. Lint rejects warnings. Navigation metadata is independent of preview registration. PR #25 is a separate API-connected prototype in `client/`; it is not a dependency of this frontend.

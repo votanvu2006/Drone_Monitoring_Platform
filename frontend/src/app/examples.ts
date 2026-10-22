@@ -1,9 +1,6 @@
 import type { ComponentType } from 'react';
 
-export const navigation = [
-  'Overview', 'Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts',
-] as const;
-export type NavigationItem = typeof navigation[number];
+import type { NavigationItem } from './navigation';
 export interface ExampleProps { state: string }
 export interface ExampleDefinition {
   id: string;
