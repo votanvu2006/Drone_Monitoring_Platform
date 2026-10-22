@@ -3,12 +3,12 @@ name: Static UI CI
 on:
   pull_request:
     paths:
-      - 'client/**'
+      - 'frontend/**'
       - '.github/workflows/static-ui-ci.yml'
   push:
     branches: [main]
     paths:
-      - 'client/**'
+      - 'frontend/**'
       - '.github/workflows/static-ui-ci.yml'
 
 permissions:
@@ -20,14 +20,14 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: client
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
