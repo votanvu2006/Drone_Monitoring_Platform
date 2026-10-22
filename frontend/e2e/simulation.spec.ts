@@ -15,5 +15,11 @@ test('scenarios are static examples inside Live Flight', async ({ page }, info) 
   await expect(page.getByRole('radio')).toHaveCount(0);
   await expect(page.getByRole('navigation')).toHaveCount(0);
   await checkLayout(page);
+  await expect(panel.getByRole('article').first()).toHaveCSS('background-color','rgb(246, 248, 250)');
+  await expect(panel.getByRole('heading', {name:'Successful flight'})).toHaveCSS('color','rgb(31, 35, 40)');
   await capture(page, info, 'flight-scenarios');
+  await page.locator('html').evaluate(element => { element.dataset.theme = 'dark'; });
+  await expect(panel.getByRole('article').first()).toHaveCSS('background-color','rgb(22, 27, 34)');
+  await expect(panel.getByRole('heading', {name:'Successful flight'})).toHaveCSS('color','rgb(240, 246, 252)');
+  await capture(page, info, 'flight-scenarios-dark');
 });
