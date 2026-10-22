@@ -26,3 +26,11 @@ All canonical data-pack JSON is imported through src/data/seeds.ts. Domain mappe
 ## Module shell integration (#58)
 
 The application composes module content inside one shell-owned main landmark. Use /?module=drones (default), overview, missions, live-flight, flight-history or alerts to inspect composition while sidebar controls remain static. Modules not present in this checkout show a placeholder. Existing ?screen= previews stay isolated in PreviewHost. Overview/Alerts/Login exports are discovered only from files in the checkout, so merging their feature PRs makes them available without importing unmerged branches. Missions/Live Flight/History require their module adapters after their owners merge the pages. Draft depends on #44.
+
+## Application routes (#60)
+
+The root redirects to /overview. Sidebar links open /overview, /drones, /missions, /live-flight, /flight-history and /alerts. Drone detail uses /drones/:droneCode. Login at /login is standalone; a placeholder is shown until its feature is present. Unknown paths render a not-found page inside the shell. Browser history and theme survive client navigation; reload resets light. Legacy root ?screen= and ?module= previews retain static controls.
+
+### Production hosting
+
+Serve frontend/dist with SPA fallback: valid frontend paths must return index.html while existing assets remain served normally. Vite dev/preview already provide the fallback used by browser tests. For nginx, use try_files $uri $uri/ /index.html; in the frontend location block. A static host that supports redirects can use /* /index.html 200. Backend/API routes must keep their separate handler. No SSR or authentication guard is introduced.
