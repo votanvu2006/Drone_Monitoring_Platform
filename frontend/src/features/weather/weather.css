@@ -8,7 +8,7 @@
 .weather-point-title { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 7px; }
 .weather-point-title h3 { margin: 0; font-size: 16px; font-weight: 550; letter-spacing: -.015em; }
 .weather-point-index { font: 9px ui-monospace, monospace; color: var(--muted); letter-spacing: .09em; }
-.weather-point-content p { margin: 11px 0 0; color: #b9c9d9; font-size: 12px; line-height: 1.8; }
+.weather-point-content p { margin: 11px 0 0; color: var(--fg-muted); font-size: 12px; line-height: 1.8; }
 @media (max-width: 480px) {
   .weather-point { gap: 12px; }
   .weather-point-icon { width: 34px; height: 34px; border-radius: 9px; }

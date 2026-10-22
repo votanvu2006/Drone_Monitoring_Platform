@@ -15,5 +15,9 @@ test('Weather and Airspace share the Mission Wizard preflight example', async ({
   await expect(page.getByRole('navigation')).toHaveCount(0);
   await expect(page.getByRole('button')).toHaveCount(0);
   await checkLayout(page);
+  await expect(weather.locator('.weather-point-content p').first()).toHaveCSS('color','rgb(89, 99, 110)');
   await capture(page, info, 'preflight-weather');
+  await page.locator('html').evaluate(element => { element.dataset.theme='dark'; });
+  await expect(weather.locator('.weather-point-content p').first()).toHaveCSS('color','rgb(145, 152, 161)');
+  await capture(page, info, 'preflight-weather-dark');
 });
