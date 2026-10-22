@@ -4,3 +4,6 @@
 client/test-results/
 client/playwright-report/
 .ui-qa/
+
+frontend/test-results/
+frontend/playwright-report/

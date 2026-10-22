@@ -1,7 +1,4 @@
-import droneSeeds from '../../../../../data/02-fleet/drones.json';
-import modelSeeds from '../../../../../data/02-fleet/drone-models.json';
-import catalogSeeds from '../../../../../data/02-fleet/component-catalog.json';
-import installedSeeds from '../../../../../data/02-fleet/drone-components.json';
+import { droneSeeds, modelSeeds, componentSeeds as catalogSeeds, installedSeeds } from '../../../data/seeds';
 import type { ComponentHealthStatus, DroneStatus } from '../drone.types';
 import type {
   DroneComponentPosition,
