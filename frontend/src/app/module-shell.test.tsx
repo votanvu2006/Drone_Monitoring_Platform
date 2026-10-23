@@ -11,7 +11,9 @@ describe('shared module composition', () => {
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     expect(screen.getAllByRole('banner')).toHaveLength(1);
-    expect(screen.getByRole('banner')).toHaveTextContent(module.label);
+    expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
+    expect(screen.getByRole('navigation').querySelector('[aria-current="page"]')).toHaveTextContent(module.label);
+    expect(screen.getByRole('heading', { level: 1 })).toBeVisible();
     if (!availableModulePages[module.id]) expect(screen.getByRole('main')).toHaveTextContent('This page is not available yet.');
     const before=window.location.href;
     fireEvent.click(screen.getByRole('navigation').querySelector('.nav-item') as HTMLElement);

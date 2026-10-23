@@ -7,7 +7,7 @@ export function App() {
   const params = new URLSearchParams(window.location.search);
   if (params.has('screen')) return <PreviewHost search={params.toString()} />;
   const module = moduleNavigation.find(item => item.id === params.get('module')) ?? moduleNavigation[1];
-  return <AppShell title={module.label} contentClassName={module.id === 'drones' ? 'fleet-content' : ''}>
+  return <AppShell activeNav={module.label} contentClassName={module.id === 'drones' ? 'fleet-content' : ''}>
     <ModuleContent module={module} />
   </AppShell>;
 }

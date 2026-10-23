@@ -5,8 +5,8 @@ import type { NavigationItem } from '../app/navigation';
 import { operatorProfile } from '../data/fixtures';
 import { Icon } from './Icon';
 
-export function AppShell({ title, activeNav = 'Overview', children, contentClassName = '' }: {
-  title: string; activeNav?: NavigationItem; children: ReactNode; contentClassName?: string;
+export function AppShell({ activeNav = 'Overview', children, contentClassName = '' }: {
+  activeNav?: NavigationItem; children: ReactNode; contentClassName?: string;
 }) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   useEffect(() => {
@@ -18,7 +18,6 @@ export function AppShell({ title, activeNav = 'Overview', children, contentClass
     <aside className="sidebar">
       <div className="brand"><span className="brand-symbol"><Icon name="drone" size={23} /></span>
         <strong>Drone Monitoring<br />Platform</strong></div>
-      <div className="workspace-label">Workspace</div>
       <nav aria-label="Primary navigation"><ul className="primary-nav">
         {moduleNavigation.map((item) => <li key={item.id}>
           <span className={'nav-item' + (item.label === activeNav ? ' is-selected' : '')}
@@ -35,8 +34,6 @@ export function AppShell({ title, activeNav = 'Overview', children, contentClass
     </aside>
     <div className="main-column">
       <header className="topbar">
-        <div className="breadcrumb"><span>Operations</span><span aria-hidden="true">/</span>
-          <strong>{title}</strong></div>
         <div className="header-actions">
           <button type="button" className="theme-toggle" role="switch" aria-checked={theme === 'dark'}
             aria-label="Dark theme" onClick={() => setTheme(current => current === 'light' ? 'dark' : 'light')}>
