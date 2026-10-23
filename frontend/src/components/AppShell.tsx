@@ -5,8 +5,8 @@ import type { NavigationItem } from '../app/navigation';
 import { operatorProfile } from '../data/fixtures';
 import { Icon } from './Icon';
 
-export function AppShell({ activeNav = 'Overview', children, contentClassName = '' }: {
-  activeNav?: NavigationItem; children: ReactNode; contentClassName?: string;
+export function AppShell({ activeNav = 'Overview', children, contentClassName = '', navigationContent }: {
+  activeNav?: NavigationItem; children: ReactNode; contentClassName?: string; navigationContent?: ReactNode;
 }) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   useEffect(() => {
@@ -18,14 +18,14 @@ export function AppShell({ activeNav = 'Overview', children, contentClassName = 
     <aside className="sidebar">
       <div className="brand"><span className="brand-symbol"><Icon name="drone" size={23} /></span>
         <strong>Drone Monitoring<br />Platform</strong></div>
-      <nav aria-label="Primary navigation"><ul className="primary-nav">
+      <nav aria-label="Primary navigation">{navigationContent ?? <ul className="primary-nav">
         {moduleNavigation.map((item) => <li key={item.id}>
           <span className={'nav-item' + (item.label === activeNav ? ' is-selected' : '')}
             aria-current={item.label === activeNav ? 'page' : undefined}>
             <Icon name={item.icon} /><span>{item.label}</span>
           </span>
         </li>)}
-      </ul></nav>
+      </ul>}</nav>
       <div className="sidebar-bottom">
         <button type="button" className="logout-control" disabled>
           <Icon name="logout" size={18} /><span>Log out</span>

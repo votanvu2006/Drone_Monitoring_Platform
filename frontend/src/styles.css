@@ -112,3 +112,6 @@
   .context-strip { padding: 16px; gap: 16px; }
   .context-strip .ui-status-badge { margin-left: 0; }
 }
+
+.primary-nav a { color: inherit; text-decoration: none; cursor: pointer; }
+.primary-nav a.is-selected { color: var(--info-fg); }
