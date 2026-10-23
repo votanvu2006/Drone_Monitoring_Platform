@@ -16,6 +16,14 @@ test('shell is readable, logout stays reachable and navigation remains static', 
   await expect(nav.getByText('Alerts', { exact: true })).toBeInViewport();
   await expect(logout).toBeInViewport();
   await expect(page.getByRole('banner')).toContainText('operator');
+  await expect(page.getByRole('banner')).not.toContainText('Operations');
+  await expect(page.getByText('Workspace', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.ui-page-heading .eyebrow')).toHaveCount(0);
+  const headerBox = (await page.getByRole('banner').boundingBox())!;
+  const actionsBox = (await page.locator('.header-actions').boundingBox())!;
+  const rightInset = headerBox.x + headerBox.width - actionsBox.x - actionsBox.width;
+  expect(rightInset).toBeGreaterThanOrEqual(15);
+  expect(rightInset).toBeLessThanOrEqual(29);
   await expect(page.locator('footer')).toHaveCount(0);
   await checkLayout(page);
   await capture(page, info, 'shell-light');
