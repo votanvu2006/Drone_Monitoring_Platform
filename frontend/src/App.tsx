@@ -11,7 +11,7 @@ export function App() {
   const Screen = definition.component;
   const content = <Screen state={state} />;
   if (definition.standalone) return content;
-  return <AppShell title={definition.title} activeNav={definition.activeNav}
+  return <AppShell activeNav={definition.activeNav}
     contentHasMain={definition.contentHasMain}>{content}</AppShell>;
 }
 
