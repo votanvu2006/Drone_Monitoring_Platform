@@ -8,7 +8,9 @@ describe('module routes', () => {
   it.each(moduleNavigation)('opens $path directly with its matching sidebar item', async module => {
     show(module.path);
     expect(screen.getAllByRole('main')).toHaveLength(1);
-    expect(screen.getByRole('banner')).toHaveTextContent(module.label);
+    expect(screen.getAllByRole('banner')).toHaveLength(1);
+    expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
+    expect(screen.getByRole('heading', { level: 1 })).toBeVisible();
     expect(screen.getByRole('link',{name:module.label})).toHaveAttribute('aria-current','page');
   });
   it('redirects the root to Overview', async () => {

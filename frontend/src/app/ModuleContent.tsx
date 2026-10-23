@@ -4,7 +4,7 @@ import type { ModuleNavigationEntry } from './navigation';
 
 function ModulePlaceholder({ title }: { title: string }) {
   return <section className="module-placeholder">
-    <PageHeading eyebrow="WORKSPACE" title={title} description="This page is not available yet." />
+    <PageHeading title={title} description="This page is not available yet." />
     <Panel title="Coming soon"><p>The workspace is ready for this page.</p></Panel>
   </section>;
 }

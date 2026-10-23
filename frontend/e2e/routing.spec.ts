@@ -24,7 +24,9 @@ test('all six routes survive direct loads and refresh', async ({page},info) => {
   for (const [path,label] of modules) {
     await page.goto('/'+path);await page.reload();
     await expect(page.getByRole('main')).toHaveCount(1);
-    await expect(page.getByRole('banner')).toContainText(label);
+    await expect(page.getByRole('banner')).toHaveCount(1);
+    await expect(page.getByRole('banner')).not.toContainText('Operations');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
     await checkLayout(page);await capture(page,info,'route-'+path+'-light');
   }
@@ -47,5 +49,9 @@ test('keyboard navigation, standalone login and unknown paths are supported', as
   await expect(page).toHaveURL(new RegExp("/drones$"));
   await page.goto('/login');await expect(page.getByRole('main')).toHaveCount(1);
   await expect(page.getByRole('navigation')).toHaveCount(0);await expect(page.getByRole('banner')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Drone Monitoring Platform');
+  await expect(page.getByLabel('Username')).toHaveAttribute('readonly');
+  await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('readonly');
+  await expect(page.getByRole('button', { name: 'Sign In', exact: true })).toBeDisabled();
   await checkLayout(page);await capture(page,info,'login-route');
 });

@@ -18,12 +18,12 @@ function RoutedShell() {
   const { pathname } = useLocation();
   const module = moduleNavigation.find(item => matchPath(item.path, pathname)
     || (item.id === 'drones' && matchPath('/drones/:droneCode', pathname)));
-  return <AppShell title={module?.label ?? 'Page not found'} navigationContent={<ModuleLinks />}
+  return <AppShell navigationContent={<ModuleLinks />}
     contentClassName={module?.id === 'drones' ? 'fleet-content' : ''}><Outlet /></AppShell>;
 }
 
 function NotFoundPage() {
-  return <><PageHeading eyebrow="WORKSPACE" title="Page not found" description="The page you requested could not be found." />
+  return <><PageHeading title="Page not found" description="The page you requested could not be found." />
     <Panel title="Choose a page"><p>Use the sidebar to return to your workspace.</p></Panel></>;
 }
 

@@ -3,7 +3,7 @@ import { PageHeading, Panel, StatusBadge } from '../components/ui';
 
 export function ShellExample() {
   return <>
-    <PageHeading eyebrow="OPERATIONS / WORKSPACE" title="Your flight operations workspace"
+    <PageHeading title="Your flight operations workspace"
       description="A clear view of the fleet, the mission, and the flight ahead."
       accessory={<StatusBadge tone="success">Workspace ready</StatusBadge>} />
     <Panel title="One workspace. Every operation." eyebrow="DRONE MONITORING PLATFORM">
