@@ -11,6 +11,7 @@ test('overview shows consistent summary data without card actions', async ({ pag
   await expect(page.locator('.activity-list li')).toHaveCount(5);
   await expect(page.getByRole('banner')).toHaveCount(0);
   await expect(page.getByRole('navigation')).toHaveCount(0);
+  await expect(page.locator('.ui-page-heading .eyebrow')).toHaveCount(0);
   const before = page.url();
   await page.getByRole('region', { name: 'Fleet status' }).click();
   expect(page.url()).toBe(before);
@@ -18,4 +19,7 @@ test('overview shows consistent summary data without card actions', async ({ pag
   await expect(page.getByRole('link')).toHaveCount(0);
   await checkLayout(page);
   await capture(page, info, 'overview');
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+  await checkLayout(page);
+  await capture(page, info, 'overview-dark');
 });

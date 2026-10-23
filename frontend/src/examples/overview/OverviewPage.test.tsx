@@ -23,6 +23,7 @@ describe('canonical overview dashboard', () => {
     fireEvent.click(screen.getByRole('region',{name:'Open alerts'}));
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
     expect(screen.queryByRole('banner')).not.toBeInTheDocument();
+    expect(document.querySelector('.ui-page-heading .eyebrow')).toBeNull();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     expect(fetchSpy).not.toHaveBeenCalled();
   });

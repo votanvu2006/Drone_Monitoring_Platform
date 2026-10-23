@@ -7,7 +7,7 @@ import './overview.css';
 export function OverviewPage({ snapshot = overviewSnapshot }: { snapshot?: OverviewSnapshot }) {
   const flight = snapshot.activeFlight;
   return <>
-    <PageHeading eyebrow="OPERATIONS / OVERVIEW" title="Operations overview"
+    <PageHeading title="Operations overview"
       description="Fleet readiness, mission activity, and the events that need your attention."
       accessory={<StatusBadge tone="neutral">{snapshot.flights.detail}</StatusBadge>} />
     <div className="metric-grid">
