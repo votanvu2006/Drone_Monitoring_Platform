@@ -15,9 +15,9 @@ export function Panel({ title, eyebrow, accessory, children, className = '' }: {
   </section>;
 }
 export function PageHeading({ eyebrow, title, description, accessory }: {
-  eyebrow: string; title: string; description: string; accessory?: ReactNode;
+  eyebrow?: string; title: string; description: string; accessory?: ReactNode;
 }) {
-  return <div className="ui-page-heading"><div><span className="eyebrow">{eyebrow}</span>
+  return <div className="ui-page-heading"><div>{eyebrow && <span className="eyebrow">{eyebrow}</span>}
     <h1>{title}</h1><p>{description}</p></div>{accessory}</div>;
 }
 export function MetricCard({ label, value, detail, icon, tone = 'success' }: {
