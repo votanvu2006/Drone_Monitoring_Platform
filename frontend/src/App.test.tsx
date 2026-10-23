@@ -12,6 +12,9 @@ describe('shared application shell', () => {
     navigation.forEach((item) => expect(within(nav).getByText(item)).toBeVisible());
     expect(within(nav).getByText('Overview').closest('.nav-item')).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('banner')).toBeVisible();
+    expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
+    expect(screen.queryByText('Workspace', { exact: true })).not.toBeInTheDocument();
+    expect(document.querySelector('.ui-page-heading .eyebrow')).toBeNull();
     expect(screen.getByRole('main')).toHaveTextContent('Your flight operations workspace');
   });
   it('keeps navigation visual and does not call APIs', () => {
@@ -24,7 +27,7 @@ describe('shared application shell', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
   it('hosts arbitrary module content and highlights its declared section', () => {
-    render(<AppShell title="Alerts" activeNav="Alerts"><h1>Example module</h1></AppShell>);
+    render(<AppShell activeNav="Alerts"><h1>Example module</h1></AppShell>);
     expect(screen.getByRole('main')).toHaveTextContent('Example module');
     expect(screen.getByRole('navigation').querySelector('[aria-current="page"]')).toHaveTextContent('Alerts');
   });
