@@ -5,8 +5,8 @@ import type { NavigationItem } from '../app/navigation';
 import { operatorProfile } from '../data/fixtures';
 import { Icon } from './Icon';
 
-export function AppShell({ activeNav = 'Overview', children, contentHasMain = false }: {
-  activeNav?: NavigationItem; children: ReactNode; contentHasMain?: boolean;
+export function AppShell({ activeNav = 'Overview', children, contentClassName = '' }: {
+  activeNav?: NavigationItem; children: ReactNode; contentClassName?: string;
 }) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   useEffect(() => {
@@ -44,8 +44,7 @@ export function AppShell({ activeNav = 'Overview', children, contentHasMain = fa
             <strong>{operatorProfile.username}</strong></div>
         </div>
       </header>
-      {contentHasMain ? <div className="page-content fleet-content">{children}</div>
-        : <main className="page-content">{children}</main>}
+      <main className={['page-content', contentClassName].filter(Boolean).join(' ')}>{children}</main>
     </div>
   </div>;
 }

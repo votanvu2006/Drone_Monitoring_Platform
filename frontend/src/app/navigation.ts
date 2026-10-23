@@ -11,3 +11,6 @@ export const moduleNavigation = [
 
 export type NavigationItem = typeof moduleNavigation[number]['label'];
 export const navigation = moduleNavigation.map(item => item.label);
+
+export type ModuleId = typeof moduleNavigation[number]['id'];
+export type ModuleNavigationEntry = typeof moduleNavigation[number];

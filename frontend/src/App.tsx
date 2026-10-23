@@ -1,18 +1,14 @@
-import { resolveExample } from './app/examples';
-import type { ExampleModule } from './app/examples';
 import { AppShell } from './components/AppShell';
-
-const modules = import.meta.glob<ExampleModule>('./examples/**/*.preview.tsx', { eager: true });
+import { ModuleContent } from './app/ModuleContent';
+import { moduleNavigation } from './app/navigation';
+import { PreviewHost } from './app/PreviewHost';
 
 export function App() {
   const params = new URLSearchParams(window.location.search);
-  if (!params.has('screen')) params.set('screen', 'drones');
-  const { definition, state } = resolveExample(modules, params.toString());
-  const Screen = definition.component;
-  const content = <Screen state={state} />;
-  if (definition.standalone) return content;
-  return <AppShell activeNav={definition.activeNav}
-    contentHasMain={definition.contentHasMain}>{content}</AppShell>;
+  if (params.has('screen')) return <PreviewHost search={params.toString()} />;
+  const module = moduleNavigation.find(item => item.id === params.get('module')) ?? moduleNavigation[1];
+  return <AppShell activeNav={module.label} contentClassName={module.id === 'drones' ? 'fleet-content' : ''}>
+    <ModuleContent module={module} />
+  </AppShell>;
 }
-
 export default App;
