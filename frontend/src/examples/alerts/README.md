@@ -1,19 +1,23 @@
-# Alerts UI — issue #31
+# Alerts UI - issue #31
+
+The fixed frontend examples follow the updated issue and maintainer comment of 23 October 2026:
+
+- DEMO-ALT-001: low battery, DRONE-002 / mission-002, WARNING, Components.
+- DEMO-ALT-002: high motor temperature, DRONE-002 / mission-002, WARNING, Components.
+- DEMO-ALT-003: weather failure, DRONE-005 / mission-005, CRITICAL, Weather.
+
+Mission identifiers match the fixed Missions demo. DEMO-ALT-* codes distinguish these presentation examples from canonical ALT-* records. The data pack and backend are unchanged.
 
 Previews:
 
-- `/?screen=alerts`: all 24 canonical seed alerts (6 active, 18 resolved).
-- `/?screen=alerts&state=detail-active`: ALT-014, active propeller incident.
-- `/?screen=alerts&state=detail-resolved`: ALT-016, resolved GPS incident.
-- `/?screen=alerts&state=detail&alert=ALT-001`: any alert by its stable code.
-- An unknown explicit alert code displays "Alert not found". Detail without a code defaults to ALT-014.
+- `/?screen=alerts`: the three examples, CRITICAL first, then WARNING, newest detection first within severity, then ascending alert code.
+- `/?screen=alerts&state=detail-active`: DEMO-ALT-001, with an empty resolution-note area.
+- `/?screen=alerts&state=detail-resolved`: DEMO-ALT-003, with a recorded resolution note.
+- `/?screen=alerts&state=detail&alert=DEMO-ALT-002`: an explicit example by code.
+- An unknown code displays "Alert not found". Detail without a code defaults to DEMO-ALT-001. The legacy detail-active/detail-resolved state names remain review-preview aliases; they do not add a Status column.
 
-The preview is standalone and has one main landmark, with no shared navigation or global header. Exported AlertsPage, AlertList and AlertDetail are content components for later shell integration.
+The seven list columns are Alert ID/title, Drone, Mission, Problem Description, Severity, Source and Detected Time. Counts show Total, Critical and Warning. Descriptions are short and separate from the alert title. All times are fixed UTC values formatted in ICT (UTC+07) through the shared formatter, independently of the browser timezone.
 
-The adapter reads canonical data-pack JSON and joins mission, flight, drone and installed component records by ID. No seed or backend files are modified. Source is a presentation group (Components, Connectivity, Airspace, Weather or System); original source, rule and alert type remain visible in details.
+The standalone preview has one main landmark and no global header or navigation. AlertsPage, AlertList and AlertDetail are content exports for shared-shell composition; AlertsPage retains its view and alertCode props. Search is readonly, the Severity filter is disabled and rows do not select or navigate. Both appearances use shared tokens; mobile rows keep a visible label for every field. There are no API requests, acknowledgement or resolution actions.
 
-Order is CRITICAL before WARNING, ACTIVE before RESOLVED within severity, newest detection first, then descending numeric ID. Counts are derived. All record fields, relationship IDs, measurements and lifecycle dates are displayed in the detail. Null values are explicit and zero measurements are preserved. Pack timestamps are UTC and displayed in ICT (UTC+07), independent of the browser timezone.
-
-Both list and details use shared semantic theme tokens. The default standalone preview is light. Search is readonly and filters are disabled. There is no record selection, navigation, acknowledgement, resolution, pagination or API request.
-
-Feature content and read models live in src/features/alerts. Preview state and URL parsing stay in src/examples/alerts. Seed imports and ICT formatting are shared.
+Feature data and content live in src/features/alerts. Preview state and URL parsing stay in src/examples/alerts. The page has no path-like Operations/Alerts eyebrow.
