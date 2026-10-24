@@ -76,21 +76,21 @@
 }
 
 .status--available {
-  border-color: #1a7f3766;
-  background: #dafbe1;
-  color: #1a7f37;
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-fg);
 }
 
 .status--in-flight {
-  border-color: #0969da66;
-  background: #ddf4ff;
-  color: #0969da;
+  border-color: var(--info-border);
+  background: var(--info-bg);
+  color: var(--info-fg);
 }
 
 .status--maintenance {
-  border-color: #9a670066;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 /* ---------- Drone name and metadata ---------- */
@@ -190,9 +190,9 @@
   align-items: center;
   overflow: hidden;
   padding: 3px;
-  border: 1.5px solid #1a7f3766;
+  border: 1.5px solid var(--success-border);
   border-radius: var(--radius-default);
-  background: #dafbe1;
+  background: var(--success-bg);
 }
 
 .battery-fill {
@@ -207,7 +207,7 @@
   height: 11px;
   flex: 0 0 4px;
   border-radius: 0 3px 3px 0;
-  background: #1a7f3766;
+  background: var(--success-border);
 }
 
 /* ---------- Drone actions ---------- */
@@ -252,14 +252,14 @@
   align-items: center;
   padding: 2px;
   border-radius: var(--radius-full);
-  background: #9198a1;
+  background: var(--switch-bg);
 }
 
 .switch-knob {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--on-emphasis);
 }
 
 .switch-label {

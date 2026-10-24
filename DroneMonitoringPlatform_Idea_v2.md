@@ -477,7 +477,7 @@ Drone_Monitoring_Platform/
 ├── DroneMonitoringPlatform_Idea_v2.md    # this plan (v2.0.0)
 ├── data/                                 # data pack v2.0.0
 ├── backend/                              # Express API, domain modules
-├── client/                               # React app (when added / maintained)
+├── frontend/                               # React app (when added / maintained)
 ├── docs/
 ├── .github/
 ├── README.md

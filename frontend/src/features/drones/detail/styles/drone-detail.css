@@ -134,21 +134,21 @@
 }
 
 .drone-detail-status--available {
-  border-color: #1a7f3766;
-  background: #dafbe1;
+  border-color: var(--success-border);
+  background: var(--success-bg);
   color: var(--success-fg);
 }
 
 .drone-detail-status--in-flight {
-  border-color: #0969da66;
-  background: #ddf4ff;
+  border-color: var(--info-border);
+  background: var(--info-bg);
   color: var(--accent-fg);
 }
 
 .drone-detail-status--maintenance {
-  border-color: #9a670066;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 /* ---------- Drone profile ---------- */
@@ -304,21 +304,21 @@
 }
 
 .component-health--healthy {
-  border-color: #1a7f3766;
-  background: #dafbe1;
+  border-color: var(--success-border);
+  background: var(--success-bg);
   color: var(--success-fg);
 }
 
 .component-health--warning {
-  border-color: #9a670066;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 .component-health--fault {
-  border-color: #cf222e66;
-  background: #ffebe9;
-  color: #cf222e;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 .component-health--maintenance {
@@ -525,23 +525,23 @@
 }
 
 .drone-component-health--healthy {
-  border-color: #1a7f3766;
-  background: #dafbe1;
-  color: #1a7f37;
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-fg);
 }
 
 .drone-component-health--warning,
 .drone-finding-severity--warning {
-  border-color: #9a670066;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 .drone-component-health--fault,
 .drone-finding-severity--fault {
-  border-color: #cf222e66;
-  background: #ffebe9;
-  color: #cf222e;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 .drone-component-health--maintenance {
