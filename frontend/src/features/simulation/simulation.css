@@ -1,0 +1,13 @@
+.scenario-count { color: var(--muted); font-size: 11px; }
+.scenario-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.scenario-card { border: 1px solid var(--border); border-radius: 11px; background: var(--canvas-subtle); padding: 23px; min-width: 0; }
+.scenario-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
+.scenario-icon { display: grid; place-items: center; width: 43px; height: 43px; border-radius: 11px; border: 1px solid currentColor; }
+.scenario-card h3 { font-size: 20px; font-weight: 550; letter-spacing: -.025em; margin: 8px 0 21px; }
+.scenario-event { border-top: 1px solid var(--border); padding-top: 16px; }
+.scenario-event > span { font: 9px ui-monospace, monospace; color: var(--muted); letter-spacing: .1em; }
+.scenario-event p { margin: 9px 0 0; color: var(--fg-muted); font-size: 12px; line-height: 1.8; }
+@media (max-width: 600px) {
+  .scenario-grid { grid-template-columns: 1fr; gap: 15px; }
+  .scenario-card { padding: 20px; }
+}
