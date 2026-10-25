@@ -34,3 +34,11 @@ export type FleetSnapshot = {
 export type FleetDataSource = {
   loadSnapshot: () => Promise<FleetSnapshot>;
 };
+
+export type DroneInventoryStatusFilter = "ALL" | DroneStatus;
+
+export type DroneInventoryFilters = {
+  searchText: string;
+  status: DroneInventoryStatusFilter;
+  modelName: string;
+};
