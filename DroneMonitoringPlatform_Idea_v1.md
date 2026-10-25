@@ -37,7 +37,7 @@ Idea design:
 
 ## 3. Version 1.0.0 Scope
 
-The version 1.0.0 manages exactly **one drone** and contains six user-facing features:
+The version 1.0.0 supports a **multi-drone fleet** and contains six user-facing features. The demo data currently seeds five aircraft; fleet size is determined by backend records rather than a frontend hard-coded limit.
 
 1. **Overview**
 2. **Drone**
@@ -69,8 +69,8 @@ This table defines the single best location for each type of information.
 | Information | Primary location | Reason |
 | --- | --- | --- |
 | Drone image and product identity | Overview | Visual introduction to the platform |
-| Drone ID, model and structure | Drone | Describes the single drone and its physical components |
-| Drone operational status | Drone | Shows whether the drone is available, offline or in use |
+| Drone ID, model and structure | Drone Fleet | Describes each backend-recorded aircraft and its physical components |
+| Drone operational status | Drone Fleet | Shows whether each aircraft is available, offline or in use |
 | Flight status | Live Flight | Describes the current flight, not the drone itself |
 | Battery level | Live Flight | Battery is most useful during active monitoring |
 | Altitude and speed | Live Flight | Live telemetry only |
@@ -114,11 +114,11 @@ Built for precise aerial monitoring.
 [Image of Drone]
 ```
 
-### 5.2 Drone
+### 5.2 Drone Fleet
 
 #### Purpose
 
-Present the identity and physical structure of the single drone used by the project.
+Present every aircraft returned by the fleet API, including identity, operational status and last known position. Operators can open live monitoring for a specific aircraft.
 
 #### Drone will have 3 status:
 
@@ -487,7 +487,7 @@ GET    /api/flights
 GET    /api/flights/:id
 ```
 
-There is no separate `/api/overview` endpoint. Overview and Drone use the single-drone data from `/api/drone`.
+There is no separate `/api/overview` endpoint. Overview and Drone Fleet aggregate paginated records from `/api/drones` and `/api/flights`. The demo data currently seeds five aircraft; the UI follows the backend fleet rather than assuming a fixed count.
 
 ## 11. Repository Structure
 
@@ -568,7 +568,7 @@ Submission checklist:
 - [ ] MySQL database
 - [ ] Frontend communicates only through the REST API
 - [ ] Six core user-facing features completed
-- [ ] Exactly one drone is used in v1
+- [ ] Fleet screens display backend aircraft records and allow per-aircraft flight monitoring
 - [ ] Mission routes are validated against demo restricted zones
 - [ ] Mission weather suitability is displayed
 - [ ] Responsive interface
