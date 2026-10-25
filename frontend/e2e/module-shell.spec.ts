@@ -9,9 +9,27 @@ test('all modules share a single frame and static sidebar', async ({page},info) 
     await expect(page.getByRole('banner')).not.toContainText('Operations');
     await expect(page.getByRole('navigation').locator('[aria-current="page"]')).toHaveText(label);
     await expect(page.getByRole('button',{name:'Log out'})).toBeDisabled();
+    if (['missions', 'live-flight', 'flight-history', 'alerts'].includes(module)) {
+      await expect(page.getByText('This page is not available yet.', { exact: true })).toHaveCount(0);
+    }
+    if (module === 'missions') {
+      await expect(page.locator('.mission-table tbody tr')).toHaveCount(5);
+      await expect(page.getByRole('button', { name: 'Create mission — coming soon' })).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'View alert for Mission 002' })).toBeDisabled();
+    }
+    if (module === 'live-flight') {
+      await expect(page.locator('.live-flight-details')).toContainText('FLIGHT-015');
+      await expect(page.locator('.flight-route-svg')).toBeVisible();
+    }
+    if (module === 'flight-history') {
+      await expect(page.locator('.flight-history-table tbody tr')).toHaveCount(4);
+      await expect(page.getByRole('searchbox', { name: 'Search flights' })).toHaveAttribute('readonly');
+    }
+    if (module === 'alerts') await expect(page.locator('tbody tr[data-alert-code]')).toHaveCount(3);
     await checkLayout(page);
     await capture(page,info,'module-' + module);
-    await page.getByRole('switch', { name: 'Dark theme' }).click();
+    await expect(page.getByRole('switch', { name: 'Dark theme' })).toBeDisabled();
+    await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
     await checkLayout(page);
     await capture(page,info,'module-' + module + '-dark');
   }

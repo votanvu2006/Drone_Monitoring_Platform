@@ -39,9 +39,9 @@ function FlightHistoryListPage() {
   }, []);
 
   return (
-    <main className="flight-history-page">
+    <section className="flight-history-page">
       <div className="flight-history-container">
-        <header className="flight-history-heading">
+        <div className="flight-history-heading">
           <p className="flight-history-eyebrow">
             Flight operations
           </p>
@@ -49,7 +49,7 @@ function FlightHistoryListPage() {
           <p className="flight-history-description">
             Review past flight records.
           </p>
-        </header>
+        </div>
 
         {pageState.kind === "loading" && (
           <p className="flight-history-message" role="status">
@@ -68,21 +68,21 @@ function FlightHistoryListPage() {
             className="flight-history-panel"
             aria-labelledby="flight-history-list-title"
           >
-            <header className="flight-history-panel-heading">
+            <div className="flight-history-panel-heading">
               <div>
                 <h2 id="flight-history-list-title">
                   Flight records
                 </h2>
                 <p>{pageState.records.length} records</p>
               </div>
-            </header>
+            </div>
 
             <FlightHistoryFilters records={pageState.records} />
             <FlightHistoryTable records={pageState.records} />
           </section>
         )}
       </div>
-    </main>
+    </section>
   );
 }
 

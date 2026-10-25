@@ -79,7 +79,7 @@ export function FlightRoutePanel({
       className="flight-route-panel"
       aria-labelledby="flight-route-title"
     >
-      <header className="flight-route-heading">
+      <div className="flight-route-heading">
         <div>
           <p className="flight-section-eyebrow">Flight route</p>
           <h2 id="flight-route-title">{flight.routeName}</h2>
@@ -93,7 +93,7 @@ export function FlightRoutePanel({
             <small>{currentWaypoint.label}</small>
           )}
         </div>
-      </header>
+      </div>
 
       <div className="flight-route-progress">
         <div className="flight-route-progress-heading">

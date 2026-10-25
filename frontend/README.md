@@ -26,6 +26,8 @@ All canonical data-pack JSON is imported through src/data/seeds.ts. Domain mappe
 
 ## Module shell integration (#58)
 
-The application composes module content inside one shell-owned main landmark. Use /?module=drones (default), overview, missions, live-flight, flight-history or alerts to inspect composition while sidebar controls remain static. Modules not present in this checkout show a placeholder. Existing ?screen= previews stay isolated in PreviewHost. Overview/Alerts/Login exports are discovered only from files in the checkout, so merging their feature PRs makes them available without importing unmerged branches. Missions/Live Flight/History require their module adapters after their owners merge the pages. Draft depends on #44.
+The application composes module content inside one shell-owned main landmark. Use `/?module=drones` (default), `overview`, `missions`, `live-flight`, `flight-history` or `alerts` to inspect composition while sidebar controls remain static. Existing `?screen=` previews stay isolated in PreviewHost.
 
-The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. Login from merged PR #45 is present through the synchronized shell; Overview and Alerts remain optional until their feature PRs arrive.
+Missions, Live Flight and Flight History reuse the page components merged into main through #56, #57 and #59. Their outer sections inherit the shell spacing without a second main landmark. Existing mission filters, the live-flight selector and static history controls retain their behavior and sample data. Alerts and Login are present through the shell's merged feature PRs. Overview remains a placeholder until #46 is integrated; its optional export is discovered only if its file exists in the checkout.
+
+The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. Theme and Log out controls remain disabled visual placeholders. Draft depends on #44; application routing belongs to #62.
