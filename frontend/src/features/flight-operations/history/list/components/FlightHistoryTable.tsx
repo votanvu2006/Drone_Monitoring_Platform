@@ -8,6 +8,7 @@ import {
 
 type FlightHistoryTableProps = {
   records: FlightHistoryRecord[];
+  isFiltered: boolean;
 };
 
 function FlightStatusBadge({
@@ -29,12 +30,20 @@ function FlightStatusBadge({
 
 export function FlightHistoryTable({
   records,
+  isFiltered,
 }: FlightHistoryTableProps) {
   if (records.length === 0) {
     return (
-      <div className="flight-history-empty">
-        <h3>No flight records</h3>
-        <p>Flight history will appear here when available.</p>
+      <div className="flight-history-empty" role="status">
+        <h3>
+          {isFiltered ? "No matching flights" : "No flight records"}
+        </h3>
+
+        <p>
+          {isFiltered
+            ? "Try changing your search or filters."
+            : "Flight history will appear here when available."}
+        </p>
       </div>
     );
   }

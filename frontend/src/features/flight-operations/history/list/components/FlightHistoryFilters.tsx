@@ -3,9 +3,17 @@ import {
   type FlightHistoryRecord,
 } from "../../flightHistory.types";
 import { formatFlightStatus } from "../../flightHistory.utils";
+import {
+  getFlightDroneCodes,
+  type FlightDateFilter,
+  type FlightHistoryFilterValues,
+  type FlightStatusFilter,
+} from "../flightHistory.filters";
 
 type FlightHistoryFiltersProps = {
   records: FlightHistoryRecord[];
+  filters: FlightHistoryFilterValues;
+  onChange: (changes: Partial<FlightHistoryFilterValues>) => void;
 };
 
 function SearchIcon() {
@@ -19,10 +27,10 @@ function SearchIcon() {
 
 export function FlightHistoryFilters({
   records,
+  filters,
+  onChange,
 }: FlightHistoryFiltersProps) {
-  const droneCodes = Array.from(
-    new Set(records.map((record) => record.droneCode)),
-  ).sort();
+  const droneCodes = getFlightDroneCodes(records);
 
   return (
     <div className="flight-history-filters">
@@ -31,14 +39,24 @@ export function FlightHistoryFilters({
         <span className="visually-hidden">Search flights</span>
         <input
           type="search"
+          value={filters.searchText}
+          onChange={(event) =>
+            onChange({ searchText: event.target.value })
+          }
           placeholder="Search flights..."
-          readOnly
         />
       </label>
 
       <label>
         <span className="visually-hidden">Filter by status</span>
-        <select defaultValue="ALL" disabled>
+        <select
+          value={filters.status}
+          onChange={(event) =>
+            onChange({
+              status: event.target.value as FlightStatusFilter,
+            })
+          }
+        >
           <option value="ALL">All statuses</option>
           {FLIGHT_HISTORY_STATUSES.map((status) => (
             <option key={status} value={status}>
@@ -50,7 +68,12 @@ export function FlightHistoryFilters({
 
       <label>
         <span className="visually-hidden">Filter by drone</span>
-        <select defaultValue="ALL" disabled>
+        <select
+          value={filters.droneCode}
+          onChange={(event) =>
+            onChange({ droneCode: event.target.value })
+          }
+        >
           <option value="ALL">All drones</option>
           {droneCodes.map((droneCode) => (
             <option key={droneCode} value={droneCode}>
@@ -62,7 +85,14 @@ export function FlightHistoryFilters({
 
       <label>
         <span className="visually-hidden">Filter by date</span>
-        <select defaultValue="ALL" disabled>
+        <select
+          value={filters.dateRange}
+          onChange={(event) =>
+            onChange({
+              dateRange: event.target.value as FlightDateFilter,
+            })
+          }
+        >
           <option value="ALL">Any date</option>
           <option value="LAST_7_DAYS">Last 7 days</option>
           <option value="LAST_30_DAYS">Last 30 days</option>

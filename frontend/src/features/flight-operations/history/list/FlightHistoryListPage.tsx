@@ -3,6 +3,12 @@ import { flightHistoryDataSource } from "../flightHistory.data";
 import type { FlightHistoryRecord } from "../flightHistory.types";
 import { FlightHistoryFilters } from "./components/FlightHistoryFilters";
 import { FlightHistoryTable } from "./components/FlightHistoryTable";
+import {
+  DEFAULT_FLIGHT_HISTORY_FILTERS,
+  filterFlightRecords,
+  hasActiveFlightFilters,
+  type FlightHistoryFilterValues,
+} from "./flightHistory.filters";
 import "./styles/flight-history-list.css";
 
 type PageState =
@@ -15,7 +21,11 @@ function FlightHistoryListPage() {
     kind: "loading",
   });
 
-  // Load records through the data source so an API can replace it later.
+  const [filters, setFilters] = useState<FlightHistoryFilterValues>(
+    DEFAULT_FLIGHT_HISTORY_FILTERS,
+  );
+
+  // Record loading
   useEffect(() => {
     let isActive = true;
 
@@ -37,6 +47,14 @@ function FlightHistoryListPage() {
       isActive = false;
     };
   }, []);
+
+  // Search and filter state
+  function updateFilters(changes: Partial<FlightHistoryFilterValues>) {
+    setFilters((current) => ({ ...current, ...changes }));
+  }
+
+  const records = pageState.kind === "ready" ? pageState.records : [];
+  const visibleRecords = filterFlightRecords(records, filters);
 
   return (
     <main className="flight-history-page">
@@ -73,12 +91,20 @@ function FlightHistoryListPage() {
                 <h2 id="flight-history-list-title">
                   Flight records
                 </h2>
-                <p>{pageState.records.length} records</p>
+                <p>{records.length} records</p>
               </div>
             </header>
 
-            <FlightHistoryFilters records={pageState.records} />
-            <FlightHistoryTable records={pageState.records} />
+            <FlightHistoryFilters
+              records={records}
+              filters={filters}
+              onChange={updateFilters}
+            />
+
+            <FlightHistoryTable
+              records={visibleRecords}
+              isFiltered={hasActiveFlightFilters(filters)}
+            />
           </section>
         )}
       </div>
