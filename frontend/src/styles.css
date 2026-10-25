@@ -20,7 +20,7 @@
 .operator { display: flex; align-items: center; gap: 8px; flex-shrink: 0; font-size: 13px; }
 .operator-avatar { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 50%; background: var(--canvas-subtle); font-size: 11px; font-weight: 600; }
 .theme-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--canvas-subtle); color: var(--text); font-size: 12px; cursor: pointer; }
-.theme-toggle:hover { border-color: var(--fg-muted); }
+.theme-toggle:disabled { cursor: default; opacity: 1; }
 .theme-switch-track { display: flex; width: 28px; height: 16px; padding: 2px; background: var(--switch-bg); border-radius: 999px; }
 .theme-switch-track > span { width: 12px; height: 12px; border-radius: 50%; background: var(--on-emphasis); }
 .theme-toggle[aria-checked="true"] .theme-switch-track { background: var(--button-primary); }
