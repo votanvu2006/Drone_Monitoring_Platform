@@ -1,18 +1,48 @@
-import { resolveExample } from './app/examples';
-import type { ExampleModule } from './app/examples';
-import { AppShell } from './components/AppShell';
+import { ModuleShellPreview } from "./app/ModuleShellPreview";
+import { resolveExample } from "./app/examples";
+import type { ExampleModule } from "./app/examples";
+import { getModulePage } from "./app/module-pages";
+import { AppShell } from "./components/AppShell";
 
-const modules = import.meta.glob<ExampleModule>('./examples/**/*.preview.tsx', { eager: true });
+const modules = import.meta.glob<ExampleModule>(
+  "./examples/**/*.preview.tsx",
+  { eager: true },
+);
 
 export function App() {
   const params = new URLSearchParams(window.location.search);
-  if (!params.has('screen')) params.set('screen', 'drones');
-  const { definition, state } = resolveExample(modules, params.toString());
+
+  // Preview a module page inside the shared application shell.
+  const modulePage = getModulePage(params.get("module"));
+
+  if (modulePage) {
+    return <ModuleShellPreview moduleId={modulePage.id} />;
+  }
+
+  // Keep the existing standalone page previews working.
+  if (!params.has("screen")) {
+    params.set("screen", "drones");
+  }
+
+  const { definition, state } = resolveExample(
+    modules,
+    params.toString(),
+  );
   const Screen = definition.component;
   const content = <Screen state={state} />;
-  if (definition.standalone) return content;
-  return <AppShell activeNav={definition.activeNav}
-    contentHasMain={definition.contentHasMain}>{content}</AppShell>;
+
+  if (definition.standalone) {
+    return content;
+  }
+
+  return (
+    <AppShell
+      activeNav={definition.activeNav}
+      contentHasMain={definition.contentHasMain}
+    >
+      {content}
+    </AppShell>
+  );
 }
 
-export default App;
+export default App; 
