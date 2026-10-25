@@ -14,7 +14,7 @@ Browser checks cover desktop, tablet, mobile and short landscape layouts, consol
 - The root page and `/?screen=drones` preserve Fleet Inventory and its View details / Back to fleet flow.
 - `/?screen=shell` demonstrates the shared frame. Unknown screen names fall back to this sample.
 - Features register metadata in `src/examples/**/*.preview.tsx`. Unknown state names use the feature's default.
-- The header shows the theme switch, fixed sample avatar and username, aligned to the right. It has no Operations breadcrumb; the sidebar keeps all six navigation entries without a Workspace group label. Navigation and Log out are visual controls.
+- The header shows the theme switch, fixed sample avatar and username, aligned to the right. It has no Operations breadcrumb. The sidebar has five entries: Drones, Missions, Live Flight, Flight History and Alerts, with Drones selected in the shell preview. Overview stays in the module registry for its separate route/preview but is excluded from the sidebar. Navigation and Log out are visual controls.
 - The standalone login preview at `/?screen=login` has a centered application title, Username and Password fields, and a visual-only Sign In button.
 - The theme switch is a disabled visual placeholder, as requested in the latest review of #44. Light is the default; the control does not change appearance or save a preference.
 - Both themes use shared semantic tokens for surfaces, text, focus, status badges, Fleet and Drone Detail.
