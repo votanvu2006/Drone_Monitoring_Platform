@@ -1,12 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DroneInventorySection } from "./components/DroneInventorySection";
 import { FleetSummary } from "./components/FleetSummary";
 import { fleetDataSource, mockSnapshot } from "./droneInventory.data";
 import type {
+  DroneInventoryFilters,
   DroneStatus,
   FleetSnapshot,
   SwitchableDroneStatus,
 } from "./droneInventory.types";
+import {
+  DEFAULT_DRONE_INVENTORY_FILTERS,
+  filterDrones,
+  getDroneModelNames,
+} from "./droneInventory.utils";
 import "./styles/inventory.css";
 
 type DroneInventoryPageProps = {
@@ -41,6 +47,7 @@ function AddDronesControl() {
             strokeLinecap="round"
           />
         </svg>
+
         <span>Add drones</span>
       </button>
 
@@ -61,6 +68,9 @@ function DroneInventoryPage({
   onTogglePower,
 }: DroneInventoryPageProps) {
   const [snapshot, setSnapshot] = useState<FleetSnapshot>(mockSnapshot);
+  const [filters, setFilters] = useState<DroneInventoryFilters>(
+    DEFAULT_DRONE_INVENTORY_FILTERS,
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -81,14 +91,29 @@ function DroneInventoryPage({
     };
   }, []);
 
-  const drones = snapshot.drones.map((drone) => ({
-    ...drone,
-    status: (droneStatusOverrides[drone.code] ?? drone.status) as DroneStatus,
-  }));
-
-  const modelNames = Array.from(
-    new Set(drones.map((drone) => drone.modelName)),
+  const drones = useMemo(
+    () =>
+      snapshot.drones.map((drone) => ({
+        ...drone,
+        status: (droneStatusOverrides[drone.code] ??
+          drone.status) as DroneStatus,
+      })),
+    [snapshot.drones, droneStatusOverrides],
   );
+
+  const modelNames = useMemo(
+    () => getDroneModelNames(drones),
+    [drones],
+  );
+
+  const visibleDrones = useMemo(
+    () => filterDrones(drones, filters),
+    [drones, filters],
+  );
+
+  function updateFilters(changes: Partial<DroneInventoryFilters>) {
+    setFilters((current) => ({ ...current, ...changes }));
+  }
 
   return (
     <main className="fleet-page">
@@ -111,8 +136,10 @@ function DroneInventoryPage({
         />
 
         <DroneInventorySection
-          drones={drones}
+          drones={visibleDrones}
           modelNames={modelNames}
+          filters={filters}
+          onFiltersChange={updateFilters}
           onViewDetails={onViewDetails}
           onTogglePower={onTogglePower}
         />
