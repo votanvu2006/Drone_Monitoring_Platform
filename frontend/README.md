@@ -14,7 +14,7 @@ Browser checks cover desktop, tablet, mobile and short landscape layouts, consol
 - The root page and `/?screen=drones` preserve Fleet Inventory and its View details / Back to fleet flow.
 - `/?screen=shell` demonstrates the shared frame. Unknown screen names fall back to this sample.
 - Features register metadata in `src/examples/**/*.preview.tsx`. Unknown state names use the feature's default.
-- The header shows the theme switch, fixed sample avatar and username, aligned to the right. It has no Operations breadcrumb; the sidebar keeps all six navigation entries without a Workspace group label. Navigation and Log out are visual controls.
+- The header shows the theme switch, fixed sample avatar and username, aligned to the right. It has no Operations breadcrumb. The sidebar has five entries: Drones, Missions, Live Flight, Flight History and Alerts, with Drones selected in the shell preview. Overview stays in the module registry for its separate route/preview but is excluded from the sidebar. Navigation and Log out are visual controls.
 - The standalone login preview at `/?screen=login` has a centered application title, Username and Password fields, and a visual-only Sign In button.
 - The theme switch is a disabled visual placeholder, as requested in the latest review of #44. Light is the default; the control does not change appearance or save a preference.
 - Both themes use shared semantic tokens for surfaces, text, focus, status badges, Fleet and Drone Detail.
@@ -30,4 +30,4 @@ The application composes module content inside one shell-owned main landmark. Us
 
 Missions, Live Flight and Flight History reuse the page components merged into main through #56, #57 and #59. Their outer sections inherit the shell spacing without a second main landmark. Existing mission filters, the live-flight selector and static history controls retain their behavior and sample data. Alerts and Login are present through the shell's merged feature PRs. Overview remains a placeholder until #46 is integrated; its optional export is discovered only if its file exists in the checkout.
 
-The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. Theme and Log out controls remain disabled visual placeholders. Draft depends on #44; application routing belongs to #62.
+The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. The Overview preview remains available at `/?module=overview` and has no selected sidebar entry because Overview is excluded from the menu. Theme and Log out controls remain disabled visual placeholders. Draft depends on #44; application routing belongs to #62.

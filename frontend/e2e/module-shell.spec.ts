@@ -7,7 +7,11 @@ test('all modules share a single frame and static sidebar', async ({page},info) 
     await expect(page.getByRole('banner')).toHaveCount(1);
     await expect(page.getByRole('navigation')).toHaveCount(1);
     await expect(page.getByRole('banner')).not.toContainText('Operations');
-    await expect(page.getByRole('navigation').locator('[aria-current="page"]')).toHaveText(label);
+    const nav = page.getByRole('navigation');
+    await expect(nav.locator('.nav-item')).toHaveText(['Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']);
+    await expect(nav.getByText('Overview', { exact: true })).toHaveCount(0);
+    if (module === 'overview') await expect(nav.locator('[aria-current="page"]')).toHaveCount(0);
+    else await expect(nav.locator('[aria-current="page"]')).toHaveText(label);
     await expect(page.getByRole('button',{name:'Log out'})).toBeDisabled();
     if (['missions', 'live-flight', 'flight-history', 'alerts'].includes(module)) {
       await expect(page.getByText('This page is not available yet.', { exact: true })).toHaveCount(0);
