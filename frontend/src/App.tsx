@@ -1,22 +1,18 @@
-import { useState } from "react";
-import DroneDetailPage from "./features/drones/detail/DroneDetailPage";
-import DroneInventoryPage from "./features/drones/inventory/DroneInventoryPage";
+import { resolveExample } from './app/examples';
+import type { ExampleModule } from './app/examples';
+import { AppShell } from './components/AppShell';
 
-function App() {
-  const [selectedDroneCode, setSelectedDroneCode] = useState<string | null>(
-    null,
-  );
+const modules = import.meta.glob<ExampleModule>('./examples/**/*.preview.tsx', { eager: true });
 
-  if (selectedDroneCode) {
-    return (
-      <DroneDetailPage
-        droneCode={selectedDroneCode}
-        onBack={() => setSelectedDroneCode(null)}
-      />
-    );
-  }
-
-  return <DroneInventoryPage onViewDetails={setSelectedDroneCode} />;
+export function App() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has('screen')) params.set('screen', 'drones');
+  const { definition, state } = resolveExample(modules, params.toString());
+  const Screen = definition.component;
+  const content = <Screen state={state} />;
+  if (definition.standalone) return content;
+  return <AppShell activeNav={definition.activeNav}
+    contentHasMain={definition.contentHasMain}>{content}</AppShell>;
 }
 
 export default App;

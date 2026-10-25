@@ -61,10 +61,10 @@
   gap: 6px;
   min-height: 36px;
   padding: 0 12px;
-  border: 1px solid #1f232826;
+  border: 1px solid var(--button-border);
   border-radius: var(--radius-default);
   background: var(--button-primary);
-  color: #ffffff;
+  color: var(--on-emphasis);
   font-size: 14px;
   font-weight: 600;
   cursor: not-allowed;
@@ -86,8 +86,8 @@
   z-index: 2;
   padding: 6px 8px;
   border-radius: 6px;
-  background: var(--fg-default);
-  color: #ffffff;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-fg);
   font-size: 12px;
   white-space: nowrap;
   opacity: 0;
