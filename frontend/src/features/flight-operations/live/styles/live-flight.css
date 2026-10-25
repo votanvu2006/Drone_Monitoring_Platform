@@ -1,0 +1,437 @@
+/* Page */
+
+.live-flight-page {
+  min-height: 100vh;
+  padding: 34px 40px 28px;
+  background: var(--canvas-default);
+}
+
+.live-flight-container {
+  width: min(100%, 1160px);
+  margin: 0 auto;
+}
+
+.live-flight-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.live-flight-heading h1 {
+  margin: 0;
+  color: var(--fg-default);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.live-flight-eyebrow,
+.flight-section-eyebrow {
+  margin: 0 0 5px;
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.live-flight-description {
+  margin-top: 7px;
+  color: var(--fg-muted);
+  font-size: 14px;
+}
+
+.live-flight-message {
+  padding: 20px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  color: var(--fg-muted);
+}
+
+/* In-progress status */
+
+.live-flight-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid #0969da33;
+  border-radius: var(--radius-full);
+  background: #ddf4ff;
+  color: #0969da;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.live-flight-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+/* Active flight selector */
+
+.live-flight-selector {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background: var(--canvas-default);
+}
+
+.live-flight-selector label {
+  color: var(--fg-default);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.live-flight-selector select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background: var(--canvas-default);
+  color: var(--fg-default);
+  font: inherit;
+  font-size: 14px;
+}
+
+.live-flight-selector select:focus-visible {
+  border-color: var(--accent-fg);
+  outline: 2px solid #0969da33;
+  outline-offset: 1px;
+}
+
+/* Shared panels */
+
+.live-flight-details,
+.flight-route-panel {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background: var(--canvas-default);
+}
+
+/* Flight identifiers */
+
+.live-flight-details {
+  margin-bottom: 16px;
+  padding: 18px 20px;
+}
+
+.live-flight-details h2 {
+  margin: 0 0 14px;
+  color: var(--fg-default);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.live-flight-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.live-flight-details-grid > div {
+  min-width: 0;
+  padding: 0 18px;
+}
+
+.live-flight-details-grid > div:first-child {
+  padding-left: 0;
+}
+
+.live-flight-details-grid > div + div {
+  border-left: 1px solid var(--border-default);
+}
+
+.live-flight-details-grid dt {
+  margin-bottom: 4px;
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+
+.live-flight-details-grid dd {
+  overflow: hidden;
+  margin: 0;
+  color: var(--fg-default);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+/* Route heading */
+
+.flight-route-panel {
+  overflow: hidden;
+  padding: 20px;
+}
+
+.flight-route-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.flight-route-heading h2 {
+  margin: 0;
+  color: var(--fg-default);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.flight-current-waypoint {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 3px;
+  text-align: right;
+}
+
+.flight-current-waypoint span,
+.flight-current-waypoint small {
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+
+.flight-current-waypoint strong {
+  color: var(--fg-default);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Route progress */
+
+.flight-route-progress {
+  margin-top: 20px;
+}
+
+.flight-route-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: var(--fg-default);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.flight-route-progress-heading strong {
+  color: var(--accent-fg);
+  font-size: 14px;
+}
+
+.flight-route-progress-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--canvas-subtle);
+}
+
+.flight-route-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-fg);
+}
+
+.flight-route-progress-note {
+  margin-top: 7px;
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+
+/* Route map */
+
+.flight-route-map {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background-color: var(--canvas-subtle);
+  background-image:
+    linear-gradient(#d1d9e066 1px, transparent 1px),
+    linear-gradient(90deg, #d1d9e066 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.flight-route-svg {
+  display: block;
+  width: 100%;
+  height: clamp(220px, 40vw, 420px);
+}
+
+.flight-route-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.flight-route-line--planned {
+  stroke: #8c959f;
+  stroke-dasharray: 5 6;
+  stroke-width: 2;
+}
+
+.flight-route-line--completed {
+  stroke: var(--accent-fg);
+  stroke-width: 3;
+}
+
+.flight-waypoint-halo {
+  fill: #0969da26;
+}
+
+.flight-waypoint-marker {
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.flight-waypoint text {
+  dominant-baseline: central;
+  fill: currentColor;
+  font-size: 2.15px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.flight-waypoint--completed,
+.flight-waypoint--current {
+  color: #ffffff;
+}
+
+.flight-waypoint--completed .flight-waypoint-marker {
+  fill: var(--success-fg);
+  stroke: #ffffff;
+}
+
+.flight-waypoint--current .flight-waypoint-marker {
+  fill: var(--accent-fg);
+  stroke: #ffffff;
+}
+
+.flight-waypoint--upcoming {
+  color: var(--fg-muted);
+}
+
+.flight-waypoint--upcoming .flight-waypoint-marker {
+  fill: #ffffff;
+  stroke: #8c959f;
+}
+
+.flight-route-unavailable {
+  margin: 18px 0 0;
+  padding: 48px 16px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background: var(--canvas-subtle);
+  color: var(--fg-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Route legend */
+
+.flight-route-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+
+.flight-route-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.flight-route-legend-marker {
+  width: 9px;
+  height: 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+}
+
+.flight-route-legend-marker--completed {
+  background: var(--success-fg);
+}
+
+.flight-route-legend-marker--current {
+  background: var(--accent-fg);
+}
+
+.flight-route-legend-marker--upcoming {
+  border-color: #8c959f;
+  background: #ffffff;
+}
+
+/* Responsive layout */
+
+@media (max-width: 760px) {
+  .live-flight-page {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .live-flight-page {
+    padding: 24px 14px;
+  }
+
+  .live-flight-heading,
+  .flight-route-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .live-flight-selector {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .live-flight-details,
+  .flight-route-panel {
+    padding: 16px;
+  }
+
+  .live-flight-details-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .live-flight-details-grid > div,
+  .live-flight-details-grid > div:first-child {
+    padding: 0;
+  }
+
+  .live-flight-details-grid > div + div {
+    padding-top: 12px;
+    border-top: 1px solid var(--border-default);
+    border-left: 0;
+  }
+
+  .flight-current-waypoint {
+    text-align: left;
+  }
+
+  .flight-route-legend {
+    gap: 10px 14px;
+  }
+}
