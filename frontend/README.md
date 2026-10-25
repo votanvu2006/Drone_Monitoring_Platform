@@ -16,10 +16,10 @@ Browser checks cover desktop, tablet, mobile and short landscape layouts, consol
 - Features register metadata in `src/examples/**/*.preview.tsx`. Unknown state names use the feature's default.
 - The header shows the theme switch, fixed sample avatar and username, aligned to the right. It has no Operations breadcrumb; the sidebar keeps all six navigation entries without a Workspace group label. Navigation and Log out are visual controls.
 - The standalone login preview at `/?screen=login` has a centered application title, Username and Password fields, and a visual-only Sign In button.
-- The theme switch works with mouse, Enter and Space. It defaults to light on each page load and never saves a preference or follows the operating system theme.
+- The theme switch is a disabled visual placeholder, as requested in the latest review of #44. Light is the default; the control does not change appearance or save a preference.
 - Both themes use shared semantic tokens for surfaces, text, focus, status badges, Fleet and Drone Detail.
 - The fixed desktop navigation scrolls independently in short windows, while Log out stays visible. Compact layouts use navigation in normal document flow.
 
-The switch behavior is an explicitly requested extension to issue #27's original static-control scope. No live authentication, logout, session handling or backend requests are implemented.
+Dark semantic tokens remain available for visual verification by the test harness. No theme-switching behavior, live authentication, logout, session handling or backend requests are implemented.
 
 All canonical data-pack JSON is imported through src/data/seeds.ts. Domain mappers derive display models; datetime formatting uses UTC input and stable ICT output. Fleet inventory and component health use those records, including Drone 003's seed faults. Preview-only samples belong to their feature. Lint rejects warnings. Navigation metadata is independent of preview registration. PR #25 is a separate API-connected prototype in `client/`; it is not a dependency of this frontend.
