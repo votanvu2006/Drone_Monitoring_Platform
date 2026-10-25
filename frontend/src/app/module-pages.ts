@@ -1,5 +1,8 @@
 import type { ComponentType } from 'react';
 import DroneFleetView from '../features/drones/DroneFleetView';
+import MissionListPage from '../features/missions/list/MissionListPage';
+import LiveFlightPage from '../features/flight-operations/live/LiveFlightPage';
+import FlightHistoryListPage from '../features/flight-operations/history/list/FlightHistoryListPage';
 import type { ModuleId } from './navigation';
 
 // Only files present in this checkout can be composed. Optional modules become
@@ -10,6 +13,9 @@ const loginModules = import.meta.glob<{ LoginPage: ComponentType }>('../features
 
 export const availableModulePages: Partial<Record<ModuleId, ComponentType>> = {
   drones: DroneFleetView,
+  missions: MissionListPage,
+  'live-flight': LiveFlightPage,
+  'flight-history': FlightHistoryListPage,
   overview: Object.values(overviewModules)[0]?.OverviewPage,
   alerts: Object.values(alertModules)[0]?.AlertsPage,
 };

@@ -29,22 +29,23 @@ test('shell is readable, logout stays reachable and navigation remains static', 
   await capture(page, info, 'shell-light');
 });
 
-test('theme supports mouse and keyboard, and resets to light after reload', async ({ page }, info) => {
+test('theme switch is visual only and light remains the default', async ({ page }, info) => {
   await page.goto('/?screen=shell');
   const toggle = page.getByRole('switch', { name: 'Dark theme' });
+  await expect(toggle).toBeDisabled();
   await expect(toggle).not.toBeChecked();
-  await toggle.click();
-  await expect(toggle).toBeChecked();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(13, 17, 23)');
-  await capture(page, info, 'shell-dark');
-  await toggle.press('Space');
+  await toggle.dispatchEvent('click');
+  await toggle.dispatchEvent('keydown', { key: 'Enter' });
+  await toggle.dispatchEvent('keydown', { key: ' ' });
   await expect(toggle).not.toBeChecked();
-  await toggle.press('Enter');
-  await expect(toggle).toBeChecked();
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0]);
+  // Exercise retained CSS tokens without adding product behavior to the control.
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(13, 17, 23)');
+  await capture(page, info, 'shell-dark-tokens');
   await page.reload();
-  await expect(toggle).not.toBeChecked();
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 });
 
@@ -57,7 +58,7 @@ test('Fleet and Drone Detail retain their flow in both themes', async ({ page },
   }
   await checkLayout(page);
   await capture(page, info, 'fleet-light');
-  await page.getByRole('switch', { name: 'Dark theme' }).click();
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
   await capture(page, info, 'fleet-dark');
   await page.getByRole('button', { name: 'View details for DRONE-003' }).click();
   await expect(page.getByRole('heading', { name: 'DRONE-003', exact: true })).toBeVisible();
@@ -65,7 +66,7 @@ test('Fleet and Drone Detail retain their flow in both themes', async ({ page },
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await checkLayout(page);
   await capture(page, info, 'drone-detail-dark');
-  await page.getByRole('switch', { name: 'Dark theme' }).click();
+  await page.evaluate(() => { delete document.documentElement.dataset.theme; });
   await capture(page, info, 'drone-detail-light');
   await page.getByRole('button', { name: 'Back to fleet' }).click();
   await expect(page.locator('.drone-card')).toHaveCount(5);

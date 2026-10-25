@@ -16,23 +16,25 @@ Browser checks cover desktop, tablet, mobile and short landscape layouts, consol
 - Features register metadata in `src/examples/**/*.preview.tsx`. Unknown state names use the feature's default.
 - The header shows the theme switch, fixed sample avatar and username, aligned to the right. It has no Operations breadcrumb; the sidebar keeps all six navigation entries without a Workspace group label. Navigation remains static in review previews and uses links on application routes. Log out is visual only.
 - The standalone login preview at `/?screen=login` has a centered application title, Username and Password fields, and a visual-only Sign In button.
-- The theme switch works with mouse, Enter and Space. It defaults to light on each page load and never saves a preference or follows the operating system theme.
+- The theme switch is a disabled visual placeholder, as requested in the latest review of #44. Light is the default; the control does not change appearance or save a preference.
 - Both themes use shared semantic tokens for surfaces, text, focus, status badges, Fleet and Drone Detail.
 - The fixed desktop navigation scrolls independently in short windows, while Log out stays visible. Compact layouts use navigation in normal document flow.
 
-The switch behavior is an explicitly requested extension to issue #27's original static-control scope. No live authentication, logout, session handling or backend requests are implemented.
+Dark semantic tokens remain available for visual verification by the test harness. No theme-switching behavior, live authentication, logout, session handling or backend requests are implemented.
 
 All canonical data-pack JSON is imported through src/data/seeds.ts. Domain mappers derive display models; datetime formatting uses UTC input and stable ICT output. Fleet inventory and component health use those records, including Drone 003's seed faults. Preview-only samples belong to their feature. Lint rejects warnings. Navigation metadata is independent of preview registration. PR #25 is a separate API-connected prototype in `client/`; it is not a dependency of this frontend.
 
 ## Module shell integration (#58)
 
-The application composes module content inside one shell-owned main landmark. Use /?module=drones (default), overview, missions, live-flight, flight-history or alerts to inspect composition while sidebar controls remain static. Modules not present in this checkout show a placeholder. Existing ?screen= previews stay isolated in PreviewHost. Overview/Alerts/Login exports are discovered only from files in the checkout, so merging their feature PRs makes them available without importing unmerged branches. Missions/Live Flight/History require their module adapters after their owners merge the pages. Draft depends on #44.
+The application composes module content inside one shell-owned main landmark. Use `/?module=drones` (default), `overview`, `missions`, `live-flight`, `flight-history` or `alerts` to inspect composition while sidebar controls remain static. Existing `?screen=` previews stay isolated in PreviewHost.
 
-The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. Login from merged PR #45 is present through the synchronized shell; Overview and Alerts remain optional until their feature PRs arrive.
+Missions, Live Flight and Flight History reuse the page components merged into main through #56, #57 and #59. Their outer sections inherit the shell spacing without a second main landmark. Existing mission filters, the live-flight selector and static history controls retain their behavior and sample data. Alerts and Login are present through the shell's merged feature PRs. Overview remains a placeholder until #46 is integrated; its optional export is discovered only if its file exists in the checkout.
+
+The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. Theme and Log out controls remain disabled visual placeholders. Draft depends on #44; application routing belongs to #62.
 
 ## Application routes (#60)
 
-The root redirects to /overview. Sidebar links open /overview, /drones, /missions, /live-flight, /flight-history and /alerts. Drone detail uses /drones/:droneCode. Login at /login is standalone and renders the default visual-only login from merged PR #45. Unknown paths render a not-found page inside the shell. Browser history and theme survive client navigation; reload resets light. Legacy root ?screen= and ?module= previews retain static controls.
+The root redirects to /overview. Sidebar links open /overview, /drones, /missions, /live-flight, /flight-history and /alerts. Drone detail uses /drones/:droneCode. Login at /login is standalone and renders the default visual-only login from merged PR #45. Unknown paths render a not-found page inside the shell. Browser history and the shared frame survive client navigation. The theme switch remains a disabled placeholder and light is the default. Missions, Live Flight, Flight History and Alerts render their available page content on these routes. Overview remains a placeholder until #46 is integrated. Legacy root ?screen= and ?module= previews retain static controls.
 
 ### Production hosting
 

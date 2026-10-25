@@ -12,18 +12,26 @@ describe('module routes', () => {
     expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
     expect(screen.getByRole('heading', { level: 1 })).toBeVisible();
     expect(screen.getByRole('link',{name:module.label})).toHaveAttribute('aria-current','page');
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
+    const samples: Record<string, string> = { missions: 'Mission 001', 'live-flight': 'FLIGHT-015', 'flight-history': 'FLIGHT-014', alerts: 'DEMO-ALT-003' };
+    if (samples[module.id]) {
+      expect(screen.getByRole('main')).toHaveTextContent(samples[module.id]);
+      expect(screen.getByRole('main')).not.toHaveTextContent('This page is not available yet.');
+    }
   });
   it('redirects the root to Overview', async () => {
     show('/'); await waitFor(() => expect(window.location.pathname).toBe('/overview'));
   });
-  it('keeps shell identity and theme while navigating', () => {
+  it('keeps shell identity and visual-only theme controls while navigating', async () => {
     show('/drones'); const banner=screen.getByRole('banner');
     fireEvent.click(screen.getByRole('switch',{name:'Dark theme'}));
     fireEvent.click(screen.getByRole('link',{name:'Missions'}));
     expect(window.location.pathname).toBe('/missions');
     expect(screen.getByRole('banner')).toBe(banner);
-    expect(screen.getByRole('switch')).toBeChecked();
+    expect(screen.getByRole('switch')).toBeDisabled();
+    expect(document.documentElement).not.toHaveAttribute('data-theme');
     expect(screen.getByRole('link',{name:'Missions'})).toHaveAttribute('aria-current','page');
+    expect(await screen.findByText('Mission 001')).toBeVisible();
   });
   it('keeps existing drone detail actions in the URL and supports unknown codes', async () => {
     const view=show('/drones');
