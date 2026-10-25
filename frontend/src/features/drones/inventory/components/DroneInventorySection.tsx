@@ -1,10 +1,17 @@
-import type { Drone } from "../droneInventory.types";
+import type {
+  Drone,
+  SwitchableDroneStatus,
+} from "../droneInventory.types";
 import { DroneCard } from "./DroneCard";
 
 type DroneInventorySectionProps = {
   drones: Drone[];
   modelNames: string[];
   onViewDetails: (droneCode: string) => void;
+  onTogglePower: (
+    droneCode: string,
+    nextStatus: SwitchableDroneStatus,
+  ) => void;
 };
 
 function SearchIcon() {
@@ -20,6 +27,7 @@ export function DroneInventorySection({
   drones,
   modelNames,
   onViewDetails,
+  onTogglePower,
 }: DroneInventorySectionProps) {
   return (
     <section className="inventory-panel" aria-labelledby="inventory-title">
@@ -61,6 +69,7 @@ export function DroneInventorySection({
             key={drone.code}
             drone={drone}
             onViewDetails={onViewDetails}
+            onTogglePower={onTogglePower}
           />
         ))}
       </div>

@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
-import { fleetDataSource, mockSnapshot } from "./droneInventory.data";
-import type { FleetSnapshot } from "./droneInventory.types";
 import { DroneInventorySection } from "./components/DroneInventorySection";
 import { FleetSummary } from "./components/FleetSummary";
+import { fleetDataSource, mockSnapshot } from "./droneInventory.data";
+import type {
+  DroneStatus,
+  FleetSnapshot,
+  SwitchableDroneStatus,
+} from "./droneInventory.types";
 import "./styles/inventory.css";
 
 type DroneInventoryPageProps = {
   onViewDetails: (droneCode: string) => void;
+  droneStatusOverrides: Partial<Record<string, SwitchableDroneStatus>>;
+  onTogglePower: (
+    droneCode: string,
+    nextStatus: SwitchableDroneStatus,
+  ) => void;
 };
 
 function AddDronesControl() {
@@ -48,6 +57,8 @@ function AddDronesControl() {
 
 function DroneInventoryPage({
   onViewDetails,
+  droneStatusOverrides,
+  onTogglePower,
 }: DroneInventoryPageProps) {
   const [snapshot, setSnapshot] = useState<FleetSnapshot>(mockSnapshot);
 
@@ -70,8 +81,13 @@ function DroneInventoryPage({
     };
   }, []);
 
+  const drones = snapshot.drones.map((drone) => ({
+    ...drone,
+    status: (droneStatusOverrides[drone.code] ?? drone.status) as DroneStatus,
+  }));
+
   const modelNames = Array.from(
-    new Set(snapshot.drones.map((drone) => drone.modelName)),
+    new Set(drones.map((drone) => drone.modelName)),
   );
 
   return (
@@ -89,15 +105,16 @@ function DroneInventoryPage({
         </header>
 
         <FleetSummary
-          drones={snapshot.drones}
+          drones={drones}
           findings={snapshot.findings}
           modelNames={modelNames}
         />
 
         <DroneInventorySection
-          drones={snapshot.drones}
+          drones={drones}
           modelNames={modelNames}
           onViewDetails={onViewDetails}
+          onTogglePower={onTogglePower}
         />
       </div>
     </main>

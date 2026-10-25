@@ -233,16 +233,33 @@
   color: var(--fg-default);
 }
 
-.power-switch:disabled,
-.details-button:disabled {
-  opacity: 1;
-  cursor: default;
-}
-
 .power-switch {
   min-width: 69px;
   flex: 0 0 auto;
   gap: 6px;
+}
+
+.power-switch:not(:disabled) {
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.power-switch:not(:disabled):hover {
+  border-color: var(--border-muted);
+  background: var(--canvas-default);
+}
+
+.power-switch:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.power-switch:focus-visible,
+.details-button:focus-visible {
+  outline: 2px solid var(--accent-fg);
+  outline-offset: 2px;
 }
 
 .switch-track {
@@ -253,6 +270,7 @@
   padding: 2px;
   border-radius: var(--radius-full);
   background: var(--switch-bg);
+  transition: background-color 140ms ease;
 }
 
 .switch-knob {
@@ -260,11 +278,25 @@
   height: 12px;
   border-radius: 50%;
   background: var(--on-emphasis);
+  transition: transform 140ms ease;
+}
+
+.power-switch.is-on .switch-track {
+  background: var(--button-primary);
+}
+
+.power-switch.is-on .switch-knob {
+  transform: translateX(11px);
 }
 
 .switch-label {
   font-size: 12px;
   font-weight: 500;
+}
+
+.power-switch.is-on .switch-label {
+  color: var(--success-fg);
+  font-weight: 600;
 }
 
 .details-button {
@@ -290,9 +322,9 @@
   color: var(--accent-fg);
 }
 
-.details-button:focus-visible {
-  outline: 2px solid var(--accent-fg);
-  outline-offset: 2px;
+.details-button:disabled {
+  opacity: 1;
+  cursor: default;
 }
 
 .details-button svg {
