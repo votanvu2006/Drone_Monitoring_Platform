@@ -90,13 +90,14 @@ describe('standalone alert list and details', () => {
     }
   });
 
-  it('exports content that fits one shared shell and switches theme', () => {
+  it('exports content that fits one shared shell with visual-only controls', () => {
     render(<AppShell activeNav="Alerts"><AlertsPage /></AppShell>);
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     expect(screen.getAllByRole('banner')).toHaveLength(1);
     fireEvent.click(screen.getByRole('switch', { name: 'Dark theme' }));
-    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeDisabled();
+    expect(document.documentElement).not.toHaveAttribute('data-theme');
     expect(screen.getAllByRole('row')).toHaveLength(4);
   });
 });
