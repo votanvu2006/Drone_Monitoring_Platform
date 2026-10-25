@@ -1,0 +1,17 @@
+.overview-lower-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; }
+.overview-empty { display: grid; justify-items: center; gap: 14px; padding: 30px 12px; text-align: center; color: var(--muted); }
+.overview-empty h3 { color: var(--text); margin: 0; }
+.overview-flight-intro { display: flex; align-items: center; gap: 18px; }
+.overview-flight-intro h3 { margin: 12px 0; }
+.overview-flight-intro p { color: var(--muted); }
+.activity-list { padding: 0; margin: 0; list-style: none; }
+.activity-list li { display: flex; gap: 13px; padding: 17px 0; border-bottom: 1px solid var(--border); }
+.activity-list li:first-child { padding-top: 3px; }
+.activity-list li:last-child { border: 0; padding-bottom: 3px; }
+.activity-list li > div { min-width: 0; overflow-wrap: anywhere; }
+.activity-icon { display: grid; place-items: center; flex-shrink: 0; width: 33px; height: 33px;
+  border: 1px solid var(--border); border-radius: 9px; color: var(--blue); background: var(--panel-alt); }
+.activity-list strong { font-size: 12px; }
+.activity-list p { margin: 5px 0; color: var(--muted); font-size: 12px; }
+.activity-list time { color: var(--muted); font: 11px ui-monospace, monospace; }
+@media (max-width: 1150px) { .overview-lower-grid { grid-template-columns: 1fr; } }
