@@ -3,7 +3,10 @@ import { test, expect, checkLayout, capture } from './support';
 test('shell is readable, logout stays reachable and navigation remains static', async ({ page }, info) => {
   await page.goto('/?screen=shell');
   const nav = page.getByRole('navigation', { name: 'Primary navigation' });
-  for (const name of ['Overview', 'Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']) {
+  await expect(nav.locator('.nav-item')).toHaveText(['Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']);
+  await expect(nav.getByText('Overview', { exact: true })).toHaveCount(0);
+  await expect(nav.locator('[aria-current="page"]')).toHaveText('Drones');
+  for (const name of ['Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']) {
     await expect(nav.getByText(name, { exact: true })).toBeVisible();
   }
   const logout = page.getByRole('button', { name: 'Log out' });
