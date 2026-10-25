@@ -1,4 +1,10 @@
 /* Shared frame and primitives; index.css owns the theme tokens. */
+/* Module pages inherit the shell spacing instead of adding another page frame. */
+.page-content > :is(.mission-page, .live-flight-page, .flight-history-page) {
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+}
 .app-shell { min-height: 100vh; }
 .sidebar {
   position: fixed; inset: 0 auto 0 0; width: 216px; height: 100dvh;

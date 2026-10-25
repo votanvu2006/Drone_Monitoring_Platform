@@ -13,3 +13,6 @@ export type NavigationItem = typeof moduleNavigation[number]['label'];
 // Overview keeps its route and preview metadata but is not a sidebar destination.
 export const sidebarNavigation = moduleNavigation.filter(item => item.id !== 'overview');
 export const navigation = sidebarNavigation.map(item => item.label);
+
+export type ModuleId = typeof moduleNavigation[number]['id'];
+export type ModuleNavigationEntry = typeof moduleNavigation[number];

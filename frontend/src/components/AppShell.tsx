@@ -4,8 +4,8 @@ import type { NavigationItem } from '../app/navigation';
 import { operatorProfile } from '../data/fixtures';
 import { Icon } from './Icon';
 
-export function AppShell({ activeNav = 'Drones', children, contentHasMain = false }: {
-  activeNav?: NavigationItem; children: ReactNode; contentHasMain?: boolean;
+export function AppShell({ activeNav = 'Drones', children, contentClassName = '' }: {
+  activeNav?: NavigationItem; children: ReactNode; contentClassName?: string;
 }) {
   return <div className="app-shell">
     <aside className="sidebar">
@@ -37,8 +37,7 @@ export function AppShell({ activeNav = 'Drones', children, contentHasMain = fals
             <strong>{operatorProfile.username}</strong></div>
         </div>
       </header>
-      {contentHasMain ? <div className="page-content fleet-content">{children}</div>
-        : <main className="page-content">{children}</main>}
+      <main className={['page-content', contentClassName].filter(Boolean).join(' ')}>{children}</main>
     </div>
   </div>;
 }
