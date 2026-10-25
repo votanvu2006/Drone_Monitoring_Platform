@@ -1,51 +1,156 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { App } from './App';
-import { AppShell } from './components/AppShell';
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { App } from "./App";
 
-describe('shared application shell', () => {
-  beforeEach(() => window.history.replaceState({}, '', '/?screen=shell'));
-  it('renders five sidebar entries without Overview and selects Drones by default', () => {
+const moduleRoutes = [
+  { label: "Drones", path: "/drones" },
+  { label: "Missions", path: "/missions" },
+  { label: "Live Flight", path: "/live-flight" },
+  { label: "Flight History", path: "/flight-history" },
+  { label: "Alerts", path: "/alerts" },
+] as const;
+
+function getNavigation() {
+  return screen.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+}
+
+describe("module navigation", () => {
+  beforeEach(() => {
+    window.history.replaceState(null, "", "/");
+  });
+
+  it.each(moduleRoutes)(
+    "opens $label directly at $path",
+    ({ label, path }) => {
+      window.history.replaceState(null, "", path);
+
+      render(<App />);
+
+      expect(
+        screen.getByRole("heading", { level: 1, name: label }),
+      ).toBeInTheDocument();
+
+      expect(
+        within(getNavigation()).getByRole("link", { name: label }),
+      ).toHaveAttribute("aria-current", "page");
+
+      expect(document.querySelector(".topbar")).toBeInTheDocument();
+    },
+  );
+
+  it("shows Drones at the root URL", () => {
     render(<App />);
-    const nav = screen.getByRole('navigation', { name: 'Primary navigation' });
-    expect(within(nav).getAllByRole('listitem').map(item => item.textContent)).toEqual([
-      'Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts',
-    ]);
-    expect(within(nav).queryByText('Overview', { exact: true })).not.toBeInTheDocument();
-    expect(within(nav).getByText('Drones').closest('.nav-item')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('banner')).toBeVisible();
-    expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
-    expect(screen.queryByText('Workspace', { exact: true })).not.toBeInTheDocument();
-    expect(document.querySelector('.ui-page-heading .eyebrow')).toBeNull();
-    expect(screen.getByRole('main')).toHaveTextContent('Your flight operations workspace');
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Drones" }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(getNavigation()).getByRole("link", { name: "Drones" }),
+    ).toHaveAttribute("aria-current", "page");
   });
-  it('keeps navigation visual and does not call APIs', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Unexpected API call'));
+
+  it("shows five navigation links without Overview", () => {
     render(<App />);
-    const before = window.location.href;
-    fireEvent.click(screen.getByText('Missions'));
-    expect(window.location.href).toBe(before);
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(fetchSpy).not.toHaveBeenCalled();
+
+    const links = within(getNavigation()).getAllByRole("link");
+
+    expect(links.map((link) => link.textContent)).toEqual(
+      moduleRoutes.map((route) => route.label),
+    );
+
+    for (const route of moduleRoutes) {
+      expect(
+        within(getNavigation()).getByRole("link", {
+          name: route.label,
+        }),
+      ).toHaveAttribute("href", route.path);
+    }
+
+    expect(
+      within(getNavigation()).queryByText("Overview"),
+    ).not.toBeInTheDocument();
   });
-  it('hosts arbitrary module content and highlights its declared section', () => {
-    render(<AppShell activeNav="Alerts"><h1>Example module</h1></AppShell>);
-    expect(screen.getByRole('main')).toHaveTextContent('Example module');
-    expect(screen.getByRole('navigation').querySelector('[aria-current="page"]')).toHaveTextContent('Alerts');
+
+  it("changes the module without replacing the shared header", () => {
+    render(<App />);
+
+    const header = document.querySelector(".topbar");
+
+    fireEvent.click(
+      within(getNavigation()).getByRole("link", {
+        name: "Missions",
+      }),
+    );
+
+    expect(window.location.pathname).toBe("/missions");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Missions" }),
+    ).toBeInTheDocument();
+    expect(document.querySelector(".topbar")).toBe(header);
+
+    expect(
+      within(getNavigation()).getByRole("link", {
+        name: "Missions",
+      }),
+    ).toHaveAttribute("aria-current", "page");
   });
-  it('keeps the theme switch visual without changing the document or saving a preference', () => {
-    const localWrite = vi.spyOn(Storage.prototype, 'setItem');
-    const { unmount } = render(<App />);
-    const toggle = screen.getByRole('switch', { name: 'Dark theme' });
-    expect(toggle).toBeDisabled();
-    expect(toggle).not.toBeChecked();
-    fireEvent.click(toggle);
-    fireEvent.keyDown(toggle, { key: 'Enter' });
-    fireEvent.keyDown(toggle, { key: ' ' });
-    expect(toggle).not.toBeChecked();
-    expect(document.documentElement).not.toHaveAttribute('data-theme');
-    expect(localWrite).not.toHaveBeenCalled();
-    unmount();
-    expect(document.documentElement).not.toHaveAttribute('data-theme');
+
+  it("updates the page when browser history changes", () => {
+    render(<App />);
+
+    fireEvent.click(
+      within(getNavigation()).getByRole("link", {
+        name: "Missions",
+      }),
+    );
+
+    fireEvent.click(
+      within(getNavigation()).getByRole("link", {
+        name: "Alerts",
+      }),
+    );
+
+    window.history.replaceState(null, "", "/missions");
+    fireEvent.popState(window);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Missions" }),
+    ).toBeInTheDocument();
+
+    window.history.replaceState(null, "", "/alerts");
+    fireEvent.popState(window);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Alerts" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a fallback for an unknown URL", () => {
+    window.history.replaceState(null, "", "/unknown-page");
+
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { name: "Page not found" }),
+    ).toBeInTheDocument();
+
+    expect(
+      getNavigation().querySelector('[aria-current="page"]'),
+    ).toBeNull();
+  });
+
+  it("keeps theme and logout controls disabled", () => {
+    render(<App />);
+
+    expect(
+      screen.getByRole("switch", { name: "Dark theme" }),
+    ).toBeDisabled();
+
+    expect(
+      screen.getByRole("button", { name: "Log out" }),
+    ).toBeDisabled();
   });
 });

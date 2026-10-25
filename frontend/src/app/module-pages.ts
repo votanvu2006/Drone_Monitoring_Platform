@@ -4,7 +4,10 @@ import DroneFleetView from "../features/drones/DroneFleetView";
 import FlightHistoryListPage from "../features/flight-operations/history/list/FlightHistoryListPage";
 import LiveFlightPage from "../features/flight-operations/live/LiveFlightPage";
 import MissionListPage from "../features/missions/list/MissionListPage";
-import type { NavigationItem } from "./navigation";
+import {
+  sidebarNavigation,
+  type NavigationItem,
+} from "./navigation";
 
 type ModulePageDefinition = {
   id: string;
@@ -12,6 +15,8 @@ type ModulePageDefinition = {
   component: ComponentType;
   contentHasMain: boolean;
 };
+
+/* ---------- Available module pages ---------- */
 
 export const modulePages = [
   {
@@ -44,10 +49,27 @@ export const modulePages = [
     component: AlertsPage,
     contentHasMain: false,
   },
-] satisfies readonly ModulePageDefinition[];
+] as const satisfies readonly ModulePageDefinition[];
 
-export type ModulePageId = (typeof modulePages)[number]["id"];
+export type ModulePage = (typeof modulePages)[number];
+export type ModulePageId = ModulePage["id"];
 
-export function getModulePage(moduleId: string | null) {
+/* ---------- Page lookup ---------- */
+
+export function getModulePage(
+  moduleId: string | null,
+): ModulePage | undefined {
   return modulePages.find((page) => page.id === moduleId);
-}   
+}
+
+export function getModulePageByPath(
+  path: string,
+): ModulePage | undefined {
+  const navigationItem = sidebarNavigation.find(
+    (item) => item.path === path,
+  );
+
+  return navigationItem
+    ? getModulePage(navigationItem.id)
+    : undefined;
+}
