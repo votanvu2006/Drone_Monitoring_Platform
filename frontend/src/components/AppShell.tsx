@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { moduleNavigation } from '../app/navigation';
+import { sidebarNavigation } from '../app/navigation';
 import type { NavigationItem } from '../app/navigation';
 import { operatorProfile } from '../data/fixtures';
 import { Icon } from './Icon';
 
-export function AppShell({ activeNav = 'Overview', children, contentClassName = '', navigationContent }: {
+export function AppShell({ activeNav = 'Drones', children, contentClassName = '', navigationContent }: {
   activeNav?: NavigationItem; children: ReactNode; contentClassName?: string; navigationContent?: ReactNode;
 }) {
   return <div className="app-shell">
@@ -12,7 +12,7 @@ export function AppShell({ activeNav = 'Overview', children, contentClassName = 
       <div className="brand"><span className="brand-symbol"><Icon name="drone" size={23} /></span>
         <strong>Drone Monitoring<br />Platform</strong></div>
       <nav aria-label="Primary navigation">{navigationContent ?? <ul className="primary-nav">
-        {moduleNavigation.map((item) => <li key={item.id}>
+        {sidebarNavigation.map((item) => <li key={item.id}>
           <span className={'nav-item' + (item.label === activeNav ? ' is-selected' : '')}
             aria-current={item.label === activeNav ? 'page' : undefined}>
             <Icon name={item.icon} /><span>{item.label}</span>

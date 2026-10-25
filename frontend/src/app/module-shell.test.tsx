@@ -12,7 +12,11 @@ describe('shared module composition', () => {
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     expect(screen.getAllByRole('banner')).toHaveLength(1);
     expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
-    expect(screen.getByRole('navigation').querySelector('[aria-current="page"]')).toHaveTextContent(module.label);
+    const nav = screen.getByRole('navigation');
+    expect(nav.querySelectorAll('.nav-item')).toHaveLength(5);
+    expect(nav).not.toHaveTextContent('Overview');
+    if (module.id === 'overview') expect(nav.querySelector('[aria-current="page"]')).toBeNull();
+    else expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent(module.label);
     expect(screen.getByRole('heading', { level: 1 })).toBeVisible();
     if (!availableModulePages[module.id]) expect(screen.getByRole('main')).toHaveTextContent('This page is not available yet.');
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());

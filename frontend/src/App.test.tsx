@@ -2,15 +2,17 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { AppShell } from './components/AppShell';
-import { navigation } from './app/navigation';
 
 describe('shared application shell', () => {
   beforeEach(() => window.history.replaceState({}, '', '/?screen=shell'));
-  it('renders the shared frame, all six navigation entries and the static selected state', () => {
+  it('renders five sidebar entries without Overview and selects Drones by default', () => {
     render(<App />);
     const nav = screen.getByRole('navigation', { name: 'Primary navigation' });
-    navigation.forEach((item) => expect(within(nav).getByText(item)).toBeVisible());
-    expect(within(nav).getByText('Overview').closest('.nav-item')).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getAllByRole('listitem').map(item => item.textContent)).toEqual([
+      'Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts',
+    ]);
+    expect(within(nav).queryByText('Overview', { exact: true })).not.toBeInTheDocument();
+    expect(within(nav).getByText('Drones').closest('.nav-item')).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('banner')).toBeVisible();
     expect(screen.getByRole('banner')).not.toHaveTextContent('Operations');
     expect(screen.queryByText('Workspace', { exact: true })).not.toBeInTheDocument();

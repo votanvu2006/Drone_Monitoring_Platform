@@ -4,10 +4,10 @@ import { Icon } from '../components/Icon';
 import { PageHeading, Panel } from '../components/ui';
 import { DroneDetailRoute, DroneInventoryRoute } from './DroneRoutes';
 import { ModuleContent, StandaloneLoginPage } from './ModuleContent';
-import { moduleNavigation } from './navigation';
+import { moduleNavigation, sidebarNavigation } from './navigation';
 
 function ModuleLinks() {
-  return <ul className="primary-nav">{moduleNavigation.map(module => <li key={module.id}>
+  return <ul className="primary-nav">{sidebarNavigation.map(module => <li key={module.id}>
     <NavLink to={module.path} end={module.id !== 'drones'} className={({isActive}) => 'nav-item' + (isActive ? ' is-selected' : '')}>
       <Icon name={module.icon} /><span>{module.label}</span>
     </NavLink>
@@ -31,7 +31,7 @@ export function AppRoutes() {
   return <Routes>
     <Route path="/login" element={<StandaloneLoginPage />} />
     <Route element={<RoutedShell />}>
-      <Route index element={<Navigate to={moduleNavigation[0].path} replace />} />
+      <Route index element={<Navigate to="/drones" replace />} />
       {moduleNavigation.filter(module => module.id !== 'drones').map(module =>
         <Route key={module.id} path={module.path} element={<ModuleContent module={module} />} />)}
       <Route path="/drones" element={<DroneInventoryRoute />} />

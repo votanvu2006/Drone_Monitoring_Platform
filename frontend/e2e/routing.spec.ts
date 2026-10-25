@@ -6,7 +6,7 @@ test('sidebar links preserve the shell and document appearance, including browse
   await expect(page.getByRole('switch', { name: 'Dark theme' })).toBeDisabled();
   await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
   const banner = await page.getByRole('banner').elementHandle();
-  for (const [path,label] of modules) {
+  for (const [path,label] of modules.filter(([path]) => path !== 'overview')) {
     await page.getByRole('link',{name:label,exact:true}).click();
     await expect(page).toHaveURL(new RegExp('/'+path+'$'));
     await expect(page.getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
@@ -23,14 +23,21 @@ test('sidebar links preserve the shell and document appearance, including browse
 });
 
 test('all six routes survive direct loads and refresh', async ({page},info) => {
-  await page.goto('/');await expect(page).toHaveURL(new RegExp("/overview$"));
+  await page.goto('/');await expect(page).toHaveURL(new RegExp("/drones$"));
+  await expect(page.getByRole('link', { name: 'Drones', exact: true })).toHaveAttribute('aria-current', 'page');
   for (const [path,label] of modules) {
     await page.goto('/'+path);await page.reload();
     await expect(page.getByRole('main')).toHaveCount(1);
     await expect(page.getByRole('banner')).toHaveCount(1);
     await expect(page.getByRole('banner')).not.toContainText('Operations');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
+    const nav = page.getByRole('navigation');
+    await expect(nav.getByRole('link')).toHaveText(['Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']);
+    await expect(nav.getByRole('link', { name: 'Overview', exact: true })).toHaveCount(0);
+    if (path === 'overview') {
+      await expect(nav.locator('[aria-current="page"]')).toHaveCount(0);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText('Overview');
+    } else await expect(page.getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
     const samples: Record<string, string> = { missions: 'Mission 001', 'live-flight': 'FLIGHT-015', 'flight-history': 'FLIGHT-014', alerts: 'DEMO-ALT-003' };
     if (samples[path]) {
       await expect(page.getByRole('main')).toContainText(samples[path]);
