@@ -1,0 +1,65 @@
+.alerts-page { min-height: 100vh; padding: 40px; background: var(--canvas-default); }
+.alerts-container { width: 100%; max-width: 1280px; margin: 0 auto; }
+.alert-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0 0 24px; }
+.alert-counts > div { padding: 18px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--canvas-subtle); }
+.alert-counts dt { font-size: 13px; color: var(--muted); }
+.alert-counts dd { margin: 8px 0 0; font-size: 28px; font-weight: 600; line-height: 1.2; }
+.alert-filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; margin-bottom: 24px; }
+.alert-record-count { color: var(--muted); font-size: 12px; }
+.alert-register .ui-panel-body { padding: 0; }
+.alert-table-scroll { overflow-x: auto; }
+.alert-table { width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; table-layout: fixed; }
+.alert-column-incident { width: 18%; }
+.alert-column-drone, .alert-column-mission { width: 11%; }
+.alert-column-problem { width: 24%; }
+.alert-column-severity { width: 11%; }
+.alert-column-source { width: 10%; }
+.alert-column-time { width: 15%; }
+.alert-table thead { background: var(--canvas-subtle); color: var(--muted); }
+.alert-table th, .alert-table td { padding: 18px 14px; border-bottom: 1px solid var(--border-muted); vertical-align: top; font-size: 13px; overflow-wrap: anywhere; }
+.alert-table thead th { padding-top: 12px; padding-bottom: 12px; font-size: 12px; font-weight: 600; }
+.alert-table tbody tr:last-child > * { border-bottom: 0; }
+.alert-incident { font-weight: 400; }
+.alert-code { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; }
+.alert-incident strong { display: block; font-size: 14px; font-weight: 600; }
+.alert-problem { line-height: 1.6; }
+.alert-time { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.alert-cell-label { display: none; }
+.alert-detail-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.alert-detail-column { display: grid; gap: 20px; min-width: 0; }
+.alert-detail-title { display: flex; align-items: center; gap: 14px; }
+.alert-detail-title h3 { margin: 0; font-size: 22px; line-height: 1.4; font-weight: 600; }
+.alert-detail-icon { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border: 1px solid currentColor; border-radius: 8px; }
+.alert-detail-badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 16px; }
+.alert-summary-text, .alert-resolution-note { margin: 0; line-height: 1.7; }
+.alert-resolution-note { color: var(--muted); }
+.alert-metadata { display: grid; gap: 18px; margin: 0; }
+.alert-metadata-pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.alert-metadata > div { min-width: 0; }
+.alert-metadata dt { margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+.alert-metadata dd { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+.alert-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 1000px) {
+  .alerts-page { padding: 28px; }
+  .alert-detail-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .alerts-page { padding: 24px 16px; }
+  .alert-counts { gap: 10px; }
+  .alert-counts > div { padding: 14px; }
+  .alert-counts dd { font-size: 24px; }
+  .alert-filters { grid-template-columns: 1fr; }
+  .alert-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .alert-table colgroup { display: none; }
+  .alert-table, .alert-table tbody { display: block; width: 100%; min-width: 0; }
+  .alert-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 18px; gap: 16px; border-bottom: 1px solid var(--border); }
+  .alert-table tbody tr:last-child { border-bottom: 0; }
+  .alert-table tbody th, .alert-table tbody td { display: block; padding: 0; border: 0; }
+  .alert-incident, .alert-problem, .alert-time { grid-column: 1 / -1; }
+  .alert-cell-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; }
+  .alert-detail-title h3 { font-size: 20px; }
+}
+@media (max-width: 380px) {
+  .alert-counts > div { padding: 12px; }
+  .alert-metadata-pairs { grid-template-columns: 1fr; }
+}
