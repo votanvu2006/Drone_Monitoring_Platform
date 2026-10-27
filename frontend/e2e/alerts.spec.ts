@@ -3,7 +3,7 @@ import { test, expect, checkLayout, capture } from './support';
 // The same ICT text must render even when the browser is in another timezone.
 test.use({ timezoneId: 'America/New_York' });
 
-test('three mission examples show separate descriptions, severity and inert controls', async ({ page }, info) => {
+test('three mission examples show separate descriptions, severity and working filters', async ({ page }, info) => {
   await page.goto('/?screen=alerts');
   const rows = page.locator('tbody tr[data-alert-code]');
   await expect(rows).toHaveCount(3);
@@ -23,10 +23,16 @@ test('three mission examples show separate descriptions, severity and inert cont
     await expect(component.locator('.alert-problem')).not.toBeEmpty();
   }
   const search = page.getByLabel('Search alerts');
-  await search.click();
-  await search.press('x');
-  await expect(search).toHaveValue('');
-  await expect(page.getByLabel('Severity', { exact: true })).toBeDisabled();
+  await search.fill('  DRONE-002  ');
+  await expect(rows).toHaveCount(2);
+  await page.getByLabel('Severity', { exact: true }).selectOption('CRITICAL');
+  await expect(rows).toHaveCount(0);
+  await expect(page.getByText('No alerts match your search or severity filter.')).toBeVisible();
+  await expect(page.getByLabel('Alert totals')).toContainText('Total alerts3Critical1Warning2');
+  await search.fill('');
+  await expect(rows).toHaveCount(1);
+  await page.getByLabel('Severity', { exact: true }).selectOption('all');
+  await expect(rows).toHaveCount(3);
   await expect(page.getByLabel('Status', { exact: true })).toHaveCount(0);
   await expect(page.locator('.ui-page-heading .eyebrow')).toHaveCount(0);
   const before = page.url();

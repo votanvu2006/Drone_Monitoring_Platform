@@ -65,10 +65,10 @@
   justify-content: center;
   gap: 6px;
   padding: 0 12px;
-  border: 1px solid #1f232826;
+  border: 1px solid var(--button-border);
   border-radius: var(--radius-default);
   background: var(--button-primary);
-  color: #ffffff;
+  color: var(--on-emphasis);
   font-size: 14px;
   font-weight: 600;
   cursor: not-allowed;
@@ -182,7 +182,7 @@
 .mission-filter-row select:focus-visible {
   border-color: var(--accent-fg);
   outline: 0;
-  box-shadow: 0 0 0 2px #0969da33;
+  box-shadow: 0 0 0 2px var(--info-border);
 }
 
 .mission-search-field svg {
@@ -289,33 +289,33 @@
 }
 
 .mission-status--ready {
-  border-color: #1a7f3726;
-  background: #dafbe1;
-  color: #1a7f37;
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-fg);
 }
 
 .mission-status--warning {
-  border-color: #d4a72c66;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 .mission-status--in-progress {
-  border-color: #0969da26;
-  background: #ddf4ff;
-  color: #0969da;
+  border-color: var(--info-border);
+  background: var(--info-bg);
+  color: var(--info-fg);
 }
 
 .mission-status--completed {
-  border-color: #59636e26;
-  background: #f6f8fa;
-  color: #59636e;
+  border-color: var(--border-muted);
+  background: var(--canvas-subtle);
+  color: var(--fg-muted);
 }
 
 .mission-status--failed {
-  border-color: #d1242f26;
-  background: #ffebe9;
-  color: #cf222e;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 /* ---------- Alert states and actions ---------- */
@@ -367,25 +367,25 @@
 }
 
 .mission-alert-action--warning {
-  border-color: #d4a72c66;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 .mission-alert-action--warning:hover:not(:disabled) {
-  border-color: #d4a72c;
-  background: #fbeeb2;
+  border-color: var(--warning-fg);
+  background: var(--warning-hover-bg);
 }
 
 .mission-alert-action--failed {
-  border-color: #d1242f33;
-  background: #ffebe9;
-  color: #cf222e;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 .mission-alert-action--failed:hover:not(:disabled) {
-  border-color: #cf222e66;
-  background: #ffdad5;
+  border-color: var(--danger-border);
+  background: var(--danger-hover-bg);
 }
 
 .mission-alert-action:disabled {

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Icon } from '../../components/Icon';
 import { PageHeading, Panel, StatusBadge } from '../../components/ui';
 import { alertCounts, alerts, alertsByCode, defaultAlertCode } from './alerts.data';
@@ -30,6 +30,14 @@ export function AlertsPage({ view = 'list', alertCode = defaultAlertCode }: { vi
 }
 
 export function AlertList() {
+  const [search, setSearch] = useState('');
+  const [severity, setSeverity] = useState('all');
+  const query = search.trim().toLowerCase();
+  const visibleAlerts = alerts.filter(alert =>
+    (severity === 'all' || alert.severity === severity)
+    && [alert.alertCode, alert.title, alert.droneCode, alert.missionCode, alert.problemDescription]
+      .some(value => value.toLowerCase().includes(query)),
+  );
   return <>
     <dl className="alert-counts" aria-label="Alert totals">
       <div><dt>Total alerts</dt><dd>{alertCounts.total}</dd></div>
@@ -38,13 +46,14 @@ export function AlertList() {
     </dl>
     <div className="alert-filters" aria-label="Alert search and filters">
       <div className="field-label"><label htmlFor="alert-search">Search alerts</label>
-        <input id="alert-search" className="text-field" type="search" value="" placeholder="Search by title or source" readOnly /></div>
+        <input id="alert-search" className="text-field" type="search" value={search}
+          onChange={event => setSearch(event.target.value)} placeholder="Search by code, title, drone, mission or description" /></div>
       <div className="field-label"><label htmlFor="severity-filter">Severity</label>
-        <select id="severity-filter" className="text-field" defaultValue="all" disabled>
+        <select id="severity-filter" className="text-field" value={severity} onChange={event => setSeverity(event.target.value)}>
           <option value="all">All severities</option><option>CRITICAL</option><option>WARNING</option>
         </select></div>
     </div>
-    <Panel title="Alert register" className="alert-register" accessory={<span className="alert-record-count">{alertCounts.total} records</span>}>
+    <Panel title="Alert register" className="alert-register" accessory={<span className="alert-record-count" role="status">{visibleAlerts.length} records</span>}>
       <div className="alert-table-scroll" role="region" aria-label="Alert register table" tabIndex={0}>
         <table className="alert-table">
           <caption className="alert-visually-hidden">Alerts ordered by severity, newest detection and alert code.</caption>
@@ -53,7 +62,7 @@ export function AlertList() {
             <col className="alert-column-severity" /><col className="alert-column-source" /><col className="alert-column-time" /></colgroup>
           <thead><tr><th scope="col">Alert ID/title</th><th scope="col">Drone</th><th scope="col">Mission</th>
             <th scope="col">Problem Description</th><th scope="col">Severity</th><th scope="col">Source</th><th scope="col">Detected Time</th></tr></thead>
-          <tbody>{alerts.map(alert => <tr key={alert.alertCode} data-alert-code={alert.alertCode}>
+          <tbody>{visibleAlerts.map(alert => <tr key={alert.alertCode} data-alert-code={alert.alertCode}>
             <th scope="row" className="alert-incident"><span className="alert-code">{alert.alertCode}</span><strong>{alert.title}</strong></th>
             <td><span className="alert-cell-label" aria-hidden="true">Drone</span>{alert.droneCode}</td>
             <td><span className="alert-cell-label" aria-hidden="true">Mission</span>{alert.missionCode}</td>
@@ -63,6 +72,10 @@ export function AlertList() {
             <td className="alert-time"><span className="alert-cell-label" aria-hidden="true">Detected Time</span><AlertTime alert={alert} /></td>
           </tr>)}</tbody>
         </table>
+        {visibleAlerts.length === 0 && <div className="alert-empty-state">
+          <h3>No alerts match your search or severity filter.</h3>
+          <p>Clear the search or choose All severities to see more alerts.</p>
+        </div>}
       </div>
     </Panel>
   </>;

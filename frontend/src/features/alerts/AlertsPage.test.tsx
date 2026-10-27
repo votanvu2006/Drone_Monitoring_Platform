@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
+import { ThemeProvider } from '../../app/ThemeProvider';
 import { AppShell } from '../../components/AppShell';
 import { alerts, alertsByCode } from './alerts.data';
 import { AlertDetail, AlertsPage } from './AlertsPage';
@@ -32,17 +33,52 @@ describe('standalone alert list and details', () => {
     expect(screen.getAllByRole('main')).toHaveLength(1);
   });
 
-  it('keeps search, severity and rows inert without API requests or navigation', () => {
+  it('keeps rows static without API requests or navigation', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     show();
-    expect(screen.getByLabelText('Search alerts')).toHaveAttribute('readonly');
-    expect(screen.getByLabelText('Severity')).toBeDisabled();
+    expect(screen.getByLabelText('Search alerts')).not.toHaveAttribute('readonly');
+    expect(screen.getByLabelText('Severity')).toBeEnabled();
     expect(screen.queryByLabelText('Status')).not.toBeInTheDocument();
     const before = window.location.href;
     fireEvent.click(document.querySelector('[data-alert-code="DEMO-ALT-001"]')!);
     expect(screen.queryByRole('region', { name: 'Alert summary' })).not.toBeInTheDocument();
     expect(window.location.href).toBe(before);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [' demo-alt-001 ', ['DEMO-ALT-001']],
+    ['LOW BATTERY', ['DEMO-ALT-001']],
+    ['drone-005', ['DEMO-ALT-003']],
+    ['MISSION-002', ['DEMO-ALT-002', 'DEMO-ALT-001']],
+    ['poor visibility', ['DEMO-ALT-003']],
+    ['   ', ['DEMO-ALT-003', 'DEMO-ALT-002', 'DEMO-ALT-001']],
+  ])('searches identifying fields and descriptions for %s', (query, expected) => {
+    show();
+    fireEvent.change(screen.getByLabelText('Search alerts'), { target: { value: query } });
+    expect(Array.from(document.querySelectorAll('tbody [data-alert-code]'), row => row.getAttribute('data-alert-code'))).toEqual(expected);
+    expect(screen.getByLabelText('Alert totals')).toHaveTextContent('Total alerts3Critical1Warning2');
+  });
+
+  it('combines search and severity, shows no results and restores all records when cleared', () => {
+    show();
+    const search = screen.getByLabelText('Search alerts');
+    const severity = screen.getByLabelText('Severity');
+    fireEvent.change(severity, { target: { value: 'WARNING' } });
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+    fireEvent.change(search, { target: { value: 'motor' } });
+    expect(screen.getAllByRole('row')).toHaveLength(2);
+    expect(screen.getByRole('table')).toHaveTextContent('DEMO-ALT-002');
+    fireEvent.change(severity, { target: { value: 'CRITICAL' } });
+    expect(screen.getAllByRole('row')).toHaveLength(1);
+    expect(screen.getByText('No alerts match your search or severity filter.')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('0 records');
+    expect(screen.getByLabelText('Alert totals')).toHaveTextContent('Total alerts3Critical1Warning2');
+    fireEvent.change(search, { target: { value: '' } });
+    expect(screen.getByRole('table')).toHaveTextContent('DEMO-ALT-003');
+    fireEvent.change(severity, { target: { value: 'all' } });
+    expect(screen.getAllByRole('row')).toHaveLength(4);
+    expect(screen.queryByText('No alerts match your search or severity filter.')).not.toBeInTheDocument();
   });
 
   it('preserves default and legacy detail previews with empty and recorded notes', () => {
@@ -90,14 +126,14 @@ describe('standalone alert list and details', () => {
     }
   });
 
-  it('exports content that fits one shared shell with visual-only controls', () => {
-    render(<AppShell activeNav="Alerts"><AlertsPage /></AppShell>);
+  it('exports content that fits one shared shell with a working theme switch', () => {
+    render(<ThemeProvider><AppShell activeNav="Alerts"><AlertsPage /></AppShell></ThemeProvider>);
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     expect(screen.getAllByRole('banner')).toHaveLength(1);
     fireEvent.click(screen.getByRole('switch', { name: 'Dark theme' }));
-    expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeDisabled();
-    expect(document.documentElement).not.toHaveAttribute('data-theme');
+    expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeChecked();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
     expect(screen.getAllByRole('row')).toHaveLength(4);
   });
 });
