@@ -64,21 +64,21 @@
 }
 
 .flight-detail-status--completed {
-  border-color: #1a7f3726;
-  background: #dafbe1;
-  color: #1a7f37;
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-fg);
 }
 
 .flight-detail-status--warning {
-  border-color: #d4a72c66;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 .flight-detail-status--failed {
-  border-color: #d1242f26;
-  background: #ffebe9;
-  color: #cf222e;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 /* ---------- Detail panels ---------- */
@@ -153,8 +153,8 @@
   border-radius: var(--radius-default);
   background-color: var(--canvas-subtle);
   background-image:
-    linear-gradient(#d1d9e066 1px, transparent 1px),
-    linear-gradient(90deg, #d1d9e066 1px, transparent 1px);
+    linear-gradient(var(--border-muted) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-muted) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -174,12 +174,12 @@
 }
 
 .flight-detail-waypoint {
-  color: #ffffff;
+  color: var(--canvas-default);
 }
 
 .flight-detail-waypoint circle {
   fill: var(--success-fg);
-  stroke: #ffffff;
+  stroke: var(--canvas-default);
   stroke-width: 1.2;
   vector-effect: non-scaling-stroke;
 }
@@ -266,11 +266,11 @@
 }
 
 .flight-event--warning .flight-event-marker {
-  background: #9a6700;
+  background: var(--warning-fg);
 }
 
 .flight-event--error .flight-event-marker {
-  background: #cf222e;
+  background: var(--danger-fg);
 }
 
 .flight-event-content {

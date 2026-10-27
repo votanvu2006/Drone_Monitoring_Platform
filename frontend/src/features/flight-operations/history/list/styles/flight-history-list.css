@@ -197,21 +197,21 @@
 }
 
 .flight-history-status--completed {
-  border-color: #1a7f3726;
-  background: #dafbe1;
-  color: #1a7f37;
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-fg);
 }
 
 .flight-history-status--warning {
-  border-color: #d4a72c66;
-  background: #fff8c5;
-  color: #9a6700;
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-fg);
 }
 
 .flight-history-status--failed {
-  border-color: #d1242f26;
-  background: #ffebe9;
-  color: #cf222e;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 /* ---------- Empty state ---------- */

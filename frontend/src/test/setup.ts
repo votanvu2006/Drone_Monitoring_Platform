@@ -5,5 +5,7 @@ import { cleanup } from '@testing-library/react';
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  localStorage.clear();
+  delete document.documentElement.dataset.theme;
   window.history.replaceState({}, '', '/');
 });
