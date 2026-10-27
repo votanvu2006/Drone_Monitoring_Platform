@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
+import { ThemeProvider } from './app/ThemeProvider';
+import { THEME_STORAGE_KEY } from './app/theme';
 import { AppShell } from './components/AppShell';
 
 describe('shared application shell', () => {
@@ -29,23 +31,55 @@ describe('shared application shell', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
   it('hosts arbitrary module content and highlights its declared section', () => {
-    render(<AppShell activeNav="Alerts"><h1>Example module</h1></AppShell>);
+    render(<ThemeProvider><AppShell activeNav="Alerts"><h1>Example module</h1></AppShell></ThemeProvider>);
     expect(screen.getByRole('main')).toHaveTextContent('Example module');
     expect(screen.getByRole('navigation').querySelector('[aria-current="page"]')).toHaveTextContent('Alerts');
   });
-  it('keeps the theme switch visual without changing the document or saving a preference', () => {
-    const localWrite = vi.spyOn(Storage.prototype, 'setItem');
-    const { unmount } = render(<App />);
+  it('defaults to light, toggles both ways and restores a saved preference after remount', () => {
+    const first = render(<App />);
     const toggle = screen.getByRole('switch', { name: 'Dark theme' });
-    expect(toggle).toBeDisabled();
+    expect(toggle).toBeEnabled();
     expect(toggle).not.toBeChecked();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
     fireEvent.click(toggle);
-    fireEvent.keyDown(toggle, { key: 'Enter' });
-    fireEvent.keyDown(toggle, { key: ' ' });
+    expect(toggle).toBeChecked();
+    expect(toggle).toHaveTextContent('Dark');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
+    first.unmount();
+    render(<App />);
+    expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeChecked();
+    fireEvent.click(screen.getByRole('switch', { name: 'Dark theme' }));
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('light');
+  });
+
+  it('falls back to light for an invalid saved preference', () => {
+    localStorage.setItem(THEME_STORAGE_KEY, 'invalid');
+    render(<App />);
+    expect(screen.getByRole('switch', { name: 'Dark theme' })).not.toBeChecked();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+  });
+
+  it('still switches both ways when browser storage is blocked', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Storage unavailable'); });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Storage unavailable'); });
+    render(<App />);
+    const toggle = screen.getByRole('switch', { name: 'Dark theme' });
+    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    fireEvent.click(toggle);
     expect(toggle).not.toBeChecked();
-    expect(document.documentElement).not.toHaveAttribute('data-theme');
-    expect(localWrite).not.toHaveBeenCalled();
-    unmount();
-    expect(document.documentElement).not.toHaveAttribute('data-theme');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+  });
+
+  it.each(['login', 'alerts'])('applies the saved theme to the standalone %s screen', name => {
+    localStorage.setItem(THEME_STORAGE_KEY, 'dark');
+    window.history.replaceState({}, '', '/?screen=' + name);
+    render(<App />);
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    expect(screen.queryByRole('banner')).not.toBeInTheDocument();
+    expect(screen.getByRole('main')).toBeVisible();
   });
 });

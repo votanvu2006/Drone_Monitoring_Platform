@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
+import { ThemeProvider } from '../../app/ThemeProvider';
 import { AppShell } from '../../components/AppShell';
 import { alerts, alertsByCode } from './alerts.data';
 import { AlertDetail, AlertsPage } from './AlertsPage';
@@ -90,14 +91,14 @@ describe('standalone alert list and details', () => {
     }
   });
 
-  it('exports content that fits one shared shell with visual-only controls', () => {
-    render(<AppShell activeNav="Alerts"><AlertsPage /></AppShell>);
+  it('exports content that fits one shared shell with a working theme switch', () => {
+    render(<ThemeProvider><AppShell activeNav="Alerts"><AlertsPage /></AppShell></ThemeProvider>);
     expect(screen.getAllByRole('main')).toHaveLength(1);
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     expect(screen.getAllByRole('banner')).toHaveLength(1);
     fireEvent.click(screen.getByRole('switch', { name: 'Dark theme' }));
-    expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeDisabled();
-    expect(document.documentElement).not.toHaveAttribute('data-theme');
+    expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeChecked();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
     expect(screen.getAllByRole('row')).toHaveLength(4);
   });
 });
