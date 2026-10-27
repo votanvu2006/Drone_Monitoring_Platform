@@ -1,6 +1,7 @@
 import { ModuleShellPreview } from "./app/ModuleShellPreview";
 import { resolveExample } from "./app/examples";
 import type { ExampleModule } from "./app/examples";
+import { ThemeProvider } from "./app/ThemeProvider";
 import { getModulePage } from "./app/module-pages";
 import { AppShell } from "./components/AppShell";
 
@@ -9,17 +10,14 @@ const modules = import.meta.glob<ExampleModule>(
   { eager: true },
 );
 
-export function App() {
+function AppContent() {
   const params = new URLSearchParams(window.location.search);
-
-  // Preview a module page inside the shared application shell.
   const modulePage = getModulePage(params.get("module"));
 
   if (modulePage) {
     return <ModuleShellPreview moduleId={modulePage.id} />;
   }
 
-  // Keep the existing standalone page previews working.
   if (!params.has("screen")) {
     params.set("screen", "drones");
   }
@@ -45,4 +43,12 @@ export function App() {
   );
 }
 
-export default App; 
+export function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+export default App;
