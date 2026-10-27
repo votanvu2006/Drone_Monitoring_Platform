@@ -58,10 +58,10 @@
   align-items: center;
   gap: 7px;
   padding: 5px 10px;
-  border: 1px solid #0969da33;
+  border: 1px solid var(--info-border);
   border-radius: var(--radius-full);
-  background: #ddf4ff;
-  color: #0969da;
+  background: var(--info-bg);
+  color: var(--info-fg);
   font-size: 12px;
   font-weight: 600;
 }
@@ -108,7 +108,7 @@
 
 .live-flight-selector select:focus-visible {
   border-color: var(--accent-fg);
-  outline: 2px solid #0969da33;
+  outline: 2px solid var(--info-border);
   outline-offset: 1px;
 }
 
@@ -261,8 +261,8 @@
   border-radius: var(--radius-default);
   background-color: var(--canvas-subtle);
   background-image:
-    linear-gradient(#d1d9e066 1px, transparent 1px),
-    linear-gradient(90deg, #d1d9e066 1px, transparent 1px);
+    linear-gradient(var(--border-muted) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-muted) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -280,7 +280,7 @@
 }
 
 .flight-route-line--planned {
-  stroke: #8c959f;
+  stroke: var(--fg-muted);
   stroke-dasharray: 5 6;
   stroke-width: 2;
 }
@@ -291,7 +291,7 @@
 }
 
 .flight-waypoint-halo {
-  fill: #0969da26;
+  fill: var(--info-bg);
 }
 
 .flight-waypoint-marker {
@@ -309,17 +309,17 @@
 
 .flight-waypoint--completed,
 .flight-waypoint--current {
-  color: #ffffff;
+  color: var(--canvas-default);
 }
 
 .flight-waypoint--completed .flight-waypoint-marker {
   fill: var(--success-fg);
-  stroke: #ffffff;
+  stroke: var(--canvas-default);
 }
 
 .flight-waypoint--current .flight-waypoint-marker {
   fill: var(--accent-fg);
-  stroke: #ffffff;
+  stroke: var(--canvas-default);
 }
 
 .flight-waypoint--upcoming {
@@ -327,8 +327,8 @@
 }
 
 .flight-waypoint--upcoming .flight-waypoint-marker {
-  fill: #ffffff;
-  stroke: #8c959f;
+  fill: var(--canvas-default);
+  stroke: var(--fg-muted);
 }
 
 .flight-route-unavailable {
@@ -375,8 +375,8 @@
 }
 
 .flight-route-legend-marker--upcoming {
-  border-color: #8c959f;
-  background: #ffffff;
+  border-color: var(--fg-muted);
+  background: var(--canvas-default);
 }
 
 /* Responsive layout */

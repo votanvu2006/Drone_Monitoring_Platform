@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTheme } from "../app/theme";
 import { sidebarNavigation } from "../app/navigation";
 import type { NavigationItem } from "../app/navigation";
 import { operatorProfile } from "../data/fixtures";
@@ -17,6 +18,8 @@ export function AppShell({
   contentHasMain = false,
   onNavigate,
 }: AppShellProps) {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -87,9 +90,9 @@ export function AppShell({
               type="button"
               className="theme-toggle"
               role="switch"
-              aria-checked={false}
+              aria-checked={theme === "dark"}
               aria-label="Dark theme"
-              disabled
+              onClick={toggleTheme}
             >
               <span
                 className="theme-switch-track"
@@ -97,7 +100,7 @@ export function AppShell({
               >
                 <span />
               </span>
-              <span>Light</span>
+              <span>{theme === "dark" ? "Dark" : "Light"}</span>
             </button>
 
             <div className="operator">
@@ -117,9 +120,7 @@ export function AppShell({
             {children}
           </div>
         ) : (
-          <main className="page-content">
-            {children}
-          </main>
+          <main className="page-content">{children}</main>
         )}
       </div>
     </div>

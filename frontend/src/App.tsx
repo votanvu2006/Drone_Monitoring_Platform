@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ModulePageView } from "./app/ModulePageView";
 import { RouteNotFoundPage } from "./app/RouteNotFoundPage";
+import { ThemeProvider } from "./app/ThemeProvider";
 import { resolveExample } from "./app/examples";
 import type { ExampleModule } from "./app/examples";
 import { getModulePage, getModulePageByPath } from "./app/module-pages";
@@ -27,7 +28,7 @@ function readBrowserLocation(): BrowserLocation {
   };
 }
 
-export function App() {
+function AppContent() {
   const [browserLocation, setBrowserLocation] =
     useState<BrowserLocation>(readBrowserLocation);
 
@@ -58,7 +59,6 @@ export function App() {
   const { pathname, search } = browserLocation;
   const params = new URLSearchParams(search);
 
-  // Keep the module preview URLs available while the pages are integrated.
   if (pathname === "/" && params.has("module")) {
     const previewPage = getModulePage(params.get("module"));
 
@@ -72,7 +72,6 @@ export function App() {
     }
   }
 
-  // The login preview remains separate from the shared application shell.
   if (pathname === "/" && params.has("screen")) {
     const { definition, state } = resolveExample(
       exampleModules,
@@ -85,7 +84,6 @@ export function App() {
     }
   }
 
-  // Show Drones at the root URL; other modules use their own URLs.
   const page =
     pathname === "/"
       ? getModulePage("drones")
@@ -104,6 +102,14 @@ export function App() {
     <AppShell activeNav={null} onNavigate={handleNavigate}>
       <RouteNotFoundPage />
     </AppShell>
+  );
+}
+
+export function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
