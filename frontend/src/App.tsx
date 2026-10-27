@@ -1,44 +1,106 @@
-import { ModuleShellPreview } from "./app/ModuleShellPreview";
+import { useEffect, useState } from "react";
+import { ModulePageView } from "./app/ModulePageView";
+import { RouteNotFoundPage } from "./app/RouteNotFoundPage";
+import { ThemeProvider } from "./app/ThemeProvider";
 import { resolveExample } from "./app/examples";
 import type { ExampleModule } from "./app/examples";
-import { ThemeProvider } from "./app/ThemeProvider";
-import { getModulePage } from "./app/module-pages";
+import { getModulePage, getModulePageByPath } from "./app/module-pages";
 import { AppShell } from "./components/AppShell";
 
-const modules = import.meta.glob<ExampleModule>(
+type BrowserLocation = {
+  pathname: string;
+  search: string;
+};
+
+const exampleModules = import.meta.glob<ExampleModule>(
   "./examples/**/*.preview.tsx",
   { eager: true },
 );
 
+function normalizePath(pathname: string): string {
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
+function readBrowserLocation(): BrowserLocation {
+  return {
+    pathname: normalizePath(window.location.pathname),
+    search: window.location.search,
+  };
+}
+
 function AppContent() {
-  const params = new URLSearchParams(window.location.search);
-  const modulePage = getModulePage(params.get("module"));
+  const [browserLocation, setBrowserLocation] =
+    useState<BrowserLocation>(readBrowserLocation);
 
-  if (modulePage) {
-    return <ModuleShellPreview moduleId={modulePage.id} />;
+  useEffect(() => {
+    function handlePopState() {
+      setBrowserLocation(readBrowserLocation());
+    }
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  function handleNavigate(path: string) {
+    if (
+      window.location.pathname === path &&
+      window.location.search === ""
+    ) {
+      return;
+    }
+
+    window.history.pushState(null, "", path);
+    setBrowserLocation(readBrowserLocation());
   }
 
-  if (!params.has("screen")) {
-    params.set("screen", "drones");
+  const { pathname, search } = browserLocation;
+  const params = new URLSearchParams(search);
+
+  if (pathname === "/" && params.has("module")) {
+    const previewPage = getModulePage(params.get("module"));
+
+    if (previewPage) {
+      return (
+        <ModulePageView
+          page={previewPage}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
   }
 
-  const { definition, state } = resolveExample(
-    modules,
-    params.toString(),
-  );
-  const Screen = definition.component;
-  const content = <Screen state={state} />;
+  if (pathname === "/" && params.has("screen")) {
+    const { definition, state } = resolveExample(
+      exampleModules,
+      params.toString(),
+    );
 
-  if (definition.standalone) {
-    return content;
+    if (definition.standalone) {
+      const PreviewComponent = definition.component;
+      return <PreviewComponent state={state} />;
+    }
+  }
+
+  const page =
+    pathname === "/"
+      ? getModulePage("drones")
+      : getModulePageByPath(pathname);
+
+  if (page) {
+    return (
+      <ModulePageView
+        page={page}
+        onNavigate={handleNavigate}
+      />
+    );
   }
 
   return (
-    <AppShell
-      activeNav={definition.activeNav}
-      contentHasMain={definition.contentHasMain}
-    >
-      {content}
+    <AppShell activeNav={null} onNavigate={handleNavigate}>
+      <RouteNotFoundPage />
     </AppShell>
   );
 }
