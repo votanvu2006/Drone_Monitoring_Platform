@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { DroneStatus } from "../drone.types";
 import { DroneIllustration } from "../shared/DroneIllustration";
 import { DroneComponentGroup } from "./components/DroneComponentGroup";
 import { droneDetailDataSource } from "./droneDetail.data";
@@ -11,6 +12,7 @@ import "./styles/drone-detail.css";
 
 type DroneDetailPageProps = {
   droneCode: string;
+  statusOverride?: DroneStatus;
   onBack: () => void;
 };
 
@@ -68,9 +70,16 @@ function groupComponents(components: DroneComponent[]) {
   });
 }
 
-function DroneDetailContent({ drone }: { drone: DroneDetail }) {
+function DroneDetailContent({
+  drone,
+  status,
+}: {
+  drone: DroneDetail;
+  status: DroneStatus;
+}) {
   const groups = groupComponents(drone.components);
-  const statusClass = drone.status.toLowerCase().replace(/_/g, "-");
+  const statusClass = status.toLowerCase().replace(/_/g, "-");
+  const isActivated = status !== "OFFLINE";
 
   return (
     <>
@@ -82,7 +91,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
 
         <div className="drone-detail-heading">
           <span className={`drone-detail-status drone-detail-status--${statusClass}`}>
-            {drone.status}
+            {status}
           </span>
           <h1>{drone.code}</h1>
           <p>{drone.modelName}</p>
@@ -123,10 +132,9 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
         <header className="drone-detail-section-heading">
           <div>
             <h2 id="drone-components-title">Drone components</h2>
-            <p>
-              Seed component health
-            </p>
+            <p>Seed component health</p>
           </div>
+
           <span className="component-total">
             {drone.components.length} components
           </span>
@@ -144,7 +152,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
         </div>
       </section>
 
-      {drone.isActivated && drone.findings.length > 0 && (
+      {isActivated && drone.findings.length > 0 && (
         <section
           className="drone-findings-panel"
           aria-labelledby="drone-findings-title"
@@ -154,6 +162,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
               <h2 id="drone-findings-title">Component findings</h2>
               <p>Issues reported during missions</p>
             </div>
+
             <span className="component-total">
               {drone.findings.length} findings
             </span>
@@ -161,10 +170,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
 
           <ul className="drone-findings-list">
             {drone.findings.map((finding) => (
-              <li
-                className="drone-finding"
-                key={finding.id}
-              >
+              <li className="drone-finding" key={finding.id}>
                 <div className="drone-finding-heading">
                   <strong>{finding.componentCode}</strong>
                   <span
@@ -193,6 +199,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
 
 function DroneDetailRequest({
   droneCode,
+  statusOverride,
   onBack,
 }: DroneDetailPageProps) {
   const [drone, setDrone] = useState<DroneDetail | null>(null);
@@ -224,6 +231,8 @@ function DroneDetailRequest({
     };
   }, [droneCode]);
 
+  const currentStatus = statusOverride ?? drone?.status;
+
   return (
     <main className="drone-detail-page">
       <div className="drone-detail-container">
@@ -250,8 +259,8 @@ function DroneDetailRequest({
           <p className="drone-detail-message">Drone not found.</p>
         )}
 
-        {loadState === "ready" && drone && (
-          <DroneDetailContent drone={drone} />
+        {loadState === "ready" && drone && currentStatus && (
+          <DroneDetailContent drone={drone} status={currentStatus} />
         )}
       </div>
     </main>

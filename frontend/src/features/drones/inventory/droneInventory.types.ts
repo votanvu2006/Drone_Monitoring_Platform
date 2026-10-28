@@ -2,6 +2,11 @@ import type { DroneStatus } from "../drone.types";
 
 export type { DroneStatus } from "../drone.types";
 
+export type SwitchableDroneStatus = Extract<
+  DroneStatus,
+  "OFFLINE" | "AVAILABLE"
+>;
+
 export type FindingSeverity = "WARNING" | "FAULT";
 
 export type Drone = {

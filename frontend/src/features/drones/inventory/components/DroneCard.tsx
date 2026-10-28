@@ -1,5 +1,10 @@
-import type { Drone, DroneStatus } from "../droneInventory.types";
+import type {
+  Drone,
+  DroneStatus,
+  SwitchableDroneStatus,
+} from "../droneInventory.types";
 import { DroneIllustration } from "../../shared/DroneIllustration";
+import { DronePowerSwitch } from "./DronePowerSwitch";
 import "../styles/drone-card.css";
 
 const BATTERY_PREVIEW_LEVEL = 100;
@@ -7,9 +12,13 @@ const BATTERY_PREVIEW_LEVEL = 100;
 type DroneCardProps = {
   drone: Drone;
   onViewDetails: (droneCode: string) => void;
+  onTogglePower: (
+    droneCode: string,
+    nextStatus: SwitchableDroneStatus,
+  ) => void;
 };
 
-function formatStatus(status: DroneStatus) {
+function formatStatus(status: DroneStatus): string {
   return status
     .toLowerCase()
     .split("_")
@@ -17,7 +26,7 @@ function formatStatus(status: DroneStatus) {
     .join(" ");
 }
 
-function getStatusClass(status: DroneStatus) {
+function getStatusClass(status: DroneStatus): string {
   return status.toLowerCase().replace(/_/g, "-");
 }
 
@@ -44,26 +53,10 @@ function BatteryMeter({ level }: { level: number }) {
   );
 }
 
-function PowerSwitch({ droneCode }: { droneCode: string }) {
-  return (
-    <button
-      className="power-switch"
-      type="button"
-      disabled
-      aria-label={`${droneCode} power is off`}
-      aria-pressed={false}
-    >
-      <span className="switch-track">
-        <span className="switch-knob" />
-      </span>
-      <span className="switch-label">OFF</span>
-    </button>
-  );
-}
-
 export function DroneCard({
   drone,
   onViewDetails,
+  onTogglePower,
 }: DroneCardProps) {
   return (
     <article className="drone-card">
@@ -89,6 +82,7 @@ export function DroneCard({
           <span>Location</span>
           <strong>{drone.lastKnownLocation ?? "No location reported"}</strong>
         </div>
+
         <div>
           <span>Active mission</span>
           <strong>{drone.activeMission ?? "No active mission"}</strong>
@@ -100,11 +94,18 @@ export function DroneCard({
           <span>Battery</span>
           <strong>{BATTERY_PREVIEW_LEVEL}%</strong>
         </div>
+
         <BatteryMeter level={BATTERY_PREVIEW_LEVEL} />
       </div>
 
       <div className="drone-card-actions">
-        <PowerSwitch droneCode={drone.code} />
+        <DronePowerSwitch
+          droneCode={drone.code}
+          status={drone.status}
+          onToggle={(nextStatus) =>
+            onTogglePower(drone.code, nextStatus)
+          }
+        />
 
         <button
           className="details-button"
