@@ -1,0 +1,1302 @@
+{
+  "metadata": {
+    "buildId": "DRONE-DATA-2.1.0-R4-20261030",
+    "runCode": "INITIAL-MOTOR-FRONT-LEFT"
+  },
+  "fleet": {
+    "drones": [
+      {
+        "code": "DRONE-001",
+        "modelName": "AeroVision X1 Enterprise",
+        "status": "OFFLINE",
+        "homeBase": "District 1 Operations Home Base",
+        "lastKnownLocation": "Demo operating location",
+        "activeMission": null
+      },
+      {
+        "code": "DRONE-002",
+        "modelName": "AeroVision X1 Enterprise",
+        "status": "OFFLINE",
+        "homeBase": "District 1 Operations Home Base",
+        "lastKnownLocation": "Demo operating location",
+        "activeMission": null
+      },
+      {
+        "code": "DRONE-003",
+        "modelName": "AeroVision X1 Enterprise",
+        "status": "IN_FLIGHT",
+        "homeBase": "District 1 Operations Home Base",
+        "lastKnownLocation": "WP-04 demo position",
+        "activeMission": "mission-003"
+      },
+      {
+        "code": "DRONE-004",
+        "modelName": "AeroVision X1 Enterprise",
+        "status": "OFFLINE",
+        "homeBase": "District 1 Operations Home Base",
+        "lastKnownLocation": "Demo operating location",
+        "activeMission": null
+      },
+      {
+        "code": "DRONE-005",
+        "modelName": "AeroVision X1 Enterprise",
+        "status": "OFFLINE",
+        "homeBase": "District 1 Operations Home Base",
+        "lastKnownLocation": "Demo operating location",
+        "activeMission": null
+      }
+    ],
+    "findings": [
+      {
+        "id": "FINDING-002",
+        "droneCode": "DRONE-002",
+        "missionCode": "mission-002",
+        "componentCode": "AVX1-MOTOR-FRONT_LEFT",
+        "severity": "WARNING",
+        "detectedAt": "2026-10-21T06:08:00.000Z"
+      }
+    ]
+  },
+  "details": [
+    {
+      "code": "DRONE-001",
+      "serialNumber": "AVX1E-2026-0001",
+      "status": "OFFLINE",
+      "isActivated": false,
+      "manufacturer": "AeroVision (fictional)",
+      "modelName": "AeroVision X1 Enterprise",
+      "modelCode": "AV-X1E",
+      "maxSpeedMps": 15,
+      "maxFlightTimeMinutes": 45,
+      "components": [
+        {
+          "code": "AVX1-FRAME-CENTER",
+          "type": "FRAME",
+          "name": "Carbon Fiber Frame",
+          "position": "CENTER",
+          "model": "AV-X1E Carbon Monocoque",
+          "primaryFunction": "Supports and protects aircraft systems",
+          "serialNumber": "DRONE-001-AVX1-FRAME-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_LEFT",
+          "type": "PROPELLER",
+          "name": "Front Left Propeller",
+          "position": "FRONT_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-left arm",
+          "serialNumber": "DRONE-001-AVX1-PROPELLER-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_RIGHT",
+          "type": "PROPELLER",
+          "name": "Front Right Propeller",
+          "position": "FRONT_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-right arm",
+          "serialNumber": "DRONE-001-AVX1-PROPELLER-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_LEFT",
+          "type": "PROPELLER",
+          "name": "Rear Left Propeller",
+          "position": "REAR_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-left arm",
+          "serialNumber": "DRONE-001-AVX1-PROPELLER-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_RIGHT",
+          "type": "PROPELLER",
+          "name": "Rear Right Propeller",
+          "position": "REAR_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-right arm",
+          "serialNumber": "DRONE-001-AVX1-PROPELLER-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_LEFT",
+          "type": "MOTOR",
+          "name": "Front Left Motor",
+          "position": "FRONT_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-left propeller",
+          "serialNumber": "DRONE-001-AVX1-MOTOR-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_RIGHT",
+          "type": "MOTOR",
+          "name": "Front Right Motor",
+          "position": "FRONT_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-right propeller",
+          "serialNumber": "DRONE-001-AVX1-MOTOR-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_LEFT",
+          "type": "MOTOR",
+          "name": "Rear Left Motor",
+          "position": "REAR_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-left propeller",
+          "serialNumber": "DRONE-001-AVX1-MOTOR-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_RIGHT",
+          "type": "MOTOR",
+          "name": "Rear Right Motor",
+          "position": "REAR_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-right propeller",
+          "serialNumber": "DRONE-001-AVX1-MOTOR-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-BATTERY-CENTER_REAR",
+          "type": "BATTERY",
+          "name": "Intelligent Flight Battery",
+          "position": "CENTER_REAR",
+          "model": "4S LiPo 5000 mAh 15.4 V",
+          "primaryFunction": "Supplies and monitors aircraft power",
+          "serialNumber": "DRONE-001-AVX1-BATTERY-CENTER_REAR",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-FLIGHT_CONTROLLER-CENTER",
+          "type": "FLIGHT_CONTROLLER",
+          "name": "Flight Controller",
+          "position": "CENTER",
+          "model": "AV-FC2",
+          "primaryFunction": "Stabilizes aircraft and executes routes",
+          "serialNumber": "DRONE-001-AVX1-FLIGHT_CONTROLLER-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-GPS-TOP_CENTER",
+          "type": "GPS",
+          "name": "GNSS Module",
+          "position": "TOP_CENTER",
+          "model": "Multi-constellation GNSS",
+          "primaryFunction": "Provides positioning and navigation data",
+          "serialNumber": "DRONE-001-AVX1-GPS-TOP_CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-SENSOR-BOTTOM_FRONT",
+          "type": "SENSOR",
+          "name": "Vision and IMU Module",
+          "position": "BOTTOM_FRONT",
+          "model": "AV VisionSense",
+          "primaryFunction": "Supports obstacle awareness and stabilization",
+          "serialNumber": "DRONE-001-AVX1-SENSOR-BOTTOM_FRONT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-CAMERA-FRONT",
+          "type": "CAMERA",
+          "name": "Monitoring Camera",
+          "position": "FRONT",
+          "model": "4K 3-Axis Gimbal Camera",
+          "primaryFunction": "Captures stabilized monitoring imagery",
+          "serialNumber": "DRONE-001-AVX1-CAMERA-FRONT",
+          "healthStatus": "HEALTHY"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "code": "DRONE-002",
+      "serialNumber": "AVX1E-2026-0002",
+      "status": "OFFLINE",
+      "isActivated": false,
+      "manufacturer": "AeroVision (fictional)",
+      "modelName": "AeroVision X1 Enterprise",
+      "modelCode": "AV-X1E",
+      "maxSpeedMps": 15,
+      "maxFlightTimeMinutes": 45,
+      "components": [
+        {
+          "code": "AVX1-FRAME-CENTER",
+          "type": "FRAME",
+          "name": "Carbon Fiber Frame",
+          "position": "CENTER",
+          "model": "AV-X1E Carbon Monocoque",
+          "primaryFunction": "Supports and protects aircraft systems",
+          "serialNumber": "DRONE-002-AVX1-FRAME-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_LEFT",
+          "type": "PROPELLER",
+          "name": "Front Left Propeller",
+          "position": "FRONT_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-left arm",
+          "serialNumber": "DRONE-002-AVX1-PROPELLER-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_RIGHT",
+          "type": "PROPELLER",
+          "name": "Front Right Propeller",
+          "position": "FRONT_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-right arm",
+          "serialNumber": "DRONE-002-AVX1-PROPELLER-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_LEFT",
+          "type": "PROPELLER",
+          "name": "Rear Left Propeller",
+          "position": "REAR_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-left arm",
+          "serialNumber": "DRONE-002-AVX1-PROPELLER-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_RIGHT",
+          "type": "PROPELLER",
+          "name": "Rear Right Propeller",
+          "position": "REAR_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-right arm",
+          "serialNumber": "DRONE-002-AVX1-PROPELLER-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_LEFT",
+          "type": "MOTOR",
+          "name": "Front Left Motor",
+          "position": "FRONT_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-left propeller",
+          "serialNumber": "DRONE-002-AVX1-MOTOR-FRONT_LEFT",
+          "healthStatus": "WARNING"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_RIGHT",
+          "type": "MOTOR",
+          "name": "Front Right Motor",
+          "position": "FRONT_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-right propeller",
+          "serialNumber": "DRONE-002-AVX1-MOTOR-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_LEFT",
+          "type": "MOTOR",
+          "name": "Rear Left Motor",
+          "position": "REAR_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-left propeller",
+          "serialNumber": "DRONE-002-AVX1-MOTOR-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_RIGHT",
+          "type": "MOTOR",
+          "name": "Rear Right Motor",
+          "position": "REAR_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-right propeller",
+          "serialNumber": "DRONE-002-AVX1-MOTOR-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-BATTERY-CENTER_REAR",
+          "type": "BATTERY",
+          "name": "Intelligent Flight Battery",
+          "position": "CENTER_REAR",
+          "model": "4S LiPo 5000 mAh 15.4 V",
+          "primaryFunction": "Supplies and monitors aircraft power",
+          "serialNumber": "DRONE-002-AVX1-BATTERY-CENTER_REAR",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-FLIGHT_CONTROLLER-CENTER",
+          "type": "FLIGHT_CONTROLLER",
+          "name": "Flight Controller",
+          "position": "CENTER",
+          "model": "AV-FC2",
+          "primaryFunction": "Stabilizes aircraft and executes routes",
+          "serialNumber": "DRONE-002-AVX1-FLIGHT_CONTROLLER-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-GPS-TOP_CENTER",
+          "type": "GPS",
+          "name": "GNSS Module",
+          "position": "TOP_CENTER",
+          "model": "Multi-constellation GNSS",
+          "primaryFunction": "Provides positioning and navigation data",
+          "serialNumber": "DRONE-002-AVX1-GPS-TOP_CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-SENSOR-BOTTOM_FRONT",
+          "type": "SENSOR",
+          "name": "Vision and IMU Module",
+          "position": "BOTTOM_FRONT",
+          "model": "AV VisionSense",
+          "primaryFunction": "Supports obstacle awareness and stabilization",
+          "serialNumber": "DRONE-002-AVX1-SENSOR-BOTTOM_FRONT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-CAMERA-FRONT",
+          "type": "CAMERA",
+          "name": "Monitoring Camera",
+          "position": "FRONT",
+          "model": "4K 3-Axis Gimbal Camera",
+          "primaryFunction": "Captures stabilized monitoring imagery",
+          "serialNumber": "DRONE-002-AVX1-CAMERA-FRONT",
+          "healthStatus": "HEALTHY"
+        }
+      ],
+      "findings": [
+        {
+          "id": "FINDING-002",
+          "droneCode": "DRONE-002",
+          "missionCode": "mission-002",
+          "componentCode": "AVX1-MOTOR-FRONT_LEFT",
+          "severity": "WARNING",
+          "detectedAt": "2026-10-21T06:08:00.000Z"
+        }
+      ]
+    },
+    {
+      "code": "DRONE-003",
+      "serialNumber": "AVX1E-2026-0003",
+      "status": "IN_FLIGHT",
+      "isActivated": true,
+      "manufacturer": "AeroVision (fictional)",
+      "modelName": "AeroVision X1 Enterprise",
+      "modelCode": "AV-X1E",
+      "maxSpeedMps": 15,
+      "maxFlightTimeMinutes": 45,
+      "components": [
+        {
+          "code": "AVX1-FRAME-CENTER",
+          "type": "FRAME",
+          "name": "Carbon Fiber Frame",
+          "position": "CENTER",
+          "model": "AV-X1E Carbon Monocoque",
+          "primaryFunction": "Supports and protects aircraft systems",
+          "serialNumber": "DRONE-003-AVX1-FRAME-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_LEFT",
+          "type": "PROPELLER",
+          "name": "Front Left Propeller",
+          "position": "FRONT_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-left arm",
+          "serialNumber": "DRONE-003-AVX1-PROPELLER-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_RIGHT",
+          "type": "PROPELLER",
+          "name": "Front Right Propeller",
+          "position": "FRONT_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-right arm",
+          "serialNumber": "DRONE-003-AVX1-PROPELLER-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_LEFT",
+          "type": "PROPELLER",
+          "name": "Rear Left Propeller",
+          "position": "REAR_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-left arm",
+          "serialNumber": "DRONE-003-AVX1-PROPELLER-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_RIGHT",
+          "type": "PROPELLER",
+          "name": "Rear Right Propeller",
+          "position": "REAR_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-right arm",
+          "serialNumber": "DRONE-003-AVX1-PROPELLER-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_LEFT",
+          "type": "MOTOR",
+          "name": "Front Left Motor",
+          "position": "FRONT_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-left propeller",
+          "serialNumber": "DRONE-003-AVX1-MOTOR-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_RIGHT",
+          "type": "MOTOR",
+          "name": "Front Right Motor",
+          "position": "FRONT_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-right propeller",
+          "serialNumber": "DRONE-003-AVX1-MOTOR-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_LEFT",
+          "type": "MOTOR",
+          "name": "Rear Left Motor",
+          "position": "REAR_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-left propeller",
+          "serialNumber": "DRONE-003-AVX1-MOTOR-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_RIGHT",
+          "type": "MOTOR",
+          "name": "Rear Right Motor",
+          "position": "REAR_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-right propeller",
+          "serialNumber": "DRONE-003-AVX1-MOTOR-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-BATTERY-CENTER_REAR",
+          "type": "BATTERY",
+          "name": "Intelligent Flight Battery",
+          "position": "CENTER_REAR",
+          "model": "4S LiPo 5000 mAh 15.4 V",
+          "primaryFunction": "Supplies and monitors aircraft power",
+          "serialNumber": "DRONE-003-AVX1-BATTERY-CENTER_REAR",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-FLIGHT_CONTROLLER-CENTER",
+          "type": "FLIGHT_CONTROLLER",
+          "name": "Flight Controller",
+          "position": "CENTER",
+          "model": "AV-FC2",
+          "primaryFunction": "Stabilizes aircraft and executes routes",
+          "serialNumber": "DRONE-003-AVX1-FLIGHT_CONTROLLER-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-GPS-TOP_CENTER",
+          "type": "GPS",
+          "name": "GNSS Module",
+          "position": "TOP_CENTER",
+          "model": "Multi-constellation GNSS",
+          "primaryFunction": "Provides positioning and navigation data",
+          "serialNumber": "DRONE-003-AVX1-GPS-TOP_CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-SENSOR-BOTTOM_FRONT",
+          "type": "SENSOR",
+          "name": "Vision and IMU Module",
+          "position": "BOTTOM_FRONT",
+          "model": "AV VisionSense",
+          "primaryFunction": "Supports obstacle awareness and stabilization",
+          "serialNumber": "DRONE-003-AVX1-SENSOR-BOTTOM_FRONT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-CAMERA-FRONT",
+          "type": "CAMERA",
+          "name": "Monitoring Camera",
+          "position": "FRONT",
+          "model": "4K 3-Axis Gimbal Camera",
+          "primaryFunction": "Captures stabilized monitoring imagery",
+          "serialNumber": "DRONE-003-AVX1-CAMERA-FRONT",
+          "healthStatus": "HEALTHY"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "code": "DRONE-004",
+      "serialNumber": "AVX1E-2026-0004",
+      "status": "OFFLINE",
+      "isActivated": false,
+      "manufacturer": "AeroVision (fictional)",
+      "modelName": "AeroVision X1 Enterprise",
+      "modelCode": "AV-X1E",
+      "maxSpeedMps": 15,
+      "maxFlightTimeMinutes": 45,
+      "components": [
+        {
+          "code": "AVX1-FRAME-CENTER",
+          "type": "FRAME",
+          "name": "Carbon Fiber Frame",
+          "position": "CENTER",
+          "model": "AV-X1E Carbon Monocoque",
+          "primaryFunction": "Supports and protects aircraft systems",
+          "serialNumber": "DRONE-004-AVX1-FRAME-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_LEFT",
+          "type": "PROPELLER",
+          "name": "Front Left Propeller",
+          "position": "FRONT_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-left arm",
+          "serialNumber": "DRONE-004-AVX1-PROPELLER-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_RIGHT",
+          "type": "PROPELLER",
+          "name": "Front Right Propeller",
+          "position": "FRONT_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-right arm",
+          "serialNumber": "DRONE-004-AVX1-PROPELLER-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_LEFT",
+          "type": "PROPELLER",
+          "name": "Rear Left Propeller",
+          "position": "REAR_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-left arm",
+          "serialNumber": "DRONE-004-AVX1-PROPELLER-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_RIGHT",
+          "type": "PROPELLER",
+          "name": "Rear Right Propeller",
+          "position": "REAR_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-right arm",
+          "serialNumber": "DRONE-004-AVX1-PROPELLER-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_LEFT",
+          "type": "MOTOR",
+          "name": "Front Left Motor",
+          "position": "FRONT_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-left propeller",
+          "serialNumber": "DRONE-004-AVX1-MOTOR-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_RIGHT",
+          "type": "MOTOR",
+          "name": "Front Right Motor",
+          "position": "FRONT_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-right propeller",
+          "serialNumber": "DRONE-004-AVX1-MOTOR-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_LEFT",
+          "type": "MOTOR",
+          "name": "Rear Left Motor",
+          "position": "REAR_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-left propeller",
+          "serialNumber": "DRONE-004-AVX1-MOTOR-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_RIGHT",
+          "type": "MOTOR",
+          "name": "Rear Right Motor",
+          "position": "REAR_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-right propeller",
+          "serialNumber": "DRONE-004-AVX1-MOTOR-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-BATTERY-CENTER_REAR",
+          "type": "BATTERY",
+          "name": "Intelligent Flight Battery",
+          "position": "CENTER_REAR",
+          "model": "4S LiPo 5000 mAh 15.4 V",
+          "primaryFunction": "Supplies and monitors aircraft power",
+          "serialNumber": "DRONE-004-AVX1-BATTERY-CENTER_REAR",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-FLIGHT_CONTROLLER-CENTER",
+          "type": "FLIGHT_CONTROLLER",
+          "name": "Flight Controller",
+          "position": "CENTER",
+          "model": "AV-FC2",
+          "primaryFunction": "Stabilizes aircraft and executes routes",
+          "serialNumber": "DRONE-004-AVX1-FLIGHT_CONTROLLER-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-GPS-TOP_CENTER",
+          "type": "GPS",
+          "name": "GNSS Module",
+          "position": "TOP_CENTER",
+          "model": "Multi-constellation GNSS",
+          "primaryFunction": "Provides positioning and navigation data",
+          "serialNumber": "DRONE-004-AVX1-GPS-TOP_CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-SENSOR-BOTTOM_FRONT",
+          "type": "SENSOR",
+          "name": "Vision and IMU Module",
+          "position": "BOTTOM_FRONT",
+          "model": "AV VisionSense",
+          "primaryFunction": "Supports obstacle awareness and stabilization",
+          "serialNumber": "DRONE-004-AVX1-SENSOR-BOTTOM_FRONT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-CAMERA-FRONT",
+          "type": "CAMERA",
+          "name": "Monitoring Camera",
+          "position": "FRONT",
+          "model": "4K 3-Axis Gimbal Camera",
+          "primaryFunction": "Captures stabilized monitoring imagery",
+          "serialNumber": "DRONE-004-AVX1-CAMERA-FRONT",
+          "healthStatus": "HEALTHY"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "code": "DRONE-005",
+      "serialNumber": "AVX1E-2026-0005",
+      "status": "OFFLINE",
+      "isActivated": false,
+      "manufacturer": "AeroVision (fictional)",
+      "modelName": "AeroVision X1 Enterprise",
+      "modelCode": "AV-X1E",
+      "maxSpeedMps": 15,
+      "maxFlightTimeMinutes": 45,
+      "components": [
+        {
+          "code": "AVX1-FRAME-CENTER",
+          "type": "FRAME",
+          "name": "Carbon Fiber Frame",
+          "position": "CENTER",
+          "model": "AV-X1E Carbon Monocoque",
+          "primaryFunction": "Supports and protects aircraft systems",
+          "serialNumber": "DRONE-005-AVX1-FRAME-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_LEFT",
+          "type": "PROPELLER",
+          "name": "Front Left Propeller",
+          "position": "FRONT_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-left arm",
+          "serialNumber": "DRONE-005-AVX1-PROPELLER-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-FRONT_RIGHT",
+          "type": "PROPELLER",
+          "name": "Front Right Propeller",
+          "position": "FRONT_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the front-right arm",
+          "serialNumber": "DRONE-005-AVX1-PROPELLER-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_LEFT",
+          "type": "PROPELLER",
+          "name": "Rear Left Propeller",
+          "position": "REAR_LEFT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-left arm",
+          "serialNumber": "DRONE-005-AVX1-PROPELLER-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-PROPELLER-REAR_RIGHT",
+          "type": "PROPELLER",
+          "name": "Rear Right Propeller",
+          "position": "REAR_RIGHT",
+          "model": "9453F-class Low-Noise Propeller",
+          "primaryFunction": "Generates lift at the rear-right arm",
+          "serialNumber": "DRONE-005-AVX1-PROPELLER-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_LEFT",
+          "type": "MOTOR",
+          "name": "Front Left Motor",
+          "position": "FRONT_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-left propeller",
+          "serialNumber": "DRONE-005-AVX1-MOTOR-FRONT_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-FRONT_RIGHT",
+          "type": "MOTOR",
+          "name": "Front Right Motor",
+          "position": "FRONT_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the front-right propeller",
+          "serialNumber": "DRONE-005-AVX1-MOTOR-FRONT_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_LEFT",
+          "type": "MOTOR",
+          "name": "Rear Left Motor",
+          "position": "REAR_LEFT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-left propeller",
+          "serialNumber": "DRONE-005-AVX1-MOTOR-REAR_LEFT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-MOTOR-REAR_RIGHT",
+          "type": "MOTOR",
+          "name": "Rear Right Motor",
+          "position": "REAR_RIGHT",
+          "model": "2008-class Brushless Motor",
+          "primaryFunction": "Drives the rear-right propeller",
+          "serialNumber": "DRONE-005-AVX1-MOTOR-REAR_RIGHT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-BATTERY-CENTER_REAR",
+          "type": "BATTERY",
+          "name": "Intelligent Flight Battery",
+          "position": "CENTER_REAR",
+          "model": "4S LiPo 5000 mAh 15.4 V",
+          "primaryFunction": "Supplies and monitors aircraft power",
+          "serialNumber": "DRONE-005-AVX1-BATTERY-CENTER_REAR",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-FLIGHT_CONTROLLER-CENTER",
+          "type": "FLIGHT_CONTROLLER",
+          "name": "Flight Controller",
+          "position": "CENTER",
+          "model": "AV-FC2",
+          "primaryFunction": "Stabilizes aircraft and executes routes",
+          "serialNumber": "DRONE-005-AVX1-FLIGHT_CONTROLLER-CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-GPS-TOP_CENTER",
+          "type": "GPS",
+          "name": "GNSS Module",
+          "position": "TOP_CENTER",
+          "model": "Multi-constellation GNSS",
+          "primaryFunction": "Provides positioning and navigation data",
+          "serialNumber": "DRONE-005-AVX1-GPS-TOP_CENTER",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-SENSOR-BOTTOM_FRONT",
+          "type": "SENSOR",
+          "name": "Vision and IMU Module",
+          "position": "BOTTOM_FRONT",
+          "model": "AV VisionSense",
+          "primaryFunction": "Supports obstacle awareness and stabilization",
+          "serialNumber": "DRONE-005-AVX1-SENSOR-BOTTOM_FRONT",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "code": "AVX1-CAMERA-FRONT",
+          "type": "CAMERA",
+          "name": "Monitoring Camera",
+          "position": "FRONT",
+          "model": "4K 3-Axis Gimbal Camera",
+          "primaryFunction": "Captures stabilized monitoring imagery",
+          "serialNumber": "DRONE-005-AVX1-CAMERA-FRONT",
+          "healthStatus": "HEALTHY"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "missions": [
+    {
+      "id": "mission-001",
+      "name": "Mission 001",
+      "droneCode": "DRONE-001",
+      "status": "READY",
+      "waypointCount": 6,
+      "createdAt": "2026-10-21T02:00:00.000Z"
+    },
+    {
+      "id": "mission-002",
+      "name": "Mission 002",
+      "droneCode": "DRONE-002",
+      "status": "WARNING",
+      "waypointCount": 8,
+      "createdAt": "2026-10-21T01:00:00.000Z"
+    },
+    {
+      "id": "mission-003",
+      "name": "Mission 003",
+      "droneCode": "DRONE-003",
+      "status": "IN_PROGRESS",
+      "waypointCount": 8,
+      "createdAt": "2026-10-20T01:00:00.000Z"
+    },
+    {
+      "id": "mission-004",
+      "name": "Mission 004",
+      "droneCode": "DRONE-004",
+      "status": "COMPLETED",
+      "waypointCount": 5,
+      "createdAt": "2026-10-12T01:00:00.000Z"
+    },
+    {
+      "id": "mission-005",
+      "name": "Mission 005",
+      "droneCode": "DRONE-005",
+      "status": "FAILED",
+      "waypointCount": 10,
+      "createdAt": "2026-10-19T01:00:00.000Z"
+    }
+  ],
+  "activeFlights": [
+    {
+      "flightCode": "FLIGHT-015",
+      "missionCode": "mission-003",
+      "droneCode": "DRONE-003",
+      "flightStatus": "IN_PROGRESS",
+      "routeName": "North Perimeter Survey",
+      "currentWaypointIndex": 3,
+      "waypoints": [
+        {
+          "code": "WP-01",
+          "label": "Launch",
+          "x": 8,
+          "y": 48
+        },
+        {
+          "code": "WP-02",
+          "label": "Waypoint 02",
+          "x": 21,
+          "y": 39
+        },
+        {
+          "code": "WP-03",
+          "label": "Waypoint 03",
+          "x": 33,
+          "y": 48
+        },
+        {
+          "code": "WP-04",
+          "label": "Waypoint 04",
+          "x": 45,
+          "y": 27
+        },
+        {
+          "code": "WP-05",
+          "label": "Waypoint 05",
+          "x": 59,
+          "y": 34
+        },
+        {
+          "code": "WP-06",
+          "label": "Waypoint 06",
+          "x": 70,
+          "y": 15
+        },
+        {
+          "code": "WP-07",
+          "label": "Waypoint 07",
+          "x": 83,
+          "y": 24
+        },
+        {
+          "code": "WP-08",
+          "label": "Return",
+          "x": 93,
+          "y": 10
+        }
+      ]
+    }
+  ],
+  "history": [
+    {
+      "flightCode": "FLIGHT-014",
+      "droneCode": "DRONE-001",
+      "missionCode": "MISSION-014",
+      "status": "COMPLETED",
+      "startedAt": "2026-10-16T02:15:00.000Z",
+      "durationSeconds": 1122
+    },
+    {
+      "flightCode": "FLIGHT-012",
+      "droneCode": "DRONE-005",
+      "missionCode": "MISSION-012",
+      "status": "FAILED",
+      "startedAt": "2026-10-14T01:55:00.000Z",
+      "durationSeconds": 496
+    },
+    {
+      "flightCode": "FLIGHT-011",
+      "droneCode": "DRONE-003",
+      "missionCode": "MISSION-011",
+      "status": "COMPLETED",
+      "startedAt": "2026-10-13T09:10:00.000Z",
+      "durationSeconds": 1380
+    },
+    {
+      "flightCode": "FLIGHT-010",
+      "droneCode": "DRONE-004",
+      "missionCode": "MISSION-010",
+      "status": "COMPLETED",
+      "startedAt": "2026-10-12T03:05:00.000Z",
+      "durationSeconds": 945
+    }
+  ],
+  "historyDetails": [
+    {
+      "flightCode": "FLIGHT-014",
+      "droneCode": "DRONE-001",
+      "missionCode": "MISSION-014",
+      "status": "COMPLETED",
+      "startedAt": "2026-10-16T02:15:00.000Z",
+      "durationSeconds": 1122,
+      "routeName": "North Perimeter Survey",
+      "waypoints": [
+        {
+          "code": "WP-01",
+          "x": 8,
+          "y": 48
+        },
+        {
+          "code": "WP-02",
+          "x": 21,
+          "y": 39
+        },
+        {
+          "code": "WP-03",
+          "x": 33,
+          "y": 48
+        },
+        {
+          "code": "WP-04",
+          "x": 45,
+          "y": 27
+        },
+        {
+          "code": "WP-05",
+          "x": 59,
+          "y": 34
+        },
+        {
+          "code": "WP-06",
+          "x": 70,
+          "y": 15
+        },
+        {
+          "code": "WP-07",
+          "x": 83,
+          "y": 24
+        },
+        {
+          "code": "WP-08",
+          "x": 93,
+          "y": 10
+        }
+      ],
+      "telemetry": {
+        "startBatteryPercent": 100,
+        "endBatteryPercent": 62,
+        "maxAltitudeMeters": 82,
+        "averageSpeedMps": 9.4,
+        "distanceMeters": 3620
+      },
+      "events": [
+        {
+          "id": "event-001",
+          "occurredAt": "2026-10-16T02:15:00.000Z",
+          "title": "Flight started",
+          "description": "The drone began the assigned route.",
+          "severity": "INFO"
+        },
+        {
+          "id": "event-002",
+          "occurredAt": "2026-10-16T02:20:00.000Z",
+          "title": "Waypoint reached",
+          "description": "The drone reached waypoint WP-04.",
+          "severity": "INFO"
+        },
+        {
+          "id": "event-003",
+          "occurredAt": "2026-10-16T02:29:00.000Z",
+          "title": "Route completed",
+          "description": "The drone returned after completing the route.",
+          "severity": "INFO"
+        }
+      ]
+    },
+    {
+      "flightCode": "FLIGHT-012",
+      "droneCode": "DRONE-005",
+      "missionCode": "MISSION-012",
+      "status": "FAILED",
+      "startedAt": "2026-10-14T01:55:00.000Z",
+      "durationSeconds": 496,
+      "routeName": "Historical Demo Route",
+      "waypoints": [
+        {
+          "code": "WP-01",
+          "x": 8,
+          "y": 48
+        },
+        {
+          "code": "WP-02",
+          "x": 21,
+          "y": 39
+        },
+        {
+          "code": "WP-03",
+          "x": 33,
+          "y": 48
+        },
+        {
+          "code": "WP-04",
+          "x": 45,
+          "y": 27
+        },
+        {
+          "code": "WP-05",
+          "x": 59,
+          "y": 34
+        },
+        {
+          "code": "WP-06",
+          "x": 70,
+          "y": 15
+        },
+        {
+          "code": "WP-07",
+          "x": 83,
+          "y": 24
+        },
+        {
+          "code": "WP-08",
+          "x": 93,
+          "y": 10
+        }
+      ],
+      "telemetry": {
+        "startBatteryPercent": 100,
+        "endBatteryPercent": 82,
+        "maxAltitudeMeters": 82,
+        "averageSpeedMps": 3.17,
+        "distanceMeters": 1450
+      },
+      "events": [
+        {
+          "id": "FLIGHT-012-START",
+          "occurredAt": "2026-10-14T01:55:00.000Z",
+          "title": "Flight started",
+          "description": "The drone began the assigned route.",
+          "severity": "INFO"
+        },
+        {
+          "id": "FLIGHT-012-END",
+          "occurredAt": "2026-10-14T02:03:16.000Z",
+          "title": "Flight ended",
+          "description": "The historical flight ended before completing its route.",
+          "severity": "ERROR"
+        }
+      ]
+    },
+    {
+      "flightCode": "FLIGHT-011",
+      "droneCode": "DRONE-003",
+      "missionCode": "MISSION-011",
+      "status": "COMPLETED",
+      "startedAt": "2026-10-13T09:10:00.000Z",
+      "durationSeconds": 1380,
+      "routeName": "Completed Demo Route",
+      "waypoints": [
+        {
+          "code": "WP-01",
+          "x": 8,
+          "y": 48
+        },
+        {
+          "code": "WP-02",
+          "x": 21,
+          "y": 39
+        },
+        {
+          "code": "WP-03",
+          "x": 33,
+          "y": 48
+        },
+        {
+          "code": "WP-04",
+          "x": 45,
+          "y": 27
+        },
+        {
+          "code": "WP-05",
+          "x": 59,
+          "y": 34
+        },
+        {
+          "code": "WP-06",
+          "x": 70,
+          "y": 15
+        },
+        {
+          "code": "WP-07",
+          "x": 83,
+          "y": 24
+        },
+        {
+          "code": "WP-08",
+          "x": 93,
+          "y": 10
+        }
+      ],
+      "telemetry": {
+        "startBatteryPercent": 100,
+        "endBatteryPercent": 65,
+        "maxAltitudeMeters": 82,
+        "averageSpeedMps": 3.33,
+        "distanceMeters": 4600
+      },
+      "events": [
+        {
+          "id": "FLIGHT-011-START",
+          "occurredAt": "2026-10-13T09:10:00.000Z",
+          "title": "Flight started",
+          "description": "The drone began the assigned route.",
+          "severity": "INFO"
+        },
+        {
+          "id": "FLIGHT-011-END",
+          "occurredAt": "2026-10-13T09:33:00.000Z",
+          "title": "Route completed",
+          "description": "The drone completed the route.",
+          "severity": "INFO"
+        }
+      ]
+    },
+    {
+      "flightCode": "FLIGHT-010",
+      "droneCode": "DRONE-004",
+      "missionCode": "MISSION-010",
+      "status": "COMPLETED",
+      "startedAt": "2026-10-12T03:05:00.000Z",
+      "durationSeconds": 945,
+      "routeName": "Completed Demo Route",
+      "waypoints": [
+        {
+          "code": "WP-01",
+          "x": 8,
+          "y": 48
+        },
+        {
+          "code": "WP-02",
+          "x": 29.25,
+          "y": 38.5
+        },
+        {
+          "code": "WP-03",
+          "x": 50.5,
+          "y": 29
+        },
+        {
+          "code": "WP-04",
+          "x": 71.75,
+          "y": 19.5
+        },
+        {
+          "code": "WP-05",
+          "x": 93,
+          "y": 10
+        }
+      ],
+      "telemetry": {
+        "startBatteryPercent": 100,
+        "endBatteryPercent": 70,
+        "maxAltitudeMeters": 82,
+        "averageSpeedMps": 3.17,
+        "distanceMeters": 3000
+      },
+      "events": [
+        {
+          "id": "FLIGHT-010-START",
+          "occurredAt": "2026-10-12T03:05:00.000Z",
+          "title": "Flight started",
+          "description": "The drone began the assigned route.",
+          "severity": "INFO"
+        },
+        {
+          "id": "FLIGHT-010-END",
+          "occurredAt": "2026-10-12T03:20:45.000Z",
+          "title": "Route completed",
+          "description": "The drone completed the route.",
+          "severity": "INFO"
+        }
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "alertCode": "DEMO-ALT-001",
+      "title": "Low battery",
+      "droneCode": "DRONE-002",
+      "missionCode": "mission-002",
+      "problemDescription": "Battery level is below the recommended reserve.",
+      "severity": "WARNING",
+      "sourceGroup": "Components",
+      "detectedAt": "2026-10-21 06:05:00",
+      "resolutionNote": null
+    },
+    {
+      "alertCode": "DEMO-ALT-002",
+      "title": "Motor temperature warning",
+      "droneCode": "DRONE-002",
+      "missionCode": "mission-002",
+      "problemDescription": "Motor temperature is above the normal operating range.",
+      "severity": "WARNING",
+      "sourceGroup": "Components",
+      "detectedAt": "2026-10-21 06:08:00",
+      "resolutionNote": "Inspect the motor and allow it to cool before the next flight."
+    },
+    {
+      "alertCode": "DEMO-ALT-003",
+      "title": "Unsafe weather",
+      "droneCode": "DRONE-005",
+      "missionCode": "mission-005",
+      "problemDescription": "Strong wind and poor visibility caused the mission to fail.",
+      "severity": "CRITICAL",
+      "sourceGroup": "Weather",
+      "detectedAt": "2026-10-19 06:10:00",
+      "resolutionNote": "Mission stopped. Review weather conditions before scheduling a new attempt."
+    }
+  ]
+}

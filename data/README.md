@@ -1,53 +1,63 @@
-# Drone Monitoring Platform — Data Pack v2.0.0
+# Drone Monitoring Platform — MySQL Data Pack v2.1.0
 
-This is a deterministic MySQL data pack for a five-drone dashboard. Each drone owns the same 14-component hardware configuration. The 20 historical flights are distributed evenly across the fleet while respecting each drone's assigned scenario category.
+**Build ID:** `DRONE-DATA-2.1.0-R4-20261030`
 
-Release identity: **DRONE-DATA-2.0.0-R1-20260919**. After every import, query data_pack_metadata before inspecting any scenario or component row. This makes an old database/volume immediately visible.
+This is the active MySQL demo data pack in the repository.
 
-## Included data
+## Contents
 
-| Entity | Rows |
-| --- | ---: |
-| data_pack_metadata | 1 |
-| drone_models | 1 |
-| drones | 5 |
-| component_catalog | 14 |
-| drone_components | 70 |
-| flight_zones | 8 |
-| simulation_scenarios | 9 |
-| drone_scenario_pool | 9 |
-| missions | 20 |
-| waypoints | 90 |
-| weather_runtime_config | 1 |
-| weather_demo_profiles | 3 |
-| drone_weather_demo_assignments | 5 |
-| weather_checks | 9 |
-| flights | 20 |
-| telemetry | 6,000 |
-| alert_rule_catalog | 14 |
-| alerts | 24 |
+- 5 drones, 14 component definitions and 70 installed components.
+- 9 mission records: 5 current missions and 4 historical references.
+- 66 waypoints.
+- 5 flights: 1 active flight and 4 ended flights.
+- 30 sparse synthetic telemetry observations.
+- 3 alerts and 1 component finding.
+- MySQL schema, seed data, procedures, verification SQL, manifest and frontend snapshot.
 
-## What is improved
+## Start MySQL
 
-- Mission distance is calculated from waypoint geometry using Haversine distance.
-- Telemetry follows route distance, uses exact two-second timestamps, and matches flight start/end times.
-- Four motor RPM and temperature channels, battery voltage/current/temperature, vibration, flight-controller temperature, vertical speed, GPS and signal are included.
-- Nine reusable scenarios cover normal flight, power, thermal, propulsion, navigation, communication and unexpected heartbeat loss.
-- Weighted scenario pools keep runtime selection random inside each drone's assigned fault category.
-- Drone - 003 independently selects one of four arm positions after selecting its propulsion scenario; seeded history covers every arm and persists the choice on the flight.
-- Historical flights are split evenly at four per drone: Drone 001 normal, Drone 002 power faults, Drone 003 propulsion faults, Drone 004 navigation/communication faults, and Drone 005 normal after route/weather approval.
-- Alerts are derived from the actual simulated telemetry event window and include affected component, metric, observed value, threshold and lifecycle.
-- DEMO is the available weather mode for this project and provides deterministic SAFE, CAUTION, and UNSAFE profiles.
-- LIVE/Open-Meteo has a prepared request contract but is disabled and labeled Coming Soon.
-- Drone - 001 through Drone - 004 use DEMO_SAFE; Drone - 005 uses DEMO_CAUTION. DEMO_UNSAFE is reserved for a blocked-launch test.
-- Seeded historical weather checks are explicitly expired and cannot authorize a current take-off.
-- Wind stored in historical telemetry is simulated and is never used as the source of truth for a new mission's take-off decision.
-- Data-quality checks verify foreign keys, route geometry, telemetry counts/times, scenario alert coverage and current state.
+Run from the repository root:
 
-## Fastest import
+```powershell
+docker compose -f .\data\docker-compose.yml config --quiet
+docker compose -f .\data\docker-compose.yml up -d --wait --wait-timeout 180
+docker compose -f .\data\docker-compose.yml ps
+```
 
-docker compose up -d
+The database is `drone_monitoring_frontend`. The host port is `3307`. Demo credentials are defined by the `DEMO_MYSQL_*` variables in `.env.example`.
 
-Or run mysql -u root -p < all-data.sql. Then run mysql -u root -p drone_monitoring < database/verify-import.sql. Both methods target a local database named drone_monitoring.
+MySQL initialization runs only when Docker creates an empty volume. Restarting the container does not re-import the seed.
 
-Read 00-overview/FINAL_DATA_AUDIT.md, CONTEXT.md, and 09-backend-guidance/import-and-reset.md first. The package is project/demo data, not an operational aviation system.
+## Verify the pack
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\data\Verify-DemoData.ps1
+```
+
+The script runs the MySQL verification SQL and checks that the generated frontend snapshot matches `records.json`.
+
+## Select a demo run
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\data\New-DemoRun.ps1
+```
+
+For a repeatable selection:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\data\New-DemoRun.ps1 -Seed 0
+```
+
+This selects and verifies a component-fault scenario in MySQL. It does not update the frontend snapshot or connect the frontend to MySQL; that integration is planned separately.
+
+## Regenerate SQL and snapshot files
+
+After intentionally editing `records.json` or `schema.sql`, run:
+
+```powershell
+node .\data\tools\build-sql.mjs
+node .\data\tools\generate-snapshot.mjs
+node .\data\tools\check-snapshot.mjs
+```
+
+`build-sql.mjs` generates `seed.sql` and `init/00-frontend-demo.sql`. The initialization SQL is intended for an empty MySQL volume.
