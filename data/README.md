@@ -1,17 +1,17 @@
 # Drone Monitoring Platform — MySQL Data Pack v2.1.0
 
-**Build ID:** `DRONE-DATA-2.1.0-R1-20261028`
+**Build ID:** `DRONE-DATA-2.1.0-R4-20261030`
 
 This is the active MySQL demo data pack in the repository.
 
 ## Contents
 
 - 5 drones, 14 component definitions and 70 installed components.
-- 7 mission records: 5 current missions and 2 historical references.
-- 53 waypoints.
-- 4 flights: 1 active flight and 3 ended flights.
-- 25 sparse synthetic telemetry observations.
-- 2 alerts and 1 component finding.
+- 9 mission records: 5 current missions and 4 historical references.
+- 66 waypoints.
+- 5 flights: 1 active flight and 4 ended flights.
+- 30 sparse synthetic telemetry observations.
+- 3 alerts and 1 component finding.
 - MySQL schema, seed data, procedures, verification SQL, manifest and frontend snapshot.
 
 ## Start MySQL

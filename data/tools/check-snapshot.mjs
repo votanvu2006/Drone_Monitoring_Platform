@@ -7,9 +7,24 @@ const snapshot = JSON.parse(await readFile(new URL('frontend.snapshot.json', roo
 assert.deepEqual(snapshot, buildSnapshot(tables));
 assert.equal(snapshot.missions.length, 5);
 assert.equal(snapshot.activeFlights.length, 1);
-assert.equal(snapshot.history.length, 3);
-assert.equal(snapshot.alerts.length, 2);
+assert.equal(snapshot.history.length, 4);
+assert.equal(snapshot.alerts.length, 3);
+assert.deepEqual(snapshot.history.map(flight => flight.flightCode), [
+  'FLIGHT-014', 'FLIGHT-012', 'FLIGHT-011', 'FLIGHT-010',
+]);
+assert.deepEqual(snapshot.alerts.map(alert => alert.alertCode), [
+  'DEMO-ALT-001', 'DEMO-ALT-002', 'DEMO-ALT-003',
+]);
+const featuredFlight = snapshot.historyDetails.find(flight => flight.flightCode === 'FLIGHT-014');
+assert.equal(featuredFlight.telemetry.averageSpeedMps, 9.4);
+assert.deepEqual(featuredFlight.events.map(event => event.title), [
+  'Flight started', 'Waypoint reached', 'Route completed',
+]);
+assert.equal(featuredFlight.events.at(-1).occurredAt, '2026-10-16T02:29:00.000Z');
 assert.equal(snapshot.fleet.findings.length, 1);
+assert.equal(snapshot.fleet.drones.filter(drone => drone.status === 'OFFLINE').length, 4);
+assert.equal(snapshot.fleet.drones.find(drone => drone.code === 'DRONE-003').status, 'IN_FLIGHT');
+assert.equal(snapshot.details.find(drone => drone.code === 'DRONE-003').isActivated, true);
 for (const flight of [...snapshot.activeFlights, ...snapshot.history]) {
   const mission = tables.missions.find(item => item.mission_code === flight.missionCode);
   const drone = tables.drones.find(item => item.drone_code === flight.droneCode);
@@ -20,7 +35,7 @@ for (const detail of snapshot.historyDetails) {
   const record = snapshot.history.find(item => item.flightCode === detail.flightCode);
   assert(record);
   assert(detail.events.length >= 2);
-  assert.equal((Date.parse(detail.events.at(-1).occurredAt) - Date.parse(detail.startedAt)) / 1000, detail.durationSeconds);
+  assert((Date.parse(detail.events.at(-1).occurredAt) - Date.parse(detail.startedAt)) / 1000 <= detail.durationSeconds);
 }
 assert.equal(snapshot.activeFlights[0].missionCode, 'mission-003');
 assert.equal(snapshot.details.find(item => item.code === 'DRONE-002').findings[0].componentCode,

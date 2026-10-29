@@ -48,13 +48,13 @@ BEGIN
   UPDATE drone_components SET health_status='HEALTHY',updated_at='2026-10-28 02:00:00' WHERE drone_id=2;
   UPDATE drone_components SET health_status=v_health WHERE id=v_component AND drone_id=2;
   UPDATE demo_runs SET run_code=UUID(),selected_fault=v_rule,component_id=v_component,
-      detected_at='2026-10-21 06:05:00',updated_at='2026-10-28 02:00:00' WHERE id=1;
+      detected_at='2026-10-21 06:08:00',updated_at='2026-10-28 02:00:00' WHERE id=1;
   UPDATE alerts SET component_id=v_component,rule_code=v_rule,type=v_rule,severity=v_severity,
       title=v_title,message=v_message,metric_name=v_metric,observed_value=v_value,threshold_value=v_threshold,
-      unit=v_unit,status='ACTIVE',resolved_at=NULL,resolution_note=NULL WHERE id=1 AND mission_id=2;
+      unit=v_unit,status='ACTIVE',resolved_at=NULL,resolution_note='Inspect the motor and allow it to cool before the next flight.' WHERE id=2 AND mission_id=2;
   INSERT INTO component_findings
     (id,finding_code,drone_id,mission_id,component_id,alert_id,run_id,severity,detected_at)
-    VALUES(1,'FINDING-002',2,2,v_component,1,1,v_health,'2026-10-21 06:05:00');
+    VALUES(1,'FINDING-002',2,2,v_component,2,1,v_health,'2026-10-21 06:08:00');
   UPDATE missions SET status='WARNING',progress_percent=0 WHERE id=2;
   COMMIT;
 END$$
@@ -62,13 +62,13 @@ END$$
 CREATE PROCEDURE verify_frontend_demo()
 SQL SECURITY INVOKER
 BEGIN
-  IF (SELECT build_id FROM data_pack_metadata WHERE id=1)<>'DRONE-DATA-2.1.0-R1-20261028' THEN
+  IF (SELECT build_id FROM data_pack_metadata WHERE id=1)<>'DRONE-DATA-2.1.0-R4-20261030' THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Wrong data pack';
   END IF;
   IF (SELECT COUNT(*) FROM drones)<>5 OR (SELECT COUNT(*) FROM drone_components)<>70
-      OR (SELECT COUNT(*) FROM missions WHERE is_current=1)<>5 OR (SELECT COUNT(*) FROM missions)<>7
-      OR (SELECT COUNT(*) FROM waypoints)<>53 OR (SELECT COUNT(*) FROM flights)<>4
-      OR (SELECT COUNT(*) FROM telemetry)<>25 OR (SELECT COUNT(*) FROM alerts)<>2
+      OR (SELECT COUNT(*) FROM missions WHERE is_current=1)<>5 OR (SELECT COUNT(*) FROM missions)<>9
+      OR (SELECT COUNT(*) FROM waypoints)<>66 OR (SELECT COUNT(*) FROM flights)<>5
+      OR (SELECT COUNT(*) FROM telemetry)<>30 OR (SELECT COUNT(*) FROM alerts)<>3
       OR (SELECT COUNT(*) FROM component_findings)<>1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Frontend demo record counts do not match';
   END IF;
@@ -85,12 +85,14 @@ BEGIN
   END IF;
   IF (SELECT COUNT(*) FROM flights WHERE status='FLYING' AND drone_id=3 AND mission_id=3 AND route_progress_percent=43)<>1
      OR (SELECT COUNT(*) FROM drones WHERE status='IN_FLIGHT')<>1
+     OR (SELECT COUNT(*) FROM drones WHERE status='OFFLINE')<>4
      OR (SELECT status FROM drones WHERE id=3)<>'IN_FLIGHT' THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Active flight and drone state do not agree';
   END IF;
-  IF (SELECT COUNT(*) FROM flights WHERE ended_at IS NOT NULL)<>3
+  IF (SELECT COUNT(*) FROM flights WHERE ended_at IS NOT NULL)<>4
      OR EXISTS(SELECT 1 FROM flights WHERE ended_at IS NOT NULL AND
-       (TIMESTAMPDIFF(SECOND,started_at,ended_at)<>duration_sec OR route_progress_percent<>100)) THEN
+       (TIMESTAMPDIFF(SECOND,started_at,ended_at)<>duration_sec OR
+        (result='SUCCESS' AND route_progress_percent<>100))) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Historical flight duration or progress is inconsistent';
   END IF;
   IF (SELECT COUNT(*) FROM component_findings f JOIN alerts a ON a.id=f.alert_id
@@ -104,6 +106,6 @@ BEGIN
       AND wind_speed_10m_mps>10 AND visibility_m<2000)<>1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Weather incident measurements do not support the failure';
   END IF;
-  SELECT 'PASS' AS verification, 'DRONE-DATA-2.1.0-R1-20261028' AS build_id;
+  SELECT 'PASS' AS verification, 'DRONE-DATA-2.1.0-R4-20261030' AS build_id;
 END$$
 DELIMITER ;

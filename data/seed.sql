@@ -2,15 +2,15 @@ SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 START TRANSACTION;
 INSERT INTO `data_pack_metadata` (`id`,`pack_name`,`pack_version`,`data_revision`,`generated_at`,`build_id`,`schema_table_count`,`expected_telemetry_rows`,`notes`) VALUES
-(1,'Drone Monitoring Platform Frontend Demo','2.1.0',1,'2026-10-28 02:00:00','DRONE-DATA-2.1.0-R1-20261028',17,25,'Frontend-aligned operating snapshot; two preflight incidents have no flights.');
+(1,'Drone Monitoring Platform Frontend Demo','2.1.0',4,'2026-10-30 00:00:00','DRONE-DATA-2.1.0-R4-20261030',17,30,'Frontend-aligned v2.1.0 demonstration data, revision 4.');
 INSERT INTO `drone_models` (`id`,`model_code`,`manufacturer`,`model_name`,`description`,`image_url`,`max_flight_time_minutes`,`max_speed_mps`,`manufacturer_max_wind_mps`,`project_wind_limit_mps`,`battery_capacity_mah`,`battery_nominal_voltage_v`,`battery_max_voltage_v`,`reference_source_url`,`is_simulated_reference`,`created_at`,`updated_at`) VALUES
 (1,'AV-X1E','AeroVision (fictional)','AeroVision X1 Enterprise','Fictional enterprise camera quadcopter whose high-level envelope references published DJI Mavic 3 Enterprise specifications. It is not a DJI aircraft model.',NULL,45,15,12,10,5000,15.4,17.6,'https://enterprise.dji.com/mavic-3-enterprise/specs',1,'2026-07-01 08:55:00','2026-09-19 10:00:00');
 INSERT INTO `drones` (`id`,`drone_code`,`display_name`,`drone_model_id`,`serial_number`,`is_simulated`,`status`,`home_location_label`,`home_latitude`,`home_longitude`,`last_known_location_label`,`last_known_latitude`,`last_known_longitude`,`last_known_altitude_m`,`location_source`,`location_updated_at`,`last_seen_at`,`created_at`,`updated_at`,`battery_percent`) VALUES
-(1,'DRONE-001','Drone - 001',1,'AVX1E-2026-0001',1,'AVAILABLE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
-(2,'DRONE-002','Drone - 002',1,'AVX1E-2026-0002',1,'AVAILABLE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
+(1,'DRONE-001','Drone - 001',1,'AVX1E-2026-0001',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
+(2,'DRONE-002','Drone - 002',1,'AVX1E-2026-0002',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
 (3,'DRONE-003','Drone - 003',1,'AVX1E-2026-0003',1,'IN_FLIGHT','District 1 Operations Home Base',10.7769,106.7009,'WP-04 demo position',10.77858,106.70386,82,'FLIGHT_TELEMETRY','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
-(4,'DRONE-004','Drone - 004',1,'AVX1E-2026-0004',1,'AVAILABLE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
-(5,'DRONE-005','Drone - 005',1,'AVX1E-2026-0005',1,'AVAILABLE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100);
+(4,'DRONE-004','Drone - 004',1,'AVX1E-2026-0004',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
+(5,'DRONE-005','Drone - 005',1,'AVX1E-2026-0005',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100);
 INSERT INTO `component_catalog` (`id`,`component_code`,`component_type`,`name`,`position`,`model`,`primary_function`,`display_order`,`created_at`,`updated_at`) VALUES
 (1,'AVX1-FRAME-CENTER','FRAME','Carbon Fiber Frame','CENTER','AV-X1E Carbon Monocoque','Supports and protects aircraft systems',1,'2026-07-01 09:00:00','2026-09-19 10:00:00'),
 (2,'AVX1-PROPELLER-FRONT_LEFT','PROPELLER','Front Left Propeller','FRONT_LEFT','9453F-class Low-Noise Propeller','Generates lift at the front-left arm',2,'2026-07-01 09:00:00','2026-09-19 10:00:00'),
@@ -105,8 +105,10 @@ INSERT INTO `missions` (`id`,`mission_code`,`drone_id`,`name`,`description`,`sta
 (3,'mission-003',3,'Mission 003','Frontend-aligned demonstration mission.','IN_PROGRESS','VALID','Demo route',82,9.4,3620,1122,43,1,'2026-10-20 01:00:00','2026-10-28 02:00:00',0),
 (4,'mission-004',4,'Mission 004','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,1,'2026-10-12 01:00:00','2026-10-28 02:00:00',0),
 (5,'mission-005',5,'Mission 005','Frontend-aligned demonstration mission.','FAILED','VALID','Unsafe weather blocked takeoff',82,9.4,3620,1122,0,1,'2026-10-19 01:00:00','2026-10-28 02:00:00',1),
-(11,'mission-011',3,'Mission 011','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,0,'2026-10-13 08:00:00','2026-10-28 02:00:00',0),
-(14,'mission-014',1,'Mission 014','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,0,'2026-10-16 01:00:00','2026-10-28 02:00:00',0);
+(10,'MISSION-010',4,'Mission 010','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,0,'2026-10-12 01:00:00','2026-10-28 02:00:00',0),
+(11,'MISSION-011',3,'Mission 011','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,0,'2026-10-13 08:00:00','2026-10-28 02:00:00',0),
+(12,'MISSION-012',5,'Mission 012','Frontend-aligned demonstration mission.','FAILED','VALID','Historical flight attempt',82,9.4,1450,496,60,0,'2026-10-14 01:00:00','2026-10-28 02:00:00',0),
+(14,'MISSION-014',1,'Mission 014','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,0,'2026-10-16 01:00:00','2026-10-28 02:00:00',0);
 INSERT INTO `waypoints` (`id`,`mission_id`,`sequence_number`,`waypoint_type`,`latitude`,`longitude`,`altitude_m`,`hold_time_sec`,`map_x`,`map_y`,`created_at`) VALUES
 (1,1,1,'START',10.7769,106.7009,82,0,8,48,'2026-10-21 02:00:00'),
 (2,1,2,'INTERMEDIATE',10.777508,106.70226,82,0,25,40.4,'2026-10-21 02:00:00'),
@@ -160,7 +162,20 @@ INSERT INTO `waypoints` (`id`,`mission_id`,`sequence_number`,`waypoint_type`,`la
 (50,14,5,'INTERMEDIATE',10.77802,106.70498,82,0,59,34,'2026-10-16 01:00:00'),
 (51,14,6,'INTERMEDIATE',10.77954,106.70586,82,0,70,15,'2026-10-16 01:00:00'),
 (52,14,7,'INTERMEDIATE',10.77882,106.7069,82,0,83,24,'2026-10-16 01:00:00'),
-(53,14,8,'DESTINATION',10.77994,106.7077,82,0,93,10,'2026-10-16 01:00:00');
+(53,14,8,'DESTINATION',10.77994,106.7077,82,0,93,10,'2026-10-16 01:00:00'),
+(54,10,1,'START',10.7769,106.7009,82,0,8,48,'2026-10-12 01:00:00'),
+(55,10,2,'INTERMEDIATE',10.77766,106.7026,82,0,29.25,38.5,'2026-10-12 01:00:00'),
+(56,10,3,'INTERMEDIATE',10.77842,106.7043,82,0,50.5,29,'2026-10-12 01:00:00'),
+(57,10,4,'INTERMEDIATE',10.77918,106.706,82,0,71.75,19.5,'2026-10-12 01:00:00'),
+(58,10,5,'DESTINATION',10.77994,106.7077,82,0,93,10,'2026-10-12 01:00:00'),
+(59,12,1,'START',10.7769,106.7009,82,0,8,48,'2026-10-14 01:00:00'),
+(60,12,2,'INTERMEDIATE',10.77762,106.70194,82,0,21,39,'2026-10-14 01:00:00'),
+(61,12,3,'INTERMEDIATE',10.7769,106.7029,82,0,33,48,'2026-10-14 01:00:00'),
+(62,12,4,'INTERMEDIATE',10.77858,106.70386,82,0,45,27,'2026-10-14 01:00:00'),
+(63,12,5,'INTERMEDIATE',10.77802,106.70498,82,0,59,34,'2026-10-14 01:00:00'),
+(64,12,6,'INTERMEDIATE',10.77954,106.70586,82,0,70,15,'2026-10-14 01:00:00'),
+(65,12,7,'INTERMEDIATE',10.77882,106.7069,82,0,83,24,'2026-10-14 01:00:00'),
+(66,12,8,'DESTINATION',10.77994,106.7077,82,0,93,10,'2026-10-14 01:00:00');
 INSERT INTO `weather_demo_profiles` (`id`,`profile_code`,`name`,`recommendation`,`condition_code`,`temperature_c`,`relative_humidity_percent`,`wind_speed_10m_mps`,`wind_speed_80m_mps`,`wind_direction_10m_deg`,`wind_gust_10m_mps`,`precipitation_mm`,`rain_mm`,`visibility_m`,`reason`,`is_enabled`,`created_at`,`updated_at`) VALUES
 (1,'DEMO_SAFE','Demo safe weather','SAFE',1,29.4,68,4.2,5.8,110,6.1,0,0,10000,'Demo fixture: dry, good visibility, and wind below project caution thresholds.',1,'2026-09-19 10:00:00','2026-09-19 10:00:00'),
 (2,'DEMO_CAUTION','Demo caution weather','CAUTION',51,28.1,82,8.7,10.2,205,10.8,0.2,0.2,4200,'Demo fixture: light precipitation and wind in the project caution range.',1,'2026-09-19 10:00:00','2026-09-19 10:00:00'),
@@ -168,19 +183,20 @@ INSERT INTO `weather_demo_profiles` (`id`,`profile_code`,`name`,`recommendation`
 INSERT INTO `weather_checks` (`id`,`validation_run_id`,`mission_id`,`waypoint_id`,`location_type`,`latitude`,`longitude`,`source_kind`,`condition_code`,`temperature_c`,`relative_humidity_percent`,`wind_speed_10m_mps`,`wind_speed_80m_mps`,`wind_direction_10m_deg`,`wind_gust_10m_mps`,`precipitation_mm`,`rain_mm`,`visibility_m`,`recommendation`,`reason`,`provider_observed_at`,`checked_at`,`expires_at`,`raw_response`,`created_at`) VALUES
 (1,'00000000-0000-0000-0000-000000000005',5,NULL,'START',10.7769,106.7009,'SIMULATED_FIXTURE',95,26.2,91,11.4,13.2,245,15.1,2.8,2.8,1400,'UNSAFE','Strong wind and poor visibility prevented takeoff.','2026-10-19 06:10:00','2026-10-19 06:10:00','2026-10-19 06:20:00',NULL,'2026-10-19 06:10:00');
 INSERT INTO `flights` (`id`,`flight_code`,`drone_id`,`mission_id`,`simulation_scenario_id`,`fault_position`,`status`,`result`,`started_at`,`ended_at`,`duration_sec`,`distance_m`,`start_battery_percent`,`end_battery_percent`,`preflight_weather_mode`,`preflight_weather_recommendation`,`weather_acknowledged_at`,`termination_reason`,`route_name`,`current_waypoint_index`,`route_progress_percent`,`created_at`,`updated_at`) VALUES
-(14,'FLIGHT-014',1,14,1,NULL,'LANDED','SUCCESS','2026-10-16 02:15:00','2026-10-16 02:33:42',1122,3620,100,62,'DEMO','SAFE',NULL,NULL,'North Perimeter Survey',7,100,'2026-10-16 02:15:00','2026-10-28 02:00:00'),
+(10,'FLIGHT-010',4,10,1,NULL,'LANDED','SUCCESS','2026-10-12 03:05:00','2026-10-12 03:20:45',945,3000,100,70,'DEMO','SAFE',NULL,NULL,'Completed Demo Route',4,100,'2026-10-12 03:05:00','2026-10-28 02:00:00'),
 (11,'FLIGHT-011',3,11,1,NULL,'LANDED','SUCCESS','2026-10-13 09:10:00','2026-10-13 09:33:00',1380,4600,100,65,'DEMO','SAFE',NULL,NULL,'Completed Demo Route',7,100,'2026-10-13 09:10:00','2026-10-28 02:00:00'),
-(10,'FLIGHT-010',4,4,1,NULL,'LANDED','SUCCESS','2026-10-12 03:05:00','2026-10-12 03:20:45',945,3000,100,70,'DEMO','SAFE',NULL,NULL,'Completed Demo Route',4,100,'2026-10-12 03:05:00','2026-10-28 02:00:00'),
+(12,'FLIGHT-012',5,12,1,NULL,'ABORTED','FAILED','2026-10-14 01:55:00','2026-10-14 02:03:16',496,1450,100,82,'DEMO','SAFE',NULL,'Historical flight ended before route completion','Historical Demo Route',4,60,'2026-10-14 01:55:00','2026-10-28 02:00:00'),
+(14,'FLIGHT-014',1,14,1,NULL,'LANDED','SUCCESS','2026-10-16 02:15:00','2026-10-16 02:33:42',1122,3620,100,62,'DEMO','SAFE',NULL,NULL,'North Perimeter Survey',7,100,'2026-10-16 02:15:00','2026-10-28 02:00:00'),
 (15,'FLIGHT-015',3,3,1,NULL,'FLYING',NULL,'2026-10-28 01:55:00',NULL,300,1551.43,100,NULL,'DEMO','SAFE',NULL,NULL,'North Perimeter Survey',3,43,'2026-10-28 01:55:00','2026-10-28 02:00:00');
 INSERT INTO `telemetry` (`id`,`flight_id`,`sequence_number`,`recorded_at`,`received_at`,`latitude`,`longitude`,`position_source`,`position_is_valid`,`transmission_state`,`heartbeat_age_seconds`,`altitude_m`,`speed_mps`,`vertical_speed_mps`,`heading_deg`,`battery_percent`,`battery_voltage_v`,`battery_current_a`,`battery_temperature_c`,`motor_rpm_fl`,`motor_rpm_fr`,`motor_rpm_rl`,`motor_rpm_rr`,`motor_temperature_fl_c`,`motor_temperature_fr_c`,`motor_temperature_rl_c`,`motor_temperature_rr_c`,`vibration_g`,`flight_controller_temperature_c`,`gps_quality`,`gps_satellites`,`signal_percent`,`wind_speed_mps`,`wind_direction_deg`,`wind_source`) VALUES
-(1,14,1,'2026-10-16 02:15:00','2026-10-16 02:15:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(2,14,2,'2026-10-16 02:17:40','2026-10-16 02:17:40',10.77762,106.70194,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,95,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(3,14,3,'2026-10-16 02:20:21','2026-10-16 02:20:21',10.7769,106.7029,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,89,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(4,14,4,'2026-10-16 02:23:01','2026-10-16 02:23:01',10.77858,106.70386,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,84,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(5,14,5,'2026-10-16 02:25:41','2026-10-16 02:25:41',10.77802,106.70498,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,78,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(6,14,6,'2026-10-16 02:28:21','2026-10-16 02:28:21',10.77954,106.70586,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,73,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(7,14,7,'2026-10-16 02:31:02','2026-10-16 02:31:02',10.77882,106.7069,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,67,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(8,14,8,'2026-10-16 02:33:42','2026-10-16 02:33:42',10.77994,106.7077,'GNSS',1,'CONNECTED',0,82,3.2264,0,110,62,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(1,14,1,'2026-10-16 02:15:00','2026-10-16 02:15:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,9.4,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(2,14,2,'2026-10-16 02:17:40','2026-10-16 02:17:40',10.77762,106.70194,'GNSS',1,'CONNECTED',0,82,9.4,0,110,95,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(3,14,3,'2026-10-16 02:20:21','2026-10-16 02:20:21',10.7769,106.7029,'GNSS',1,'CONNECTED',0,82,9.4,0,110,89,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(4,14,4,'2026-10-16 02:23:01','2026-10-16 02:23:01',10.77858,106.70386,'GNSS',1,'CONNECTED',0,82,9.4,0,110,84,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(5,14,5,'2026-10-16 02:25:41','2026-10-16 02:25:41',10.77802,106.70498,'GNSS',1,'CONNECTED',0,82,9.4,0,110,78,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(6,14,6,'2026-10-16 02:28:21','2026-10-16 02:28:21',10.77954,106.70586,'GNSS',1,'CONNECTED',0,82,9.4,0,110,73,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(7,14,7,'2026-10-16 02:31:02','2026-10-16 02:31:02',10.77882,106.7069,'GNSS',1,'CONNECTED',0,82,9.4,0,110,67,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(8,14,8,'2026-10-16 02:33:42','2026-10-16 02:33:42',10.77994,106.7077,'GNSS',1,'CONNECTED',0,82,9.4,0,110,62,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (9,11,1,'2026-10-13 09:10:00','2026-10-13 09:10:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,3.3333,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (10,11,2,'2026-10-13 09:13:17','2026-10-13 09:13:17',10.77762,106.70194,'GNSS',1,'CONNECTED',0,82,3.3333,0,110,95,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (11,11,3,'2026-10-13 09:16:34','2026-10-13 09:16:34',10.7769,106.7029,'GNSS',1,'CONNECTED',0,82,3.3333,0,110,90,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
@@ -197,25 +213,35 @@ INSERT INTO `telemetry` (`id`,`flight_id`,`sequence_number`,`recorded_at`,`recei
 (22,15,1,'2026-10-28 01:55:00','2026-10-28 01:55:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (23,15,2,'2026-10-28 01:56:40','2026-10-28 01:56:40',10.77762,106.70194,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (24,15,3,'2026-10-28 01:58:20','2026-10-28 01:58:20',10.7769,106.7029,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(25,15,4,'2026-10-28 02:00:00','2026-10-28 02:00:00',10.77858,106.70386,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE');
+(25,15,4,'2026-10-28 02:00:00','2026-10-28 02:00:00',10.77858,106.70386,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(26,12,1,'2026-10-14 01:55:00','2026-10-14 01:55:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(27,12,2,'2026-10-14 01:57:04','2026-10-14 01:57:04',10.77766,106.7026,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,96,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(28,12,3,'2026-10-14 01:59:08','2026-10-14 01:59:08',10.77842,106.7043,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,91,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(29,12,4,'2026-10-14 02:01:12','2026-10-14 02:01:12',10.77918,106.706,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,86,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
+(30,12,5,'2026-10-14 02:03:16','2026-10-14 02:03:16',10.77994,106.7077,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,82,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE');
 INSERT INTO `alert_rule_catalog` (`rule_code`,`alert_type`,`source`,`default_severity`,`authority`,`description`,`is_enabled`,`created_at`,`updated_at`) VALUES
 ('MOTOR_OVERHEAT','MOTOR_OVERHEAT','TELEMETRY','WARNING','PROJECT_SIMULATION_POLICY','Motor temperature >= 70 C',1,'2026-10-28 02:00:00','2026-10-28 02:00:00'),
 ('PROPELLER_DAMAGE_SUSPECTED','PROPELLER_DAMAGE_SUSPECTED','TELEMETRY','CRITICAL','PROJECT_SIMULATION_POLICY','RPM imbalance and excessive vibration',1,'2026-10-28 02:00:00','2026-10-28 02:00:00'),
 ('GPS_LOST','GPS_LOST','TELEMETRY','CRITICAL','PROJECT_SIMULATION_POLICY','GNSS signal lost',1,'2026-10-28 02:00:00','2026-10-28 02:00:00'),
-('UNSAFE_WEATHER','UNSAFE_WEATHER','WEATHER','CRITICAL','PROJECT_SIMULATION_POLICY','Unsafe weather before takeoff',1,'2026-10-28 02:00:00','2026-10-28 02:00:00');
+('UNSAFE_WEATHER','UNSAFE_WEATHER','WEATHER','CRITICAL','PROJECT_SIMULATION_POLICY','Unsafe weather before takeoff',1,'2026-10-28 02:00:00','2026-10-28 02:00:00'),
+('LOW_BATTERY','LOW_BATTERY','TELEMETRY','WARNING','PROJECT_SIMULATION_POLICY','Demo battery reserve warning',1,'2026-10-28 02:00:00','2026-10-28 02:00:00');
 INSERT INTO `alerts` (`id`,`alert_code`,`flight_id`,`mission_id`,`component_id`,`source`,`rule_code`,`severity`,`type`,`message`,`metric_name`,`observed_value`,`threshold_value`,`unit`,`status`,`detected_at`,`last_observed_at`,`resolved_at`,`resolution_note`,`created_at`,`updated_at`,`title`,`source_group`) VALUES
-(1,'DEMO-ALT-001',NULL,2,20,'TELEMETRY','MOTOR_OVERHEAT','WARNING','MOTOR_OVERHEAT','Front-left motor reached 75 C before takeoff.','motor_temperature_c',75,70,'C','ACTIVE','2026-10-21 06:05:00','2026-10-21 06:05:00',NULL,NULL,'2026-10-21 06:05:00','2026-10-21 06:05:00','Motor temperature warning','Components'),
-(3,'DEMO-ALT-003',NULL,5,NULL,'WEATHER','UNSAFE_WEATHER','CRITICAL','UNSAFE_WEATHER','Strong wind and poor visibility prevented takeoff.',NULL,NULL,NULL,NULL,'ACTIVE','2026-10-19 06:10:00','2026-10-19 06:10:00',NULL,NULL,'2026-10-19 06:10:00','2026-10-19 06:10:00','Unsafe weather','Weather');
+(1,'DEMO-ALT-001',NULL,2,24,'TELEMETRY','LOW_BATTERY','WARNING','LOW_BATTERY','Battery level is below the recommended reserve.','battery_percent',20,25,'%','ACTIVE','2026-10-21 06:05:00','2026-10-21 06:05:00',NULL,NULL,'2026-10-21 06:05:00','2026-10-21 06:05:00','Low battery','Components'),
+(2,'DEMO-ALT-002',NULL,2,20,'TELEMETRY','MOTOR_OVERHEAT','WARNING','MOTOR_OVERHEAT','Motor temperature is above the normal operating range.','motor_temperature_c',75,70,'C','ACTIVE','2026-10-21 06:08:00','2026-10-21 06:08:00',NULL,'Inspect the motor and allow it to cool before the next flight.','2026-10-21 06:08:00','2026-10-21 06:08:00','Motor temperature warning','Components'),
+(3,'DEMO-ALT-003',NULL,5,NULL,'WEATHER','UNSAFE_WEATHER','CRITICAL','UNSAFE_WEATHER','Strong wind and poor visibility caused the mission to fail.',NULL,NULL,NULL,NULL,'ACTIVE','2026-10-19 06:10:00','2026-10-19 06:10:00',NULL,'Mission stopped. Review weather conditions before scheduling a new attempt.','2026-10-19 06:10:00','2026-10-19 06:10:00','Unsafe weather','Weather');
 INSERT INTO `demo_runs` (`id`,`run_code`,`selected_fault`,`component_id`,`detected_at`,`updated_at`) VALUES
-(1,'INITIAL-MOTOR-FRONT-LEFT','MOTOR_OVERHEAT',20,'2026-10-21 06:05:00','2026-10-28 02:00:00');
+(1,'INITIAL-MOTOR-FRONT-LEFT','MOTOR_OVERHEAT',20,'2026-10-21 06:08:00','2026-10-28 02:00:00');
 INSERT INTO `flight_events` (`id`,`flight_id`,`event_code`,`occurred_at`,`title`,`description`,`severity`) VALUES
-(1,14,'FLIGHT-014-START','2026-10-16 02:15:00','Flight started','The drone began the assigned route.','INFO'),
-(2,14,'FLIGHT-014-END','2026-10-16 02:33:42','Route completed','The drone completed the route.','INFO'),
+(1,14,'event-001','2026-10-16 02:15:00','Flight started','The drone began the assigned route.','INFO'),
+(2,14,'event-002','2026-10-16 02:20:00','Waypoint reached','The drone reached waypoint WP-04.','INFO'),
 (3,11,'FLIGHT-011-START','2026-10-13 09:10:00','Flight started','The drone began the assigned route.','INFO'),
 (4,11,'FLIGHT-011-END','2026-10-13 09:33:00','Route completed','The drone completed the route.','INFO'),
 (5,10,'FLIGHT-010-START','2026-10-12 03:05:00','Flight started','The drone began the assigned route.','INFO'),
 (6,10,'FLIGHT-010-END','2026-10-12 03:20:45','Route completed','The drone completed the route.','INFO'),
-(7,15,'FLIGHT-015-START','2026-10-28 01:55:00','Flight started','The drone began the assigned route.','INFO');
+(7,15,'FLIGHT-015-START','2026-10-28 01:55:00','Flight started','The drone began the assigned route.','INFO'),
+(8,14,'event-003','2026-10-16 02:29:00','Route completed','The drone returned after completing the route.','INFO'),
+(9,12,'FLIGHT-012-START','2026-10-14 01:55:00','Flight started','The drone began the assigned route.','INFO'),
+(10,12,'FLIGHT-012-END','2026-10-14 02:03:16','Flight ended','The historical flight ended before completing its route.','ERROR');
 INSERT INTO `component_findings` (`id`,`finding_code`,`drone_id`,`mission_id`,`component_id`,`alert_id`,`run_id`,`severity`,`detected_at`) VALUES
-(1,'FINDING-002',2,2,20,1,1,'WARNING','2026-10-21 06:05:00');
+(1,'FINDING-002',2,2,20,2,1,'WARNING','2026-10-21 06:08:00');
 COMMIT;

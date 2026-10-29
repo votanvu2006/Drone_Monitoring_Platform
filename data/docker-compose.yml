@@ -15,7 +15,7 @@ services:
       - frontend_v21_mysql:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql --protocol=TCP -h 127.0.0.1 -u \"$$MYSQL_USER\" --database=\"$$MYSQL_DATABASE\" --batch --skip-column-names -e \"SELECT build_id FROM data_pack_metadata WHERE id=1\" | grep -qx DRONE-DATA-2.1.0-R1-20261028"]
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql --protocol=TCP -h 127.0.0.1 -u \"$$MYSQL_USER\" --database=\"$$MYSQL_DATABASE\" --batch --skip-column-names -e \"SELECT build_id FROM data_pack_metadata WHERE id=1\" | grep -qx DRONE-DATA-2.1.0-R4-20261030"]
       interval: 5s
       timeout: 5s
       retries: 30

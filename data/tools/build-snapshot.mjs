@@ -51,7 +51,7 @@ export function buildSnapshot(tables) {
       waypoints: pointsFor(item.mission_id).map(({ code, x, y }) => ({ code, x, y })),
       telemetry: { startBatteryPercent: num(item.start_battery_percent), endBatteryPercent: num(item.end_battery_percent),
         maxAltitudeMeters: Math.max(0, ...samples.map(sample => Number(sample.altitude_m))),
-        averageSpeedMps: Number((Number(item.distance_m) / Number(item.duration_sec)).toFixed(2)), distanceMeters: num(item.distance_m) },
+        averageSpeedMps: Number((samples.reduce((sum, sample) => sum + Number(sample.speed_mps), 0) / samples.length).toFixed(2)), distanceMeters: num(item.distance_m) },
       events: tables.flight_events.filter(event => Number(event.flight_id) === Number(item.id)).map(event => ({
         id: event.event_code, occurredAt: iso(event.occurred_at), title: event.title, description: event.description, severity: event.severity,
       })).sort((a, b) => a.occurredAt.localeCompare(b.occurredAt)),

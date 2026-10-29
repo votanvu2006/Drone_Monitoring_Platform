@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "buildId": "DRONE-DATA-2.1.0-R1-20261028",
+    "buildId": "DRONE-DATA-2.1.0-R4-20261030",
     "runCode": "INITIAL-MOTOR-FRONT-LEFT"
   },
   "fleet": {
@@ -8,7 +8,7 @@
       {
         "code": "DRONE-001",
         "modelName": "AeroVision X1 Enterprise",
-        "status": "AVAILABLE",
+        "status": "OFFLINE",
         "homeBase": "District 1 Operations Home Base",
         "lastKnownLocation": "Demo operating location",
         "activeMission": null
@@ -16,7 +16,7 @@
       {
         "code": "DRONE-002",
         "modelName": "AeroVision X1 Enterprise",
-        "status": "AVAILABLE",
+        "status": "OFFLINE",
         "homeBase": "District 1 Operations Home Base",
         "lastKnownLocation": "Demo operating location",
         "activeMission": null
@@ -32,7 +32,7 @@
       {
         "code": "DRONE-004",
         "modelName": "AeroVision X1 Enterprise",
-        "status": "AVAILABLE",
+        "status": "OFFLINE",
         "homeBase": "District 1 Operations Home Base",
         "lastKnownLocation": "Demo operating location",
         "activeMission": null
@@ -40,7 +40,7 @@
       {
         "code": "DRONE-005",
         "modelName": "AeroVision X1 Enterprise",
-        "status": "AVAILABLE",
+        "status": "OFFLINE",
         "homeBase": "District 1 Operations Home Base",
         "lastKnownLocation": "Demo operating location",
         "activeMission": null
@@ -53,7 +53,7 @@
         "missionCode": "mission-002",
         "componentCode": "AVX1-MOTOR-FRONT_LEFT",
         "severity": "WARNING",
-        "detectedAt": "2026-10-21T06:05:00.000Z"
+        "detectedAt": "2026-10-21T06:08:00.000Z"
       }
     ]
   },
@@ -61,8 +61,8 @@
     {
       "code": "DRONE-001",
       "serialNumber": "AVX1E-2026-0001",
-      "status": "AVAILABLE",
-      "isActivated": true,
+      "status": "OFFLINE",
+      "isActivated": false,
       "manufacturer": "AeroVision (fictional)",
       "modelName": "AeroVision X1 Enterprise",
       "modelCode": "AV-X1E",
@@ -215,8 +215,8 @@
     {
       "code": "DRONE-002",
       "serialNumber": "AVX1E-2026-0002",
-      "status": "AVAILABLE",
-      "isActivated": true,
+      "status": "OFFLINE",
+      "isActivated": false,
       "manufacturer": "AeroVision (fictional)",
       "modelName": "AeroVision X1 Enterprise",
       "modelCode": "AV-X1E",
@@ -371,7 +371,7 @@
           "missionCode": "mission-002",
           "componentCode": "AVX1-MOTOR-FRONT_LEFT",
           "severity": "WARNING",
-          "detectedAt": "2026-10-21T06:05:00.000Z"
+          "detectedAt": "2026-10-21T06:08:00.000Z"
         }
       ]
     },
@@ -532,8 +532,8 @@
     {
       "code": "DRONE-004",
       "serialNumber": "AVX1E-2026-0004",
-      "status": "AVAILABLE",
-      "isActivated": true,
+      "status": "OFFLINE",
+      "isActivated": false,
       "manufacturer": "AeroVision (fictional)",
       "modelName": "AeroVision X1 Enterprise",
       "modelCode": "AV-X1E",
@@ -686,8 +686,8 @@
     {
       "code": "DRONE-005",
       "serialNumber": "AVX1E-2026-0005",
-      "status": "AVAILABLE",
-      "isActivated": true,
+      "status": "OFFLINE",
+      "isActivated": false,
       "manufacturer": "AeroVision (fictional)",
       "modelName": "AeroVision X1 Enterprise",
       "modelCode": "AV-X1E",
@@ -944,15 +944,23 @@
     {
       "flightCode": "FLIGHT-014",
       "droneCode": "DRONE-001",
-      "missionCode": "mission-014",
+      "missionCode": "MISSION-014",
       "status": "COMPLETED",
       "startedAt": "2026-10-16T02:15:00.000Z",
       "durationSeconds": 1122
     },
     {
+      "flightCode": "FLIGHT-012",
+      "droneCode": "DRONE-005",
+      "missionCode": "MISSION-012",
+      "status": "FAILED",
+      "startedAt": "2026-10-14T01:55:00.000Z",
+      "durationSeconds": 496
+    },
+    {
       "flightCode": "FLIGHT-011",
       "droneCode": "DRONE-003",
-      "missionCode": "mission-011",
+      "missionCode": "MISSION-011",
       "status": "COMPLETED",
       "startedAt": "2026-10-13T09:10:00.000Z",
       "durationSeconds": 1380
@@ -960,7 +968,7 @@
     {
       "flightCode": "FLIGHT-010",
       "droneCode": "DRONE-004",
-      "missionCode": "mission-004",
+      "missionCode": "MISSION-010",
       "status": "COMPLETED",
       "startedAt": "2026-10-12T03:05:00.000Z",
       "durationSeconds": 945
@@ -970,7 +978,7 @@
     {
       "flightCode": "FLIGHT-014",
       "droneCode": "DRONE-001",
-      "missionCode": "mission-014",
+      "missionCode": "MISSION-014",
       "status": "COMPLETED",
       "startedAt": "2026-10-16T02:15:00.000Z",
       "durationSeconds": 1122,
@@ -1021,30 +1029,111 @@
         "startBatteryPercent": 100,
         "endBatteryPercent": 62,
         "maxAltitudeMeters": 82,
-        "averageSpeedMps": 3.23,
+        "averageSpeedMps": 9.4,
         "distanceMeters": 3620
       },
       "events": [
         {
-          "id": "FLIGHT-014-START",
+          "id": "event-001",
           "occurredAt": "2026-10-16T02:15:00.000Z",
           "title": "Flight started",
           "description": "The drone began the assigned route.",
           "severity": "INFO"
         },
         {
-          "id": "FLIGHT-014-END",
-          "occurredAt": "2026-10-16T02:33:42.000Z",
-          "title": "Route completed",
-          "description": "The drone completed the route.",
+          "id": "event-002",
+          "occurredAt": "2026-10-16T02:20:00.000Z",
+          "title": "Waypoint reached",
+          "description": "The drone reached waypoint WP-04.",
           "severity": "INFO"
+        },
+        {
+          "id": "event-003",
+          "occurredAt": "2026-10-16T02:29:00.000Z",
+          "title": "Route completed",
+          "description": "The drone returned after completing the route.",
+          "severity": "INFO"
+        }
+      ]
+    },
+    {
+      "flightCode": "FLIGHT-012",
+      "droneCode": "DRONE-005",
+      "missionCode": "MISSION-012",
+      "status": "FAILED",
+      "startedAt": "2026-10-14T01:55:00.000Z",
+      "durationSeconds": 496,
+      "routeName": "Historical Demo Route",
+      "waypoints": [
+        {
+          "code": "WP-01",
+          "x": 8,
+          "y": 48
+        },
+        {
+          "code": "WP-02",
+          "x": 21,
+          "y": 39
+        },
+        {
+          "code": "WP-03",
+          "x": 33,
+          "y": 48
+        },
+        {
+          "code": "WP-04",
+          "x": 45,
+          "y": 27
+        },
+        {
+          "code": "WP-05",
+          "x": 59,
+          "y": 34
+        },
+        {
+          "code": "WP-06",
+          "x": 70,
+          "y": 15
+        },
+        {
+          "code": "WP-07",
+          "x": 83,
+          "y": 24
+        },
+        {
+          "code": "WP-08",
+          "x": 93,
+          "y": 10
+        }
+      ],
+      "telemetry": {
+        "startBatteryPercent": 100,
+        "endBatteryPercent": 82,
+        "maxAltitudeMeters": 82,
+        "averageSpeedMps": 3.17,
+        "distanceMeters": 1450
+      },
+      "events": [
+        {
+          "id": "FLIGHT-012-START",
+          "occurredAt": "2026-10-14T01:55:00.000Z",
+          "title": "Flight started",
+          "description": "The drone began the assigned route.",
+          "severity": "INFO"
+        },
+        {
+          "id": "FLIGHT-012-END",
+          "occurredAt": "2026-10-14T02:03:16.000Z",
+          "title": "Flight ended",
+          "description": "The historical flight ended before completing its route.",
+          "severity": "ERROR"
         }
       ]
     },
     {
       "flightCode": "FLIGHT-011",
       "droneCode": "DRONE-003",
-      "missionCode": "mission-011",
+      "missionCode": "MISSION-011",
       "status": "COMPLETED",
       "startedAt": "2026-10-13T09:10:00.000Z",
       "durationSeconds": 1380,
@@ -1118,7 +1207,7 @@
     {
       "flightCode": "FLIGHT-010",
       "droneCode": "DRONE-004",
-      "missionCode": "mission-004",
+      "missionCode": "MISSION-010",
       "status": "COMPLETED",
       "startedAt": "2026-10-12T03:05:00.000Z",
       "durationSeconds": 945,
@@ -1178,25 +1267,36 @@
   "alerts": [
     {
       "alertCode": "DEMO-ALT-001",
-      "title": "Motor temperature warning",
+      "title": "Low battery",
       "droneCode": "DRONE-002",
       "missionCode": "mission-002",
-      "problemDescription": "Front-left motor reached 75 C before takeoff.",
+      "problemDescription": "Battery level is below the recommended reserve.",
       "severity": "WARNING",
       "sourceGroup": "Components",
       "detectedAt": "2026-10-21 06:05:00",
       "resolutionNote": null
     },
     {
+      "alertCode": "DEMO-ALT-002",
+      "title": "Motor temperature warning",
+      "droneCode": "DRONE-002",
+      "missionCode": "mission-002",
+      "problemDescription": "Motor temperature is above the normal operating range.",
+      "severity": "WARNING",
+      "sourceGroup": "Components",
+      "detectedAt": "2026-10-21 06:08:00",
+      "resolutionNote": "Inspect the motor and allow it to cool before the next flight."
+    },
+    {
       "alertCode": "DEMO-ALT-003",
       "title": "Unsafe weather",
       "droneCode": "DRONE-005",
       "missionCode": "mission-005",
-      "problemDescription": "Strong wind and poor visibility prevented takeoff.",
+      "problemDescription": "Strong wind and poor visibility caused the mission to fail.",
       "severity": "CRITICAL",
       "sourceGroup": "Weather",
       "detectedAt": "2026-10-19 06:10:00",
-      "resolutionNote": null
+      "resolutionNote": "Mission stopped. Review weather conditions before scheduling a new attempt."
     }
   ]
 }
