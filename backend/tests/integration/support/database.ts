@@ -1,10 +1,21 @@
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { createDatabase } from '../../../src/config/database';
 import { readConfig } from '../../../src/config/env';
 
-const expectedBuildId = 'DRONE-DATA-2.0.0-R1-20260919';
+interface DataManifest {
+  version: string;
+  dataRevision: number;
+  buildId: string;
+  counts: Record<string, number>;
+}
+
+const manifest = JSON.parse(
+  readFileSync(resolve(process.cwd(), '../data/manifest.json'), 'utf8'),
+) as DataManifest;
 
 interface DataPackMetadataRow extends RowDataPacket {
   pack_version: string;
@@ -23,6 +34,10 @@ export function createIntegrationDatabase(): Pool {
 }
 
 export async function assertV2DataPack(database: Pool): Promise<void> {
+  if (manifest.version !== '2.1.0') {
+    throw new Error(`Expected data manifest v2.1.0, found ${manifest.version}`);
+  }
+
   const [metadataRows] = await database.query<DataPackMetadataRow[]>(
     'SELECT pack_version, data_revision, build_id FROM data_pack_metadata WHERE id = ?',
     [1],
@@ -30,26 +45,29 @@ export async function assertV2DataPack(database: Pool): Promise<void> {
   const metadata = metadataRows[0];
 
   if (
-    metadata?.pack_version !== '2.0.0'
-    || Number(metadata.data_revision) !== 1
-    || metadata.build_id !== expectedBuildId
+    metadata?.pack_version !== manifest.version
+    || Number(metadata.data_revision) !== manifest.dataRevision
+    || metadata.build_id !== manifest.buildId
   ) {
-    throw new Error(`Expected data pack ${expectedBuildId}; verify the configured MySQL database.`);
+    throw new Error(
+      `Expected data pack ${manifest.buildId}; verify the configured MySQL database.`,
+    );
   }
 
-  const expectedCounts: Array<[string, number]> = [
-    ['drones', 5],
-    ['flight_zones', 8],
-    ['missions', 20],
-    ['flights', 20],
-    ['telemetry', 6000],
-    ['alerts', 24],
-  ];
-  for (const [table, expected] of expectedCounts) {
-    const [countRows] = await database.query<CountRow[]>(`SELECT COUNT(*) AS total FROM ${table}`);
+  for (const [table, expected] of Object.entries(manifest.counts)) {
+    if (!/^[a-z_]+$/.test(table)) {
+      throw new Error(`Invalid table name in data manifest: ${table}`);
+    }
+
+    const [countRows] = await database.query<CountRow[]>(
+      `SELECT COUNT(*) AS total FROM \`${table}\``,
+    );
     const actual = Number(countRows[0]?.total ?? 0);
+
     if (actual !== expected) {
-      throw new Error(`Expected ${expected} rows in ${table}, found ${actual}; verify the configured MySQL database.`);
+      throw new Error(
+        `Expected ${expected} rows in ${table}, found ${actual}; verify the configured MySQL database.`,
+      );
     }
   }
 }
@@ -86,7 +104,10 @@ export async function createMissionFixture(
       options.sourceMissionId,
     ],
   );
-  if (!result.insertId) throw new Error(`Could not copy source mission ${options.sourceMissionId}`);
+  if (!result.insertId) {
+    throw new Error(`Could not copy source mission ${options.sourceMissionId}`);
+  }
+
   await database.execute(
     `INSERT INTO waypoints
       (mission_id, sequence_number, waypoint_type, latitude, longitude, altitude_m, hold_time_sec, created_at)
@@ -97,7 +118,10 @@ export async function createMissionFixture(
   return result.insertId;
 }
 
-export async function cleanupMissionFixture(database: Pool, missionId: number): Promise<void> {
+export async function cleanupMissionFixture(
+  database: Pool,
+  missionId: number,
+): Promise<void> {
   await database.execute('DELETE FROM alerts WHERE mission_id = ?', [missionId]);
   await database.execute(
     'DELETE t FROM telemetry t JOIN flights f ON f.id = t.flight_id WHERE f.mission_id = ?',
@@ -115,10 +139,12 @@ export async function waitFor<T>(
   intervalMs = 200,
 ): Promise<T> {
   const deadline = Date.now() + timeoutMs;
+
   while (Date.now() < deadline) {
     const result = await probe();
     if (result) return result;
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
+
   throw new Error(`Condition was not met within ${timeoutMs} ms`);
 }

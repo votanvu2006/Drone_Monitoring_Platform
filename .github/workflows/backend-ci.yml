@@ -2,7 +2,6 @@ name: Backend CI
 
 on:
   pull_request:
-    branches: [main]
   push:
     branches: [main]
 
@@ -16,15 +15,15 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3307'
+      DB_NAME: drone_monitoring_frontend
+      DB_USER: drone_app
+      DB_PASSWORD: drone_app_password
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Check out base revision for existing backend integration data
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.base.sha || github.event.before }}
-          path: ci-data-baseline
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -42,46 +41,28 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
+      - name: Unit tests
         run: npm test
 
-      - name: Start MySQL with the v2.1.0 data pack
-        id: frontend_mysql
+      - name: Check frontend snapshot
+        run: node ../data/tools/check-snapshot.mjs
+
+      - name: Start MySQL with v2.1.0 data
+        id: mysql
         run: docker compose -f ../data/docker-compose.yml up --detach --wait --wait-timeout 120
 
-      - name: Verify the v2.1.0 data pack
+      - name: Verify v2.1.0 data
         run: docker compose -f ../data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysql --user="$MYSQL_USER" --database="$MYSQL_DATABASE" -e "CALL verify_frontend_demo();"'
 
-      - name: Start MySQL with base revision data for backend integration
-        id: mysql
-        run: docker compose -f ../ci-data-baseline/data/docker-compose.yml up --detach --wait --wait-timeout 120
-
-      - name: Wait for the v2.0.0 data-pack import
+      - name: Wait for v2.1.0 data pack
         run: npm run wait:data-pack
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_NAME: drone_monitoring
-          DB_USER: drone_app
-          DB_PASSWORD: drone_app_password
-
-      - name: Run base revision data-pack verification queries
-        run: docker compose -f ../ci-data-baseline/data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --user=root' < ../ci-data-baseline/data/database/verify-import.sql
 
       - name: MySQL integration tests
         run: npm run test:integration
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_NAME: drone_monitoring
-          DB_USER: drone_app
-          DB_PASSWORD: drone_app_password
 
       - name: Build
         run: npm run build
 
-      - name: Show MySQL logs after backend failure
-        if: failure() && (steps.frontend_mysql.outcome != 'skipped' || steps.mysql.outcome != 'skipped')
-        run: |
-          docker compose -f ../data/docker-compose.yml logs --no-color mysql || true
-          docker compose -f ../ci-data-baseline/data/docker-compose.yml logs --no-color mysql || true
+      - name: Show MySQL logs after failure
+        if: failure() && steps.mysql.outcome != 'skipped'
+        run: docker compose -f ../data/docker-compose.yml logs --no-color mysql
