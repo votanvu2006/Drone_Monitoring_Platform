@@ -144,7 +144,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
         </div>
       </section>
 
-      {drone.isActivated && drone.findings.length > 0 && (
+      {drone.findings.length > 0 && (
         <section
           className="drone-findings-panel"
           aria-labelledby="drone-findings-title"

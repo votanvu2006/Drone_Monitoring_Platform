@@ -76,7 +76,7 @@ test('Fleet and Drone Detail retain their flow in both themes', async ({ page },
   await capture(page, info, 'fleet-dark');
   await page.getByRole('button', { name: 'View details for DRONE-003' }).click();
   await expect(page.getByRole('heading', { name: 'DRONE-003', exact: true })).toBeVisible();
-  await expect(page.locator('.drone-component-health--fault')).toHaveCount(1);
+  await expect(page.locator('.drone-component-health--healthy')).toHaveCount(14);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await checkLayout(page);
   await capture(page, info, 'drone-detail-dark');
@@ -84,6 +84,9 @@ test('Fleet and Drone Detail retain their flow in both themes', async ({ page },
   await capture(page, info, 'drone-detail-light');
   await page.getByRole('button', { name: 'Back to fleet' }).click();
   await expect(page.locator('.drone-card')).toHaveCount(5);
+  await page.getByRole('button', { name: 'View details for DRONE-002' }).click();
+  await expect(page.locator('.drone-component-health--warning')).toHaveCount(1);
+  await expect(page.locator('.drone-findings-panel')).toContainText('AVX1-MOTOR-FRONT_LEFT');
 });
 
 test('unknown screen and state fall back to the shell', async ({ page }) => {
