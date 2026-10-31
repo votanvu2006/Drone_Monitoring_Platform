@@ -81,3 +81,8 @@ test('explicit demo codes and missing records retain their preview behavior', as
   await expect(page.getByRole('region', { name: 'Alert not found' })).toContainText('DEMO-ALT-999');
   await checkLayout(page);
 });
+
+// Module checks run with a demo session; login behavior has its own coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('drone-monitoring.demo-session', 'active'));
+});

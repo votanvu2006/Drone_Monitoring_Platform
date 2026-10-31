@@ -6,6 +6,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { DEMO_SESSION_KEY } from "./app/demo-session";
 import { App } from "./App";
 import { ThemeProvider } from "./app/ThemeProvider";
 import { THEME_STORAGE_KEY } from "./app/theme";
@@ -29,6 +30,7 @@ describe("application shell and module navigation", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     localStorage.clear();
+    localStorage.setItem(DEMO_SESSION_KEY, "active");
     document.documentElement.removeAttribute("data-theme");
     window.history.replaceState(null, "", "/?screen=shell");
   });
@@ -52,7 +54,7 @@ describe("application shell and module navigation", () => {
     ).toHaveAttribute("aria-current", "page");
 
     expect(document.querySelector(".topbar")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Log out" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Log out" })).toBeEnabled();
     expect(screen.getByRole("main")).toBeVisible();
   });
 
@@ -233,7 +235,8 @@ describe("application shell and module navigation", () => {
   });
 
   it("still switches themes when browser storage is blocked", () => {
-    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation((key) => {
+      if (key === DEMO_SESSION_KEY) return "active";
       throw new Error("Storage unavailable");
     });
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
