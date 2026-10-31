@@ -84,19 +84,19 @@ export function TelemetrySummary({
   const metrics = [
     {
       label: "Start battery",
-      value: `${telemetry.startBatteryPercent}%`,
+      value: telemetry.startBatteryPercent === null ? "Not recorded" : `${telemetry.startBatteryPercent}%`,
     },
     {
       label: "End battery",
-      value: `${telemetry.endBatteryPercent}%`,
+      value: telemetry.endBatteryPercent === null ? "Not recorded" : `${telemetry.endBatteryPercent}%`,
     },
     {
       label: "Maximum altitude",
-      value: `${telemetry.maxAltitudeMeters} m`,
+      value: telemetry.maxAltitudeMeters === null ? "Not recorded" : `${telemetry.maxAltitudeMeters} m`,
     },
     {
       label: "Average speed",
-      value: `${telemetry.averageSpeedMps} m/s`,
+      value: telemetry.averageSpeedMps === null ? "Not recorded" : `${telemetry.averageSpeedMps} m/s`,
     },
     {
       label: "Distance",

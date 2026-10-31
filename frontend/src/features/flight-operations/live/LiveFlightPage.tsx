@@ -1,3 +1,4 @@
+import type { LiveFlightDataSource } from "./liveFlight.types";
 import { useEffect, useState } from "react";
 import { FlightRoutePanel } from "./components/FlightRoutePanel";
 import { liveFlightDataSource } from "./liveFlight.data";
@@ -80,7 +81,7 @@ function FlightDetails({
   );
 }
 
-function LiveFlightPage() {
+function LiveFlightPage({ dataSource = liveFlightDataSource }: { dataSource?: LiveFlightDataSource }) {
   const [pageState, setPageState] = useState<PageState>({
     kind: "loading",
   });
@@ -91,7 +92,7 @@ function LiveFlightPage() {
   useEffect(() => {
     let isActive = true;
 
-    liveFlightDataSource
+    dataSource
       .loadActiveFlights()
       .then((flights) => {
         if (isActive) {
@@ -105,9 +106,8 @@ function LiveFlightPage() {
           });
         }
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (isActive) {
-          console.error("Failed to load active flights:", error);
           setPageState({ kind: "error" });
         }
       });
@@ -115,7 +115,7 @@ function LiveFlightPage() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [dataSource]);
 
   const selectedFlight =
     pageState.kind === "ready"

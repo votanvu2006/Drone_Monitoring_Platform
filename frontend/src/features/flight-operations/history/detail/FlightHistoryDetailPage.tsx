@@ -5,6 +5,7 @@ import {
 } from "../flightHistory.data";
 import type {
   FlightHistoryDetail,
+  FlightHistoryDataSource,
   FlightHistoryStatus,
 } from "../flightHistory.types";
 import {
@@ -26,6 +27,7 @@ type PageState =
 
 type FlightHistoryDetailPageProps = {
   flightCode?: string;
+  dataSource?: FlightHistoryDataSource;
 };
 
 function FlightStatusBadge({
@@ -45,6 +47,7 @@ function FlightStatusBadge({
 
 function FlightHistoryDetailPage({
   flightCode = DEFAULT_FLIGHT_CODE,
+  dataSource = flightHistoryDataSource,
 }: FlightHistoryDetailPageProps) {
   const [pageState, setPageState] = useState<PageState>({
     kind: "loading",
@@ -54,16 +57,15 @@ function FlightHistoryDetailPage({
   useEffect(() => {
     let isActive = true;
 
-    flightHistoryDataSource
+    dataSource
       .loadDetail(flightCode)
       .then((flight) => {
         if (isActive) {
           setPageState({ kind: "ready", flight });
         }
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (isActive) {
-          console.error("Failed to load flight details:", error);
           setPageState({ kind: "error" });
         }
       });
@@ -71,7 +73,7 @@ function FlightHistoryDetailPage({
     return () => {
       isActive = false;
     };
-  }, [flightCode]);
+  }, [flightCode, dataSource]);
 
   const flight =
     pageState.kind === "ready" ? pageState.flight : null;
