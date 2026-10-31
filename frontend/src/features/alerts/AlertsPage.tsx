@@ -15,7 +15,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   return <div><dt>{label}</dt><dd>{children}</dd></div>;
 }
 
-export function AlertsPage({ view = 'list', alertCode = defaultAlertCode }: { view?: 'list' | 'detail'; alertCode?: string }) {
+export function AlertsPage({ view = 'list', alertCode = defaultAlertCode, droneCode, missionCode }: { view?: 'list' | 'detail'; alertCode?: string; droneCode?: string; missionCode?: string }) {
   const detail = view === 'detail';
   const selected = alertsByCode.get(alertCode);
   return <>
@@ -25,20 +25,23 @@ export function AlertsPage({ view = 'list', alertCode = defaultAlertCode }: { vi
     {detail
       ? selected ? <AlertDetail alert={selected} />
         : <Panel title="Alert not found"><p>No alert matches {alertCode}.</p></Panel>
-      : <AlertList />}
+      : <AlertList droneCode={droneCode} missionCode={missionCode} />}
   </>;
 }
 
-export function AlertList() {
+export function AlertList({ droneCode, missionCode }: { droneCode?: string; missionCode?: string }) {
   const [search, setSearch] = useState('');
   const [severity, setSeverity] = useState('all');
   const query = search.trim().toLowerCase();
   const visibleAlerts = alerts.filter(alert =>
-    (severity === 'all' || alert.severity === severity)
+    (!droneCode || alert.droneCode === droneCode)
+    && (!missionCode || alert.missionCode === missionCode)
+    && (severity === 'all' || alert.severity === severity)
     && [alert.alertCode, alert.title, alert.droneCode, alert.missionCode, alert.problemDescription]
       .some(value => value.toLowerCase().includes(query)),
   );
   return <>
+    {(droneCode || missionCode) && <p className="alert-scope">Alerts for {[droneCode, missionCode].filter(Boolean).join(' · ')} · <a href="/alerts">Show all alerts</a></p>}
     <dl className="alert-counts" aria-label="Alert totals">
       <div><dt>Total alerts</dt><dd>{alertCounts.total}</dd></div>
       <div><dt>Critical</dt><dd>{alertCounts.critical}</dd></div>

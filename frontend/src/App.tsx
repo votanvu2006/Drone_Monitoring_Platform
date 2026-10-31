@@ -87,6 +87,7 @@ function AppContent() {
       return (
         <ModulePageView
           page={previewPage}
+          search={search}
           onNavigate={handleNavigate}
           onSignOut={signOut}
         />
@@ -115,6 +116,7 @@ function AppContent() {
     return (
       <ModulePageView
         page={page}
+        search={search}
         onNavigate={handleNavigate}
           onSignOut={signOut}
       />
