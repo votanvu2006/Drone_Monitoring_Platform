@@ -171,3 +171,27 @@ describe('Flight Operations list API', () => {
     expect(query).not.toHaveBeenCalled();
   });
 });
+
+describe('Flight Operations view endpoints', () => {
+  it('returns empty active/history views without inventing flights', async () => {
+    const query = vi.fn().mockResolvedValue([[], []]);
+    const app = createTestApp(query);
+    for (const path of ['active', 'history']) {
+      const response = await request(app).get('/api/flights/' + path);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ data: [] });
+    }
+  });
+
+  it('returns a missing-detail error and rejects invalid codes', async () => {
+    const query = vi.fn().mockResolvedValue([[], []]);
+    const app = createTestApp(query);
+    const missing = await request(app).get('/api/flights/UNKNOWN');
+    expect(missing.status).toBe(404);
+    expect(missing.body.error.code).toBe('FLIGHT_NOT_FOUND');
+    expect(query.mock.calls[0]?.[1]).toEqual(['UNKNOWN']);
+    const invalid = await request(app).get('/api/flights/invalid%20code');
+    expect(invalid.status).toBe(400);
+    expect(query).toHaveBeenCalledTimes(1);
+  });
+});
