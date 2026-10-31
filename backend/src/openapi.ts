@@ -113,6 +113,34 @@ export const openApiDocument = {
         },
       },
     },
+    '/flights/active': {
+      get: {
+        tags: ['Flight Operations'], summary: 'Read active v2.1.0 flights with their mission waypoints and progress',
+        responses: { '200': { description: 'Active flights', content: { 'application/json': { schema: {
+          type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/ActiveFlight' } } },
+        } } } } },
+      },
+    },
+    '/flights/history': {
+      get: {
+        tags: ['Flight Operations'], summary: 'Read ended flights; blocked preflight attempts have no history record',
+        responses: { '200': { description: 'Flight history', content: { 'application/json': { schema: {
+          type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/FlightHistoryRecord' } } },
+        } } } } },
+      },
+    },
+    '/flights/{flightCode}': {
+      get: {
+        tags: ['Flight Operations'], summary: 'Read a historical flight with route, telemetry summary and ordered events',
+        parameters: [{ name: 'flightCode', in: 'path', required: true, schema: { type: 'string', pattern: '^[a-zA-Z0-9-]{1,30}$' } }],
+        responses: {
+          '200': { description: 'Flight details', content: { 'application/json': { schema: { type: 'object', properties: {
+            data: { $ref: '#/components/schemas/FlightHistoryDetail' },
+          } } } } },
+          '400': { description: 'Invalid flight code' }, '404': { description: 'Historical flight not found' },
+        },
+      },
+    },
     '/flights': {
       get: {
         tags: ['Flight Operations'],
@@ -177,6 +205,44 @@ export const openApiDocument = {
           missionCode: { type: 'string' },
           name: { type: 'string' },
         },
+      },
+      FlightMapWaypoint: {
+        type: 'object', properties: { code: { type: 'string' }, label: { type: 'string' },
+          x: { type: 'number', nullable: true }, y: { type: 'number', nullable: true } },
+      },
+      ActiveFlight: {
+        type: 'object', properties: {
+          flightCode: { type: 'string' }, missionCode: { type: 'string' }, droneCode: { type: 'string' },
+          flightStatus: { type: 'string', enum: ['IN_PROGRESS'] }, status: { type: 'string', enum: ['FLYING', 'PAUSED', 'RETURNING'] },
+          routeName: { type: 'string' }, currentWaypointIndex: { type: 'integer', minimum: 0 },
+          routeProgressPercent: { type: 'integer', minimum: 0, maximum: 100 },
+          waypoints: { type: 'array', items: { $ref: '#/components/schemas/FlightMapWaypoint' } },
+        },
+      },
+      FlightHistoryRecord: {
+        type: 'object', properties: {
+          flightCode: { type: 'string' }, missionCode: { type: 'string' }, droneCode: { type: 'string' },
+          status: { type: 'string', enum: ['COMPLETED', 'FAILED'] },
+          startedAt: { type: 'string', format: 'date-time', nullable: true, description: 'UTC instant' },
+          durationSeconds: { type: 'integer', minimum: 0 },
+        },
+      },
+      FlightHistoryDetail: {
+        allOf: [{ $ref: '#/components/schemas/FlightHistoryRecord' }, {
+          type: 'object', properties: {
+            routeName: { type: 'string' },
+            waypoints: { type: 'array', items: { $ref: '#/components/schemas/FlightMapWaypoint' } },
+            telemetry: { type: 'object', properties: {
+              startBatteryPercent: { type: 'number', nullable: true }, endBatteryPercent: { type: 'number', nullable: true },
+              maxAltitudeMeters: { type: 'number', nullable: true }, averageSpeedMps: { type: 'number', nullable: true },
+              distanceMeters: { type: 'number' },
+            } },
+            events: { type: 'array', items: { type: 'object', properties: {
+              id: { type: 'string' }, occurredAt: { type: 'string', format: 'date-time' },
+              title: { type: 'string' }, description: { type: 'string' }, severity: { enum: ['INFO', 'WARNING', 'ERROR'] },
+            } } },
+          },
+        }],
       },
       FlightListItem: {
         type: 'object',
