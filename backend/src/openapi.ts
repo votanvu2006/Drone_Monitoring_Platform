@@ -25,6 +25,32 @@ export const openApiDocument = {
         },
       },
     },
+    '/drones/{droneCode}': {
+      get: {
+        tags: ['Fleet'],
+        summary: 'Get a drone with its installed components and findings',
+        parameters: [{
+          name: 'droneCode',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', pattern: '^[A-Za-z0-9_-]{1,30}$' },
+        }],
+        responses: {
+          '200': {
+            description: 'Drone details',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/DroneDetailResponse' } } },
+          },
+          '400': {
+            description: 'Invalid drone code',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+          '404': {
+            description: 'Drone not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
+          },
+        },
+      },
+    },
     '/missions': {
       get: {
         tags: ['Mission'],
@@ -296,27 +322,106 @@ export const openApiDocument = {
           updatedAt: { type: 'string', format: 'date-time', nullable: true },
         },
       },
+      ComponentFinding: {
+        type: 'object',
+        required: ['id', 'droneCode', 'missionCode', 'componentCode', 'severity', 'detectedAt'],
+        properties: {
+          id: { type: 'string' },
+          droneCode: { type: 'string' },
+          missionCode: { type: 'string' },
+          componentCode: { type: 'string' },
+          severity: { type: 'string', enum: ['WARNING', 'FAULT'] },
+          detectedAt: { type: 'string', format: 'date-time' },
+        },
+      },
       DroneListItem: {
-        type: 'object', required: ['id', 'droneCode', 'displayName', 'status', 'isSimulated', 'model', 'homeLocation', 'lastKnownLocation'],
+        type: 'object',
+        required: [
+          'id', 'droneCode', 'displayName', 'status', 'batteryPercent',
+          'isSimulated', 'model', 'homeLocation', 'lastKnownLocation',
+          'activeMission', 'findings',
+        ],
         properties: {
           id: { type: 'integer', format: 'int64' },
           droneCode: { type: 'string' },
           displayName: { type: 'string' },
           status: { type: 'string', enum: ['AVAILABLE', 'IN_FLIGHT', 'MAINTENANCE', 'OFFLINE'] },
+          batteryPercent: { type: 'number', minimum: 0, maximum: 100 },
           isSimulated: { type: 'boolean' },
           model: {
-            type: 'object', required: ['modelCode', 'manufacturer', 'modelName'],
-            properties: { modelCode: { type: 'string' }, manufacturer: { type: 'string' }, modelName: { type: 'string' } },
+            type: 'object',
+            required: ['modelCode', 'manufacturer', 'modelName'],
+            properties: {
+              modelCode: { type: 'string' },
+              manufacturer: { type: 'string' },
+              modelName: { type: 'string' },
+            },
           },
           homeLocation: { $ref: '#/components/schemas/HomeLocation' },
           lastKnownLocation: { $ref: '#/components/schemas/LastKnownLocation' },
+          activeMission: { type: 'string', nullable: true },
+          findings: { type: 'array', items: { $ref: '#/components/schemas/ComponentFinding' } },
         },
       },
       DroneListResponse: {
-        type: 'object', required: ['data', 'page', 'pageSize', 'total'],
+        type: 'object',
+        required: ['data', 'page', 'pageSize', 'total'],
         properties: {
           data: { type: 'array', items: { $ref: '#/components/schemas/DroneListItem' } },
-          page: { type: 'integer' }, pageSize: { type: 'integer' }, total: { type: 'integer' },
+          page: { type: 'integer' },
+          pageSize: { type: 'integer' },
+          total: { type: 'integer' },
+        },
+      },
+      InstalledDroneComponent: {
+        type: 'object',
+        required: [
+          'code', 'type', 'name', 'position', 'model',
+          'primaryFunction', 'serialNumber', 'healthStatus',
+        ],
+        properties: {
+          code: { type: 'string' },
+          type: { type: 'string' },
+          name: { type: 'string' },
+          position: { type: 'string' },
+          model: { type: 'string' },
+          primaryFunction: { type: 'string' },
+          serialNumber: { type: 'string' },
+          healthStatus: { type: 'string', enum: ['HEALTHY', 'WARNING', 'FAULT', 'MAINTENANCE'] },
+        },
+      },
+      DroneDetailResponse: {
+        type: 'object',
+        required: ['data'],
+        properties: {
+          data: {
+            type: 'object',
+            required: [
+              'code', 'status', 'isActivated', 'batteryPercent', 'serialNumber',
+              'manufacturer', 'modelName', 'modelCode', 'maxSpeedMps',
+              'maxFlightTimeMinutes', 'components', 'findings',
+            ],
+            properties: {
+              code: { type: 'string' },
+              status: { type: 'string', enum: ['AVAILABLE', 'IN_FLIGHT', 'MAINTENANCE', 'OFFLINE'] },
+              isActivated: { type: 'boolean' },
+              batteryPercent: { type: 'number', minimum: 0, maximum: 100 },
+              serialNumber: { type: 'string' },
+              manufacturer: { type: 'string' },
+              modelName: { type: 'string' },
+              modelCode: { type: 'string' },
+              maxSpeedMps: { type: 'number' },
+              maxFlightTimeMinutes: { type: 'number' },
+              components: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/InstalledDroneComponent' },
+              },
+              findings: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/ComponentFinding' },
+              },
+            },
+          },
         },
       },
       ResolveAlert: {
