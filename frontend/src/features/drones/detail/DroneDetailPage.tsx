@@ -93,9 +93,9 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
         className="drone-profile-panel"
         aria-labelledby="drone-profile-title"
       >
-        <header className="drone-detail-section-heading">
+        <div className="drone-detail-section-heading">
           <h2 id="drone-profile-title">Drone profile</h2>
-        </header>
+        </div>
 
         <dl className="drone-spec-grid">
           <DetailField label="Serial number" value={drone.serialNumber} />
@@ -120,7 +120,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
         className="drone-components-section"
         aria-labelledby="drone-components-title"
       >
-        <header className="drone-detail-section-heading">
+        <div className="drone-detail-section-heading">
           <div>
             <h2 id="drone-components-title">Drone components</h2>
             <p>
@@ -130,7 +130,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
           <span className="component-total">
             {drone.components.length} components
           </span>
-        </header>
+        </div>
 
         <div className="component-groups-grid">
           {groups.map((group) => (
@@ -149,7 +149,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
           className="drone-findings-panel"
           aria-labelledby="drone-findings-title"
         >
-          <header className="drone-detail-section-heading">
+          <div className="drone-detail-section-heading">
             <div>
               <h2 id="drone-findings-title">Component findings</h2>
               <p>Issues reported during missions</p>
@@ -157,7 +157,7 @@ function DroneDetailContent({ drone }: { drone: DroneDetail }) {
             <span className="component-total">
               {drone.findings.length} findings
             </span>
-          </header>
+          </div>
 
           <ul className="drone-findings-list">
             {drone.findings.map((finding) => (
@@ -225,7 +225,7 @@ function DroneDetailRequest({
   }, [droneCode]);
 
   return (
-    <main className="drone-detail-page">
+    <section className="drone-detail-page">
       <div className="drone-detail-container">
         <button
           className="back-to-fleet-button"
@@ -254,7 +254,7 @@ function DroneDetailRequest({
           <DroneDetailContent drone={drone} />
         )}
       </div>
-    </main>
+    </section>
   );
 }
 

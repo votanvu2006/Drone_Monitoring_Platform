@@ -75,9 +75,9 @@ function DroneInventoryPage({
   );
 
   return (
-    <main className="fleet-page">
+    <section className="fleet-page">
       <div className="page-container">
-        <header className="page-heading">
+        <div className="page-heading">
           <div>
             <h1>Drones</h1>
             <p className="page-description">
@@ -86,7 +86,7 @@ function DroneInventoryPage({
           </div>
 
           <AddDronesControl />
-        </header>
+        </div>
 
         <FleetSummary
           drones={snapshot.drones}
@@ -100,7 +100,7 @@ function DroneInventoryPage({
           onViewDetails={onViewDetails}
         />
       </div>
-    </main>
+    </section>
   );
 }
 

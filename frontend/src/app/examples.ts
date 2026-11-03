@@ -8,7 +8,6 @@ export interface ExampleDefinition {
   component: ComponentType<ExampleProps>;
   activeNav?: NavigationItem;
   standalone?: boolean;
-  contentHasMain?: boolean;
   states?: readonly string[];
 }
 export interface ExampleModule { default: ExampleDefinition }

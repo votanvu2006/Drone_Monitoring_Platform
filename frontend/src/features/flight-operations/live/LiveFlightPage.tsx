@@ -125,9 +125,9 @@ function LiveFlightPage() {
       : null;
 
   return (
-    <main className="live-flight-page">
+    <section className="live-flight-page">
       <div className="live-flight-container">
-        <header className="live-flight-heading">
+        <div className="live-flight-heading">
           <div>
             <p className="live-flight-eyebrow">
               Flight operations
@@ -139,7 +139,7 @@ function LiveFlightPage() {
           </div>
 
           {selectedFlight && <FlightStatusBadge />}
-        </header>
+        </div>
 
         {pageState.kind === "loading" && (
           <p className="live-flight-message" role="status">
@@ -173,7 +173,7 @@ function LiveFlightPage() {
           </>
         )}
       </div>
-    </main>
+    </section>
   );
 }
 

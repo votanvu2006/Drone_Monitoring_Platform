@@ -23,3 +23,11 @@ Browser checks cover desktop, tablet, mobile and short landscape layouts, consol
 Dark semantic tokens remain available for visual verification by the test harness. No theme-switching behavior, live authentication, logout, session handling or backend requests are implemented.
 
 All canonical data-pack JSON is imported through src/data/seeds.ts. Domain mappers derive display models; datetime formatting uses UTC input and stable ICT output. Fleet inventory and component health use those records, including Drone 003's seed faults. Preview-only samples belong to their feature. Lint rejects warnings. Navigation metadata is independent of preview registration. PR #25 is a separate API-connected prototype in `client/`; it is not a dependency of this frontend.
+
+## Module shell integration (#58)
+
+The application composes module content inside one shell-owned main landmark. Use `/?module=drones` (default), `overview`, `missions`, `live-flight`, `flight-history` or `alerts` to inspect composition while sidebar controls remain static. Existing `?screen=` previews stay isolated in PreviewHost.
+
+Missions, Live Flight and Flight History reuse the page components merged into main through #56, #57 and #59. Their outer sections inherit the shell spacing without a second main landmark. Existing mission filters, the live-flight selector and static history controls retain their behavior and sample data. Alerts and Login are present through the shell's merged feature PRs. Overview remains a placeholder until #46 is integrated; its optional export is discovered only if its file exists in the checkout.
+
+The selected sidebar entry follows the module preview without adding a header breadcrumb or Workspace label. The Overview preview remains available at `/?module=overview` and has no selected sidebar entry because Overview is excluded from the menu. Theme and Log out controls remain disabled visual placeholders. Draft depends on #44; application routing belongs to #62.

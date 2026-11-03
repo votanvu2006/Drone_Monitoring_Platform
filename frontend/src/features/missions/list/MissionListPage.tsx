@@ -102,16 +102,16 @@ function MissionListPage({ onViewAlert }: MissionListPageProps) {
   }
 
   return (
-    <main className="mission-page">
+    <section className="mission-page">
       <div className="mission-page-container">
-        <header className="mission-page-heading">
+        <div className="mission-page-heading">
           <div>
             <h1>Missions</h1>
             <p>Plan and manage drone missions</p>
           </div>
 
           <CreateMissionControl />
-        </header>
+        </div>
 
         {loadState === "loading" && (
           <div className="mission-page-message" role="status">
@@ -147,7 +147,7 @@ function MissionListPage({ onViewAlert }: MissionListPageProps) {
           />
         )}
       </div>
-    </main>
+    </section>
   );
 }
 
