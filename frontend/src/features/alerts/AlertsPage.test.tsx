@@ -7,6 +7,7 @@ import { alerts, alertsByCode } from './alerts.data';
 import { AlertDetail, AlertsPage } from './AlertsPage';
 
 function show(query = 'state=list') {
+  localStorage.setItem('drone-monitoring.demo-session', 'active');
   window.history.replaceState({}, '', '/?screen=alerts&' + query);
   return render(<App />);
 }

@@ -28,7 +28,7 @@ test("shell stays readable while navigation changes modules", async ({ page }, i
   }
 
   const logout = page.getByRole("button", { name: "Log out" });
-  await expect(logout).toBeDisabled();
+  await expect(logout).toBeEnabled();
   await expect(logout).toBeInViewport();
 
   await nav.getByRole("link", { name: "Missions" }).click();
@@ -163,4 +163,8 @@ test("unknown preview screen falls back to Drones", async ({ page }) => {
       .getByRole("navigation", { name: "Primary navigation" })
       .locator('[aria-current="page"]'),
   ).toHaveText("Drones");
+});
+// Module checks run with a demo session; login behavior has its own coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('drone-monitoring.demo-session', 'active'));
 });

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { LoginPage } from "./features/authentication/LoginPage";
+import { hasDemoSession, saveDemoSession } from "./app/demo-session";
 import { ModulePageView } from "./app/ModulePageView";
 import { RouteNotFoundPage } from "./app/RouteNotFoundPage";
 import { ThemeProvider } from "./app/ThemeProvider";
@@ -29,6 +31,7 @@ function readBrowserLocation(): BrowserLocation {
 }
 
 function AppContent() {
+  const [signedIn, setSignedIn] = useState(hasDemoSession);
   const [browserLocation, setBrowserLocation] =
     useState<BrowserLocation>(readBrowserLocation);
 
@@ -56,8 +59,26 @@ function AppContent() {
     setBrowserLocation(readBrowserLocation());
   }
 
+  function signIn() {
+    saveDemoSession(true);
+    setSignedIn(true);
+    window.history.replaceState(null, "", "/drones");
+    setBrowserLocation(readBrowserLocation());
+  }
+
+  function signOut() {
+    saveDemoSession(false);
+    setSignedIn(false);
+    window.history.replaceState(null, "", "/login");
+    setBrowserLocation(readBrowserLocation());
+  }
+
   const { pathname, search } = browserLocation;
   const params = new URLSearchParams(search);
+
+  if (!signedIn || pathname === "/login" || params.get("screen") === "login") {
+    return <LoginPage onSignIn={signIn} />;
+  }
 
   if (pathname === "/" && params.has("module")) {
     const previewPage = getModulePage(params.get("module"));
@@ -67,6 +88,7 @@ function AppContent() {
         <ModulePageView
           page={previewPage}
           onNavigate={handleNavigate}
+          onSignOut={signOut}
         />
       );
     }
@@ -94,12 +116,14 @@ function AppContent() {
       <ModulePageView
         page={page}
         onNavigate={handleNavigate}
+          onSignOut={signOut}
       />
     );
   }
 
   return (
-    <AppShell activeNav={null} onNavigate={handleNavigate}>
+    <AppShell activeNav={null} onNavigate={handleNavigate}
+          onSignOut={signOut}>
       <RouteNotFoundPage />
     </AppShell>
   );

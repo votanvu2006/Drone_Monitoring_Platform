@@ -1,45 +1,45 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
+import { DEMO_SESSION_KEY } from '../../app/demo-session';
 
-function show(state = 'default') {
-  window.history.replaceState({}, '', '/?screen=login&state=' + state);
-  return render(<App />);
+function signIn() {
+  fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'operator' } });
+  fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'demo-password' } });
+  fireEvent.submit(screen.getByRole('form', { name: 'Sign in' }));
 }
 
-describe('default login screen', () => {
-  it('renders the centered identity and readonly fields without an authenticated shell', () => {
-    show();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Drone Monitoring Platform');
-    expect(screen.getByLabelText('Username')).toHaveAttribute('readonly');
-    expect(screen.getByLabelText('Password')).toHaveAttribute('type', 'password');
-    expect(screen.getByLabelText('Password')).toHaveAttribute('readonly');
-    expect(screen.getByRole('button', { name: 'Sign In' })).toBeDisabled();
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
-    expect(screen.queryByRole('banner')).not.toBeInTheDocument();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it.each(['validation-error', 'loading', 'login-error'])('falls back to default for the former %s state', state => {
-    show(state);
-    expect(screen.getByLabelText('Username')).toHaveValue('');
-    expect(screen.getByLabelText('Password')).toHaveValue('');
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    expect(document.querySelector('[aria-invalid="true"], [aria-busy="true"]')).toBeNull();
-    expect(screen.getByRole('button')).toHaveTextContent('Sign In');
-  });
-
-  it('does not submit, navigate, call an API or leave a dark theme behind', () => {
+describe('demo login flow', () => {
+  it('gates direct module URLs and accepts the form without calling an API or storing credentials', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    show();
-    const before = window.location.href;
-    fireEvent.click(screen.getByRole('button'));
-    fireEvent.keyDown(screen.getByLabelText('Password'), { key: 'Enter' });
-    expect(document.querySelector('form')).toBeNull();
-    expect(document.documentElement).not.toHaveAttribute('data-theme', 'dark');
-    expect(window.location.href).toBe(before);
+    window.history.replaceState(null, '', '/missions');
+    render(<App />);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Username')).not.toHaveAttribute('readonly');
+    fireEvent.submit(screen.getByRole('form', { name: 'Sign in' }));
+    expect(localStorage.getItem(DEMO_SESSION_KEY)).toBeNull();
+    signIn();
+    expect(window.location.pathname).toBe('/drones');
+    expect(screen.getByRole('heading', { name: /^Drones$/ })).toBeVisible();
+    expect(localStorage.getItem(DEMO_SESSION_KEY)).toBe('active');
+    expect(JSON.stringify(localStorage)).not.toContain('demo-password');
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('restores the session after remount and clears it on logout, including history navigation', () => {
+    const first = render(<App />);
+    signIn();
+    first.unmount();
+    const second = render(<App />);
+    expect(screen.getByRole('navigation')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
+    expect(window.location.pathname).toBe('/login');
+    expect(localStorage.getItem(DEMO_SESSION_KEY)).toBeNull();
+    window.history.replaceState(null, '', '/missions');
+    fireEvent.popState(window);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    second.unmount();
+    render(<App />);
+    expect(screen.getByRole('form', { name: 'Sign in' })).toBeVisible();
   });
 });

@@ -9,6 +9,7 @@ type AppShellProps = {
   activeNav?: NavigationItem | null;
   children: ReactNode;
   contentHasMain?: boolean;
+  onSignOut?: () => void;
   onNavigate?: (path: string) => void;
 };
 
@@ -17,6 +18,7 @@ export function AppShell({
   children,
   contentHasMain = false,
   onNavigate,
+  onSignOut,
 }: AppShellProps) {
   const { theme, toggleTheme } = useTheme();
 
@@ -75,7 +77,8 @@ export function AppShell({
           <button
             type="button"
             className="logout-control"
-            disabled
+            disabled={!onSignOut}
+            onClick={onSignOut}
           >
             <Icon name="logout" size={18} />
             <span>Log out</span>
