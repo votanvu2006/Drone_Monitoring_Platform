@@ -131,6 +131,8 @@ export const openApiDocument = {
       get: {
         tags: ['Alerts'], summary: 'List and filter alerts',
         parameters: [
+          { name: 'droneCode', in: 'query', schema: { type: 'string' } },
+          { name: 'missionCode', in: 'query', schema: { type: 'string' } },
           { name: 'status', in: 'query', schema: { type: 'string', enum: ['ACTIVE', 'RESOLVED'] } },
           { name: 'severity', in: 'query', schema: { type: 'string', enum: ['WARNING', 'CRITICAL'] } },
           { name: 'source', in: 'query', schema: { type: 'string', enum: ['ROUTE', 'WEATHER', 'TELEMETRY', 'SYSTEM'] } },
@@ -139,7 +141,7 @@ export const openApiDocument = {
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
         ],
-        responses: { '200': { description: 'Paginated alerts' } },
+        responses: { '200': { description: 'Paginated v2.1.0 alerts, including title, source_group, drone_code, mission_code, component_code, lifecycle and incident details. flight_id may be null for blocked preflight alerts.' }, '400': { description: 'Invalid pagination or filters' } },
       },
     },
     '/alerts/{id}/resolve': {

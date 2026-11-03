@@ -45,7 +45,7 @@ interface AlertRow extends RowDataPacket {
 
 function positiveInteger(value: unknown, name: string): number {
   const parsed = Number(value);
-  if (!Number.isSafeInteger(parsed) || parsed < 1) {
+  if (typeof value !== 'string' || !/^\d+$/.test(value) || !Number.isSafeInteger(parsed) || parsed < 1) {
     throw new ApiError(400, 'INVALID_ARGUMENT', `${name} must be a positive integer`);
   }
   return parsed;
@@ -130,7 +130,11 @@ export function createAlertsRouter(database: Pool): Router {
       const page = request.query.page === undefined ? 1 : positiveInteger(request.query.page, 'page');
       const pageSize = request.query.pageSize === undefined
         ? 25
-        : Math.min(100, positiveInteger(request.query.pageSize, 'pageSize'));
+        : positiveInteger(request.query.pageSize, 'pageSize');
+      const offset = (page - 1) * pageSize;
+      if (pageSize > 100 || !Number.isSafeInteger(offset)) {
+        throw new ApiError(400, 'INVALID_ARGUMENT', 'Invalid pagination');
+      }
       const clauses: string[] = [];
       const values: unknown[] = [];
       for (const [queryName, column, allowed] of [
@@ -143,27 +147,44 @@ export function createAlertsRouter(database: Pool): Router {
           if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) {
             throw new ApiError(400, 'INVALID_ARGUMENT', `Invalid ${queryName}`);
           }
-          clauses.push(`${column} = ?`);
+          clauses.push(`a.${column} = ?`);
           values.push(value);
         }
       }
       for (const [queryName, column] of [['flightId', 'flight_id'], ['missionId', 'mission_id']] as const) {
         if (request.query[queryName] !== undefined) {
-          clauses.push(`${column} = ?`);
+          clauses.push(`a.${column} = ?`);
           values.push(positiveInteger(request.query[queryName], queryName));
         }
       }
+      for (const [queryName, column] of [['droneCode', 'd.drone_code'], ['missionCode', 'm.mission_code']] as const) {
+        const value = request.query[queryName];
+        if (value !== undefined) {
+          if (typeof value !== 'string' || !/^[a-zA-Z0-9-]{1,30}$/.test(value)) {
+            throw new ApiError(400, 'INVALID_ARGUMENT', `Invalid ${queryName}`);
+          }
+          clauses.push(`${column} = ?`);
+          values.push(value);
+        }
+      }
       const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+      // A blocked preflight alert has a mission and no flight. Resolve its owner via the mission.
+      const joins = `FROM alerts a LEFT JOIN flights f ON f.id = a.flight_id
+        LEFT JOIN missions m ON m.id = COALESCE(a.mission_id, f.mission_id)
+        LEFT JOIN drone_components dc ON dc.id = a.component_id
+        LEFT JOIN drones d ON d.id = COALESCE(m.drone_id, f.drone_id, dc.drone_id)
+        LEFT JOIN component_catalog c ON c.id = dc.component_catalog_id`;
       const [countRows] = await database.query<RowDataPacket[]>(
-        `SELECT COUNT(*) AS total FROM alerts ${where}`,
-        values,
+        `SELECT COUNT(*) AS total ${joins} ${where}`, values,
       );
       const [rows] = await database.query<AlertRow[]>(
-        `SELECT id, alert_code, flight_id, mission_id, component_id, source, rule_code,
-         severity, type, message, metric_name, observed_value, threshold_value, unit,
-         status, detected_at, last_observed_at, resolved_at, resolution_note
-         FROM alerts ${where} ORDER BY detected_at DESC, id DESC LIMIT ? OFFSET ?`,
-        [...values, pageSize, (page - 1) * pageSize],
+        `SELECT a.*, d.drone_code, m.mission_code, c.component_code,
+         DATE_FORMAT(a.detected_at, '%Y-%m-%d %H:%i:%s.%f') AS detected_at,
+         DATE_FORMAT(a.last_observed_at, '%Y-%m-%d %H:%i:%s.%f') AS last_observed_at,
+         DATE_FORMAT(a.resolved_at, '%Y-%m-%d %H:%i:%s.%f') AS resolved_at
+         ${joins} ${where}
+         ORDER BY CASE a.severity WHEN 'CRITICAL' THEN 0 ELSE 1 END, a.detected_at DESC, a.alert_code
+         LIMIT ? OFFSET ?`, [...values, pageSize, offset],
       );
       response.json({ data: rows, page, pageSize, total: Number(countRows[0]?.total ?? 0) });
     } catch (error) {
