@@ -53,7 +53,7 @@ test('theme switch is visual only and light remains the default', async ({ page 
 });
 
 test('Fleet and Drone Detail retain their flow in both themes', async ({ page }, info) => {
-  await page.goto('/');
+  await page.goto('/?screen=drones');
   await expect(page.locator('.drone-card')).toHaveCount(5);
   if ((page.viewportSize()?.width ?? 0) >= 1280) {
     const rows = await page.locator('.drone-card').evaluateAll(cards => cards.map(card => card.getBoundingClientRect().top));
