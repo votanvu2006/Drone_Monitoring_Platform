@@ -1,3 +1,4 @@
+import snapshot from '../../../../data/frontend.snapshot.json';
 import { formatSeedTime, toUtcIso } from '../../data/format';
 
 export type AlertSeverity = 'WARNING' | 'CRITICAL';
@@ -14,31 +15,8 @@ export type AlertRecord = {
   resolutionNote: string | null;
 };
 
-// Frontend-only examples match the mission-002 / mission-005 Missions demo.
-// These are not canonical ALT-* records. All timestamps below are fixed UTC.
-export const alertSamples: readonly AlertRecord[] = [
-  {
-    alertCode: 'DEMO-ALT-001', title: 'Low battery',
-    droneCode: 'DRONE-002', missionCode: 'mission-002',
-    problemDescription: 'Battery level is below the recommended reserve.',
-    severity: 'WARNING', sourceGroup: 'Components', detectedAt: '2026-10-21 06:05:00.000',
-    resolutionNote: null,
-  },
-  {
-    alertCode: 'DEMO-ALT-002', title: 'Motor temperature warning',
-    droneCode: 'DRONE-002', missionCode: 'mission-002',
-    problemDescription: 'Motor temperature is above the normal operating range.',
-    severity: 'WARNING', sourceGroup: 'Components', detectedAt: '2026-10-21 06:08:00.000',
-    resolutionNote: 'Inspect the motor and allow it to cool before the next flight.',
-  },
-  {
-    alertCode: 'DEMO-ALT-003', title: 'Unsafe weather',
-    droneCode: 'DRONE-005', missionCode: 'mission-005',
-    problemDescription: 'Strong wind and poor visibility caused the mission to fail.',
-    severity: 'CRITICAL', sourceGroup: 'Weather', detectedAt: '2026-10-19 06:10:00.000',
-    resolutionNote: 'Mission stopped. Review weather conditions before scheduling a new attempt.',
-  },
-];
+// Canonical bundled data for static previews and snapshot verification.
+export const alertSamples = snapshot.alerts as AlertRecord[];
 
 export function buildAlertView(record: AlertRecord) {
   return {
