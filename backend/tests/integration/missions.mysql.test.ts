@@ -18,7 +18,7 @@ describe('Missions MySQL v2.1.0 integration', () => {
     await integrationDatabase.end();
   });
 
-  it('lists only the five current R4 missions with statuses and waypoint counts', async () => {
+  it('lists only the five current R5 missions with statuses and waypoint counts', async () => {
     const response = await request(app).get('/api/missions');
 
     expect(response.status).toBe(200);
@@ -29,7 +29,7 @@ describe('Missions MySQL v2.1.0 integration', () => {
       data: [
         { missionCode: 'mission-001', status: 'READY', waypointCount: 6 },
         { missionCode: 'mission-002', status: 'WARNING', waypointCount: 8 },
-        { missionCode: 'mission-003', status: 'IN_PROGRESS', waypointCount: 8 },
+        { missionCode: 'mission-003', status: 'READY', waypointCount: 8 },
         { missionCode: 'mission-004', status: 'COMPLETED', waypointCount: 5 },
         { missionCode: 'mission-005', status: 'FAILED', waypointCount: 10 },
       ],
@@ -62,7 +62,7 @@ describe('Missions MySQL v2.1.0 integration', () => {
     });
   });
 
-  it('filters current missions by drone and R4 status', async () => {
+  it('filters current missions by drone and R5 status', async () => {
     const response = await request(app)
       .get('/api/missions?droneId=2&status=WARNING');
 
@@ -77,13 +77,16 @@ describe('Missions MySQL v2.1.0 integration', () => {
       }],
     });
 
-    const inProgress = await request(app)
-      .get('/api/missions?status=IN_PROGRESS');
+    const ready = await request(app)
+      .get('/api/missions?status=READY');
 
-    expect(inProgress.status).toBe(200);
-    expect(inProgress.body).toMatchObject({
-      total: 1,
-      data: [{ missionCode: 'mission-003', status: 'IN_PROGRESS' }],
+    expect(ready.status).toBe(200);
+    expect(ready.body).toMatchObject({
+      total: 2,
+      data: [
+        { missionCode: 'mission-001', status: 'READY' },
+        { missionCode: 'mission-003', status: 'READY' },
+      ],
     });
   });
 
