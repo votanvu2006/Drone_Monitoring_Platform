@@ -18,7 +18,7 @@ describe('Fleet MySQL v2.1.0 integration', () => {
     await integrationDatabase.end();
   });
 
-  it('reads the five R4 drones with the actual active flight state', async () => {
+  it('reads the five R5 drones before power is switched on', async () => {
     const response = await request(app).get('/api/drones');
 
     expect(response.status).toBe(200);
@@ -33,9 +33,9 @@ describe('Fleet MySQL v2.1.0 integration', () => {
       { droneCode: 'DRONE-002', status: 'OFFLINE', batteryPercent: 100 },
       {
         droneCode: 'DRONE-003',
-        status: 'IN_FLIGHT',
+        status: 'OFFLINE',
         batteryPercent: 100,
-        activeMission: 'mission-003',
+        activeMission: null,
       },
       { droneCode: 'DRONE-004', status: 'OFFLINE', batteryPercent: 100 },
       { droneCode: 'DRONE-005', status: 'OFFLINE', batteryPercent: 100 },
@@ -49,19 +49,19 @@ describe('Fleet MySQL v2.1.0 integration', () => {
     expect(response.body.data[2].findings).toEqual([]);
   });
 
-  it('filters and paginates the four OFFLINE drones', async () => {
+  it('filters and paginates the five OFFLINE drones', async () => {
     const response = await request(app)
       .get('/api/drones?status=OFFLINE&page=2&pageSize=2');
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       data: [
+        { droneCode: 'DRONE-003', status: 'OFFLINE' },
         { droneCode: 'DRONE-004', status: 'OFFLINE' },
-        { droneCode: 'DRONE-005', status: 'OFFLINE' },
       ],
       page: 2,
       pageSize: 2,
-      total: 4,
+      total: 5,
     });
   });
 
@@ -94,14 +94,14 @@ describe('Fleet MySQL v2.1.0 integration', () => {
     );
   });
 
-  it('keeps DRONE-003 active without borrowing DRONE-002 findings', async () => {
+  it('keeps DRONE-003 offline without borrowing DRONE-002 findings', async () => {
     const response = await request(app).get('/api/drones/DRONE-003');
 
     expect(response.status).toBe(200);
     expect(response.body.data).toMatchObject({
       code: 'DRONE-003',
-      status: 'IN_FLIGHT',
-      isActivated: true,
+      status: 'OFFLINE',
+      isActivated: false,
       batteryPercent: 100,
       findings: [],
     });
