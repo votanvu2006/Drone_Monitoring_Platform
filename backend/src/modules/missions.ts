@@ -2,7 +2,16 @@ import { Router } from 'express';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { ApiError } from '../middleware/error-handler';
 
-type MissionStatus = 'DRAFT' | 'READY' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+type MissionStatus =
+  | 'DRAFT'
+  | 'READY'
+  | 'RUNNING'
+  | 'WARNING'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'CANCELLED';
+
 type ValidationStatus = 'NOT_CHECKED' | 'VALID' | 'INVALID';
 type WaypointType = 'START' | 'INTERMEDIATE' | 'DESTINATION';
 
@@ -17,6 +26,7 @@ interface MissionListRow extends RowDataPacket {
   validation_status: ValidationStatus;
   progress_percent: number | string;
   estimated_distance_m: number | string;
+  waypoint_count: number | string;
   created_at: string;
 }
 
@@ -67,6 +77,7 @@ interface MissionListItem {
   validationStatus: ValidationStatus;
   progressPercent: number;
   estimatedDistanceM: number;
+  waypointCount: number;
   createdAt: string;
 }
 
@@ -107,6 +118,8 @@ const MISSION_STATUSES: readonly MissionStatus[] = [
   'DRAFT',
   'READY',
   'RUNNING',
+  'WARNING',
+  'IN_PROGRESS',
   'COMPLETED',
   'FAILED',
   'CANCELLED',
@@ -139,6 +152,7 @@ function toMissionListItem(row: MissionListRow): MissionListItem {
     validationStatus: row.validation_status,
     progressPercent: Number(row.progress_percent),
     estimatedDistanceM: Number(row.estimated_distance_m),
+    waypointCount: Number(row.waypoint_count),
     createdAt: row.created_at,
   };
 }
@@ -196,6 +210,7 @@ export function createMissionsRouter(database: Pool): Router {
         [missionId],
       );
       const mission = missionRows[0];
+
       if (!mission) {
         throw new ApiError(404, 'MISSION_NOT_FOUND', 'Mission not found');
       }
@@ -217,10 +232,13 @@ export function createMissionsRouter(database: Pool): Router {
 
   router.get('/missions', async (request, response, next) => {
     try {
-      const page = request.query.page === undefined ? 1 : positiveInteger(request.query.page, 'page');
+      const page = request.query.page === undefined
+        ? 1
+        : positiveInteger(request.query.page, 'page');
       const pageSize = request.query.pageSize === undefined
         ? 25
         : positiveInteger(request.query.pageSize, 'pageSize');
+
       if (pageSize > 100) {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'pageSize must not exceed 100');
       }
@@ -230,8 +248,9 @@ export function createMissionsRouter(database: Pool): Router {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'page is too large');
       }
 
-      const clauses: string[] = [];
+      const clauses: string[] = ['m.is_current = 1'];
       const values: unknown[] = [];
+
       if (request.query.droneId !== undefined) {
         clauses.push('m.drone_id = ?');
         values.push(positiveInteger(request.query.droneId, 'droneId'));
@@ -242,11 +261,12 @@ export function createMissionsRouter(database: Pool): Router {
         if (typeof status !== 'string' || !MISSION_STATUSES.includes(status as MissionStatus)) {
           throw new ApiError(400, 'INVALID_ARGUMENT', 'Invalid status');
         }
+
         clauses.push('m.status = ?');
         values.push(status);
       }
 
-      const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+      const where = `WHERE ${clauses.join(' AND ')}`;
       const [countRows] = await database.query<CountRow[]>(
         `SELECT COUNT(*) AS total FROM missions m ${where}`,
         values,
@@ -256,11 +276,12 @@ export function createMissionsRouter(database: Pool): Router {
          d.id AS assigned_drone_id, d.drone_code AS assigned_drone_code,
          d.display_name AS assigned_drone_display_name, m.status, m.validation_status,
          m.progress_percent, m.estimated_distance_m,
+         (SELECT COUNT(*) FROM waypoints w WHERE w.mission_id = m.id) AS waypoint_count,
          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS created_at
          FROM missions m
          INNER JOIN drones d ON d.id = m.drone_id
          ${where}
-         ORDER BY m.created_at DESC, m.id DESC
+         ORDER BY m.id ASC
          LIMIT ? OFFSET ?`,
         [...values, pageSize, offset],
       );
