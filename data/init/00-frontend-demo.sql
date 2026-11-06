@@ -402,13 +402,13 @@ SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 START TRANSACTION;
 INSERT INTO `data_pack_metadata` (`id`,`pack_name`,`pack_version`,`data_revision`,`generated_at`,`build_id`,`schema_table_count`,`expected_telemetry_rows`,`notes`) VALUES
-(1,'Drone Monitoring Platform Frontend Demo','2.1.0',4,'2026-10-30 00:00:00','DRONE-DATA-2.1.0-R4-20261030',17,30,'Frontend-aligned v2.1.0 demonstration data, revision 4.');
+(1,'Drone Monitoring Platform Frontend Demo','2.1.0',5,'2026-11-06 00:00:00','DRONE-DATA-2.1.0-R5-20261106',17,26,'Frontend-aligned v2.1.0 demo data, revision 5: all drones start offline.');
 INSERT INTO `drone_models` (`id`,`model_code`,`manufacturer`,`model_name`,`description`,`image_url`,`max_flight_time_minutes`,`max_speed_mps`,`manufacturer_max_wind_mps`,`project_wind_limit_mps`,`battery_capacity_mah`,`battery_nominal_voltage_v`,`battery_max_voltage_v`,`reference_source_url`,`is_simulated_reference`,`created_at`,`updated_at`) VALUES
 (1,'AV-X1E','AeroVision (fictional)','AeroVision X1 Enterprise','Fictional enterprise camera quadcopter whose high-level envelope references published DJI Mavic 3 Enterprise specifications. It is not a DJI aircraft model.',NULL,45,15,12,10,5000,15.4,17.6,'https://enterprise.dji.com/mavic-3-enterprise/specs',1,'2026-07-01 08:55:00','2026-09-19 10:00:00');
 INSERT INTO `drones` (`id`,`drone_code`,`display_name`,`drone_model_id`,`serial_number`,`is_simulated`,`status`,`home_location_label`,`home_latitude`,`home_longitude`,`last_known_location_label`,`last_known_latitude`,`last_known_longitude`,`last_known_altitude_m`,`location_source`,`location_updated_at`,`last_seen_at`,`created_at`,`updated_at`,`battery_percent`) VALUES
 (1,'DRONE-001','Drone - 001',1,'AVX1E-2026-0001',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
 (2,'DRONE-002','Drone - 002',1,'AVX1E-2026-0002',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
-(3,'DRONE-003','Drone - 003',1,'AVX1E-2026-0003',1,'IN_FLIGHT','District 1 Operations Home Base',10.7769,106.7009,'WP-04 demo position',10.77858,106.70386,82,'FLIGHT_TELEMETRY','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
+(3,'DRONE-003','Drone - 003',1,'AVX1E-2026-0003',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
 (4,'DRONE-004','Drone - 004',1,'AVX1E-2026-0004',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100),
 (5,'DRONE-005','Drone - 005',1,'AVX1E-2026-0005',1,'OFFLINE','District 1 Operations Home Base',10.7769,106.7009,'Demo operating location',10.7769,106.7009,0,'MANUAL','2026-10-28 02:00:00','2026-10-28 02:00:00','2026-07-01 09:00:00','2026-10-28 02:00:00',100);
 INSERT INTO `component_catalog` (`id`,`component_code`,`component_type`,`name`,`position`,`model`,`primary_function`,`display_order`,`created_at`,`updated_at`) VALUES
@@ -501,8 +501,8 @@ INSERT INTO `simulation_scenarios` (`id`,`scenario_code`,`name`,`category`,`expe
 (1,'NORMAL','Normal flight','NORMAL','SUCCESS',NULL,NULL,'NONE','{}','All simulated health metrics remain within the project normal envelope.',1,'2026-07-02 09:00:00','2026-09-19 10:00:00');
 INSERT INTO `missions` (`id`,`mission_code`,`drone_id`,`name`,`description`,`status`,`validation_status`,`validation_message`,`planned_altitude_m`,`planned_speed_mps`,`estimated_distance_m`,`estimated_duration_sec`,`progress_percent`,`is_current`,`created_at`,`updated_at`,`preflight_blocked`) VALUES
 (1,'mission-001',1,'Mission 001','Frontend-aligned demonstration mission.','READY','VALID','Demo route',82,9.4,3620,1122,0,1,'2026-10-21 02:00:00','2026-10-28 02:00:00',0),
-(2,'mission-002',2,'Mission 002','Frontend-aligned demonstration mission.','WARNING','VALID','Component issue before takeoff',82,9.4,3620,1122,0,1,'2026-10-21 01:00:00','2026-10-28 02:00:00',1),
-(3,'mission-003',3,'Mission 003','Frontend-aligned demonstration mission.','IN_PROGRESS','VALID','Demo route',82,9.4,3620,1122,43,1,'2026-10-20 01:00:00','2026-10-28 02:00:00',0),
+(2,'mission-002',2,'Mission 002','Frontend-aligned demonstration mission.','WARNING','VALID','Component caution: require confirmation and safe preflight checks before flight',82,9.4,3620,1122,0,1,'2026-10-21 01:00:00','2026-10-28 02:00:00',0),
+(3,'mission-003',3,'Mission 003','Frontend-aligned demonstration mission.','READY','VALID','Demo route',82,9.4,3620,1122,0,1,'2026-10-20 01:00:00','2026-10-28 02:00:00',0),
 (4,'mission-004',4,'Mission 004','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,1,'2026-10-12 01:00:00','2026-10-28 02:00:00',0),
 (5,'mission-005',5,'Mission 005','Frontend-aligned demonstration mission.','FAILED','VALID','Unsafe weather blocked takeoff',82,9.4,3620,1122,0,1,'2026-10-19 01:00:00','2026-10-28 02:00:00',1),
 (10,'MISSION-010',4,'Mission 010','Frontend-aligned demonstration mission.','COMPLETED','VALID','Demo route',82,9.4,3620,1122,100,0,'2026-10-12 01:00:00','2026-10-28 02:00:00',0),
@@ -587,7 +587,7 @@ INSERT INTO `flights` (`id`,`flight_code`,`drone_id`,`mission_id`,`simulation_sc
 (11,'FLIGHT-011',3,11,1,NULL,'LANDED','SUCCESS','2026-10-13 09:10:00','2026-10-13 09:33:00',1380,4600,100,65,'DEMO','SAFE',NULL,NULL,'Completed Demo Route',7,100,'2026-10-13 09:10:00','2026-10-28 02:00:00'),
 (12,'FLIGHT-012',5,12,1,NULL,'ABORTED','FAILED','2026-10-14 01:55:00','2026-10-14 02:03:16',496,1450,100,82,'DEMO','SAFE',NULL,'Historical flight ended before route completion','Historical Demo Route',4,60,'2026-10-14 01:55:00','2026-10-28 02:00:00'),
 (14,'FLIGHT-014',1,14,1,NULL,'LANDED','SUCCESS','2026-10-16 02:15:00','2026-10-16 02:33:42',1122,3620,100,62,'DEMO','SAFE',NULL,NULL,'North Perimeter Survey',7,100,'2026-10-16 02:15:00','2026-10-28 02:00:00'),
-(15,'FLIGHT-015',3,3,1,NULL,'FLYING',NULL,'2026-10-28 01:55:00',NULL,300,1551.43,100,NULL,'DEMO','SAFE',NULL,NULL,'North Perimeter Survey',3,43,'2026-10-28 01:55:00','2026-10-28 02:00:00');
+(15,'FLIGHT-015',3,3,1,NULL,'READY',NULL,NULL,NULL,0,0,NULL,NULL,'DEMO','SAFE',NULL,NULL,'North Perimeter Survey',0,0,'2026-10-28 01:55:00','2026-10-28 02:00:00');
 INSERT INTO `telemetry` (`id`,`flight_id`,`sequence_number`,`recorded_at`,`received_at`,`latitude`,`longitude`,`position_source`,`position_is_valid`,`transmission_state`,`heartbeat_age_seconds`,`altitude_m`,`speed_mps`,`vertical_speed_mps`,`heading_deg`,`battery_percent`,`battery_voltage_v`,`battery_current_a`,`battery_temperature_c`,`motor_rpm_fl`,`motor_rpm_fr`,`motor_rpm_rl`,`motor_rpm_rr`,`motor_temperature_fl_c`,`motor_temperature_fr_c`,`motor_temperature_rl_c`,`motor_temperature_rr_c`,`vibration_g`,`flight_controller_temperature_c`,`gps_quality`,`gps_satellites`,`signal_percent`,`wind_speed_mps`,`wind_direction_deg`,`wind_source`) VALUES
 (1,14,1,'2026-10-16 02:15:00','2026-10-16 02:15:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,9.4,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (2,14,2,'2026-10-16 02:17:40','2026-10-16 02:17:40',10.77762,106.70194,'GNSS',1,'CONNECTED',0,82,9.4,0,110,95,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
@@ -610,10 +610,6 @@ INSERT INTO `telemetry` (`id`,`flight_id`,`sequence_number`,`recorded_at`,`recei
 (19,10,3,'2026-10-12 03:12:52','2026-10-12 03:12:52',10.77842,106.7043,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,85,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (20,10,4,'2026-10-12 03:16:49','2026-10-12 03:16:49',10.77918,106.706,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,78,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (21,10,5,'2026-10-12 03:20:45','2026-10-12 03:20:45',10.77994,106.7077,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,70,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(22,15,1,'2026-10-28 01:55:00','2026-10-28 01:55:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(23,15,2,'2026-10-28 01:56:40','2026-10-28 01:56:40',10.77762,106.70194,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(24,15,3,'2026-10-28 01:58:20','2026-10-28 01:58:20',10.7769,106.7029,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
-(25,15,4,'2026-10-28 02:00:00','2026-10-28 02:00:00',10.77858,106.70386,'GNSS',1,'CONNECTED',0,82,5.1714,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (26,12,1,'2026-10-14 01:55:00','2026-10-14 01:55:00',10.7769,106.7009,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,100,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (27,12,2,'2026-10-14 01:57:04','2026-10-14 01:57:04',10.77766,106.7026,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,96,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
 (28,12,3,'2026-10-14 01:59:08','2026-10-14 01:59:08',10.77842,106.7043,'GNSS',1,'CONNECTED',0,82,3.1746,0,110,91,16.8,4,35,5000,5000,5000,5000,45,45,45,45,0.3,42,'GOOD',16,100,4.2,110,'SIMULATED_WEATHER_PROFILE'),
@@ -638,7 +634,6 @@ INSERT INTO `flight_events` (`id`,`flight_id`,`event_code`,`occurred_at`,`title`
 (4,11,'FLIGHT-011-END','2026-10-13 09:33:00','Route completed','The drone completed the route.','INFO'),
 (5,10,'FLIGHT-010-START','2026-10-12 03:05:00','Flight started','The drone began the assigned route.','INFO'),
 (6,10,'FLIGHT-010-END','2026-10-12 03:20:45','Route completed','The drone completed the route.','INFO'),
-(7,15,'FLIGHT-015-START','2026-10-28 01:55:00','Flight started','The drone began the assigned route.','INFO'),
 (8,14,'event-003','2026-10-16 02:29:00','Route completed','The drone returned after completing the route.','INFO'),
 (9,12,'FLIGHT-012-START','2026-10-14 01:55:00','Flight started','The drone began the assigned route.','INFO'),
 (10,12,'FLIGHT-012-END','2026-10-14 02:03:16','Flight ended','The historical flight ended before completing its route.','ERROR');
@@ -710,32 +705,37 @@ END$$
 CREATE PROCEDURE verify_frontend_demo()
 SQL SECURITY INVOKER
 BEGIN
-  IF (SELECT build_id FROM data_pack_metadata WHERE id=1)<>'DRONE-DATA-2.1.0-R4-20261030' THEN
+  IF (SELECT build_id FROM data_pack_metadata WHERE id=1)<>'DRONE-DATA-2.1.0-R5-20261106' THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Wrong data pack';
   END IF;
   IF (SELECT COUNT(*) FROM drones)<>5 OR (SELECT COUNT(*) FROM drone_components)<>70
       OR (SELECT COUNT(*) FROM missions WHERE is_current=1)<>5 OR (SELECT COUNT(*) FROM missions)<>9
       OR (SELECT COUNT(*) FROM waypoints)<>66 OR (SELECT COUNT(*) FROM flights)<>5
-      OR (SELECT COUNT(*) FROM telemetry)<>30 OR (SELECT COUNT(*) FROM alerts)<>3
+      OR (SELECT COUNT(*) FROM telemetry)<>26 OR (SELECT COUNT(*) FROM alerts)<>3
       OR (SELECT COUNT(*) FROM component_findings)<>1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Frontend demo record counts do not match';
   END IF;
-  IF EXISTS(SELECT 1 FROM flights WHERE mission_id IN (2,5)) THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='A blocked preflight attempt must not have a flight';
+  IF EXISTS(SELECT 1 FROM flights WHERE mission_id=5) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='A failed preflight attempt must not have a flight';
   END IF;
   IF EXISTS(SELECT 1 FROM missions WHERE is_current=1 AND status<>CASE id
-      WHEN 1 THEN 'READY' WHEN 2 THEN 'WARNING' WHEN 3 THEN 'IN_PROGRESS'
+      WHEN 1 THEN 'READY' WHEN 2 THEN 'WARNING' WHEN 3 THEN 'READY'
       WHEN 4 THEN 'COMPLETED' WHEN 5 THEN 'FAILED' END) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Mission demonstration roles do not match';
   END IF;
   IF EXISTS(SELECT 1 FROM drones WHERE battery_percent<>100) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Current drone batteries must be 100 percent';
   END IF;
-  IF (SELECT COUNT(*) FROM flights WHERE status='FLYING' AND drone_id=3 AND mission_id=3 AND route_progress_percent=43)<>1
-     OR (SELECT COUNT(*) FROM drones WHERE status='IN_FLIGHT')<>1
-     OR (SELECT COUNT(*) FROM drones WHERE status='OFFLINE')<>4
-     OR (SELECT status FROM drones WHERE id=3)<>'IN_FLIGHT' THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Active flight and drone state do not agree';
+  IF (SELECT COUNT(*) FROM drones WHERE status='OFFLINE')<>5
+     OR (SELECT COUNT(*) FROM flights WHERE status IN ('FLYING','PAUSED','RETURNING'))<>0
+     OR (SELECT COUNT(*) FROM flights WHERE id=15 AND drone_id=3 AND mission_id=3
+       AND status='READY' AND started_at IS NULL AND ended_at IS NULL
+       AND duration_sec=0 AND distance_m=0 AND route_progress_percent=0)<>1
+     OR EXISTS(SELECT 1 FROM telemetry WHERE flight_id=15)
+     OR EXISTS(SELECT 1 FROM flight_events WHERE flight_id=15)
+     OR (SELECT preflight_blocked FROM missions WHERE id=2)<>0
+     OR (SELECT preflight_blocked FROM missions WHERE id=5)<>1 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Initial power and flight states do not agree';
   END IF;
   IF (SELECT COUNT(*) FROM flights WHERE ended_at IS NOT NULL)<>4
      OR EXISTS(SELECT 1 FROM flights WHERE ended_at IS NOT NULL AND
@@ -754,6 +754,6 @@ BEGIN
       AND wind_speed_10m_mps>10 AND visibility_m<2000)<>1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Weather incident measurements do not support the failure';
   END IF;
-  SELECT 'PASS' AS verification, 'DRONE-DATA-2.1.0-R4-20261030' AS build_id;
+  SELECT 'PASS' AS verification, 'DRONE-DATA-2.1.0-R5-20261106' AS build_id;
 END$$
 DELIMITER ;
