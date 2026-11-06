@@ -20,6 +20,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Check out base revision for existing backend integration data
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.event.before }}
+          path: ci-data-baseline
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
@@ -39,9 +45,16 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Start MySQL with the v2.0.0 data pack
-        id: mysql
+      - name: Start MySQL with the v2.1.0 data pack
+        id: frontend_mysql
         run: docker compose -f ../data/docker-compose.yml up --detach --wait --wait-timeout 120
+
+      - name: Verify the v2.1.0 data pack
+        run: docker compose -f ../data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysql --user="$MYSQL_USER" --database="$MYSQL_DATABASE" -e "CALL verify_frontend_demo();"'
+
+      - name: Start MySQL with base revision data for backend integration
+        id: mysql
+        run: docker compose -f ../ci-data-baseline/data/docker-compose.yml up --detach --wait --wait-timeout 120
 
       - name: Wait for the v2.0.0 data-pack import
         run: npm run wait:data-pack
@@ -52,8 +65,8 @@ jobs:
           DB_USER: drone_app
           DB_PASSWORD: drone_app_password
 
-      - name: Run data-pack verification queries
-        run: docker compose -f ../data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --user=root' < ../data/database/verify-import.sql
+      - name: Run base revision data-pack verification queries
+        run: docker compose -f ../ci-data-baseline/data/docker-compose.yml exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --user=root' < ../ci-data-baseline/data/database/verify-import.sql
 
       - name: MySQL integration tests
         run: npm run test:integration
@@ -68,5 +81,7 @@ jobs:
         run: npm run build
 
       - name: Show MySQL logs after backend failure
-        if: failure() && steps.mysql.outcome != 'skipped'
-        run: docker compose -f ../data/docker-compose.yml logs --no-color mysql || true
+        if: failure() && (steps.frontend_mysql.outcome != 'skipped' || steps.mysql.outcome != 'skipped')
+        run: |
+          docker compose -f ../data/docker-compose.yml logs --no-color mysql || true
+          docker compose -f ../ci-data-baseline/data/docker-compose.yml logs --no-color mysql || true

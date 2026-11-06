@@ -1,20 +1,19 @@
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS component_findings;
+DROP TABLE IF EXISTS flight_events;
+DROP TABLE IF EXISTS demo_runs;
 
 DROP TABLE IF EXISTS alerts;
 DROP TABLE IF EXISTS alert_rule_catalog;
 DROP TABLE IF EXISTS telemetry;
 DROP TABLE IF EXISTS flights;
 DROP TABLE IF EXISTS weather_checks;
-DROP TABLE IF EXISTS drone_weather_demo_assignments;
 DROP TABLE IF EXISTS weather_demo_profiles;
-DROP TABLE IF EXISTS weather_runtime_config;
 DROP TABLE IF EXISTS waypoints;
 DROP TABLE IF EXISTS missions;
-DROP TABLE IF EXISTS drone_scenario_pool;
 DROP TABLE IF EXISTS simulation_scenarios;
-DROP TABLE IF EXISTS flight_zones;
 DROP TABLE IF EXISTS drone_components;
 DROP TABLE IF EXISTS component_catalog;
 DROP TABLE IF EXISTS drones;
@@ -60,6 +59,7 @@ CREATE TABLE drone_models (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE drones (
+  battery_percent TINYINT UNSIGNED NOT NULL DEFAULT 100 CHECK (battery_percent BETWEEN 0 AND 100),
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   drone_code VARCHAR(30) NOT NULL UNIQUE,
   display_name VARCHAR(100) NOT NULL,
@@ -119,22 +119,6 @@ CREATE TABLE drone_components (
   INDEX idx_component_drone_health (drone_id, health_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE flight_zones (
-  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  zone_code VARCHAR(30) NOT NULL UNIQUE,
-  name VARCHAR(120) NOT NULL,
-  zone_type ENUM('ALLOWED','RESTRICTED') NOT NULL,
-  boundary_geojson JSON NOT NULL,
-  min_altitude_m DECIMAL(7,2) NULL,
-  max_altitude_m DECIMAL(7,2) NULL,
-  reason VARCHAR(500) NULL,
-  data_authority ENUM('DEMO_ONLY','OFFICIAL') NOT NULL DEFAULT 'DEMO_ONLY',
-  display_color CHAR(7) NOT NULL,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  CONSTRAINT chk_zone_altitude CHECK (min_altitude_m IS NULL OR max_altitude_m IS NULL OR min_altitude_m <= max_altitude_m)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE simulation_scenarios (
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -153,29 +137,17 @@ CREATE TABLE simulation_scenarios (
   CONSTRAINT chk_scenario_progress CHECK ((fault_start_progress IS NULL AND fault_end_progress IS NULL) OR (fault_start_progress BETWEEN 0 AND 100 AND fault_end_progress BETWEEN fault_start_progress AND 100))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE drone_scenario_pool (
-  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  drone_id BIGINT UNSIGNED NOT NULL,
-  simulation_scenario_id BIGINT UNSIGNED NOT NULL,
-  selection_weight TINYINT UNSIGNED NOT NULL,
-  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-  description VARCHAR(500) NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  CONSTRAINT fk_scenario_pool_drone FOREIGN KEY (drone_id) REFERENCES drones(id),
-  CONSTRAINT fk_scenario_pool_scenario FOREIGN KEY (simulation_scenario_id) REFERENCES simulation_scenarios(id),
-  CONSTRAINT uq_drone_scenario_pool UNIQUE (drone_id, simulation_scenario_id),
-  CONSTRAINT chk_scenario_weight CHECK (selection_weight BETWEEN 1 AND 100),
-  INDEX idx_scenario_pool_drone_enabled (drone_id, is_enabled)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE missions (
+  preflight_blocked BOOLEAN NOT NULL DEFAULT FALSE,
+  CONSTRAINT chk_blocked_mission CHECK (NOT preflight_blocked OR (status IN ('WARNING','FAILED') AND progress_percent=0)),
+  is_current BOOLEAN NOT NULL DEFAULT FALSE,
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   mission_code VARCHAR(30) NOT NULL UNIQUE,
   drone_id BIGINT UNSIGNED NOT NULL,
   name VARCHAR(150) NOT NULL,
   description TEXT NULL,
-  status ENUM('DRAFT','READY','RUNNING','COMPLETED','FAILED','CANCELLED') NOT NULL,
+  status ENUM('DRAFT','READY','RUNNING','WARNING','IN_PROGRESS','COMPLETED','FAILED','CANCELLED') NOT NULL,
   validation_status ENUM('NOT_CHECKED','VALID','INVALID') NOT NULL DEFAULT 'NOT_CHECKED',
   validation_message VARCHAR(500) NULL,
   planned_altitude_m DECIMAL(7,2) NOT NULL,
@@ -191,6 +163,8 @@ CREATE TABLE missions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE waypoints (
+  map_x DECIMAL(7,2) NULL,
+  map_y DECIMAL(7,2) NULL,
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   mission_id BIGINT UNSIGNED NOT NULL,
   sequence_number SMALLINT UNSIGNED NOT NULL,
@@ -205,26 +179,6 @@ CREATE TABLE waypoints (
   CONSTRAINT chk_waypoint_coordinates CHECK (latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE weather_runtime_config (
-  id TINYINT UNSIGNED PRIMARY KEY,
-  active_mode ENUM('LIVE','DEMO') NOT NULL DEFAULT 'DEMO',
-  live_provider ENUM('OPEN_METEO') NOT NULL DEFAULT 'OPEN_METEO',
-  demo_mode_status ENUM('AVAILABLE','COMING_SOON','DISABLED') NOT NULL DEFAULT 'AVAILABLE',
-  live_mode_status ENUM('AVAILABLE','COMING_SOON','DISABLED') NOT NULL DEFAULT 'COMING_SOON',
-  snapshot_ttl_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 10,
-  caution_requires_confirmation BOOLEAN NOT NULL DEFAULT TRUE,
-  unsafe_can_be_overridden BOOLEAN NOT NULL DEFAULT FALSE,
-  demo_banner_text VARCHAR(180) NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  CONSTRAINT chk_weather_runtime_singleton CHECK (id = 1),
-  CONSTRAINT chk_weather_runtime_ttl CHECK (snapshot_ttl_minutes BETWEEN 1 AND 60),
-  CONSTRAINT chk_active_weather_mode_available CHECK (
-    (active_mode = 'DEMO' AND demo_mode_status = 'AVAILABLE')
-    OR (active_mode = 'LIVE' AND live_mode_status = 'AVAILABLE')
-  ),
-  CONSTRAINT chk_unsafe_not_overridable CHECK (unsafe_can_be_overridden = FALSE)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE weather_demo_profiles (
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -249,16 +203,6 @@ CREATE TABLE weather_demo_profiles (
   CONSTRAINT chk_demo_weather_direction CHECK (wind_direction_10m_deg BETWEEN 0 AND 359)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE drone_weather_demo_assignments (
-  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  drone_id BIGINT UNSIGNED NOT NULL,
-  weather_demo_profile_id BIGINT UNSIGNED NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  CONSTRAINT fk_demo_weather_assignment_drone FOREIGN KEY (drone_id) REFERENCES drones(id),
-  CONSTRAINT fk_demo_weather_assignment_profile FOREIGN KEY (weather_demo_profile_id) REFERENCES weather_demo_profiles(id),
-  CONSTRAINT uq_demo_weather_assignment_drone UNIQUE (drone_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE weather_checks (
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -295,6 +239,9 @@ CREATE TABLE weather_checks (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE flights (
+  route_name VARCHAR(150) NOT NULL DEFAULT 'Demo route',
+  current_waypoint_index SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  route_progress_percent TINYINT UNSIGNED NOT NULL DEFAULT 0 CHECK (route_progress_percent BETWEEN 0 AND 100),
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   flight_code VARCHAR(30) NOT NULL UNIQUE,
   drone_id BIGINT UNSIGNED NOT NULL,
@@ -385,6 +332,8 @@ CREATE TABLE alert_rule_catalog (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE alerts (
+  title VARCHAR(150) NOT NULL DEFAULT 'Incident',
+  source_group ENUM('Components','Weather') NULL,
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   alert_code VARCHAR(30) NOT NULL UNIQUE,
   flight_id BIGINT UNSIGNED NULL,
@@ -417,3 +366,34 @@ CREATE TABLE alerts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+CREATE TABLE demo_runs (
+ id TINYINT UNSIGNED PRIMARY KEY CHECK (id=1), run_code VARCHAR(80) NOT NULL,
+ selected_fault VARCHAR(60) NOT NULL, component_id BIGINT UNSIGNED NOT NULL,
+ detected_at DATETIME(3) NOT NULL, updated_at DATETIME(3) NOT NULL,
+ FOREIGN KEY (component_id) REFERENCES drone_components(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE flight_events (
+ id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, flight_id BIGINT UNSIGNED NOT NULL,
+ event_code VARCHAR(80) UNIQUE NOT NULL, occurred_at DATETIME(3) NOT NULL,
+ title VARCHAR(150) NOT NULL, description VARCHAR(500) NOT NULL,
+ severity ENUM('INFO','WARNING','ERROR') NOT NULL,
+ FOREIGN KEY (flight_id) REFERENCES flights(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE component_findings (
+ id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, finding_code VARCHAR(80) UNIQUE NOT NULL,
+ drone_id BIGINT UNSIGNED NOT NULL, mission_id BIGINT UNSIGNED NOT NULL,
+ component_id BIGINT UNSIGNED NOT NULL, alert_id BIGINT UNSIGNED NOT NULL UNIQUE,
+ run_id TINYINT UNSIGNED NOT NULL, severity ENUM('WARNING','FAULT') NOT NULL,
+ detected_at DATETIME(3) NOT NULL,
+ FOREIGN KEY (drone_id) REFERENCES drones(id), FOREIGN KEY (mission_id) REFERENCES missions(id),
+ FOREIGN KEY (component_id) REFERENCES drone_components(id), FOREIGN KEY (alert_id) REFERENCES alerts(id),
+ FOREIGN KEY (run_id) REFERENCES demo_runs(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE missions ADD UNIQUE KEY uq_mission_drone (id,drone_id);
+ALTER TABLE drone_components ADD UNIQUE KEY uq_installed_drone (id,drone_id);
+ALTER TABLE flights ADD CONSTRAINT fk_flight_owner FOREIGN KEY (mission_id,drone_id) REFERENCES missions(id,drone_id);
+ALTER TABLE component_findings ADD CONSTRAINT fk_finding_mission_owner FOREIGN KEY (mission_id,drone_id) REFERENCES missions(id,drone_id);
+ALTER TABLE component_findings ADD CONSTRAINT fk_finding_component_owner FOREIGN KEY (component_id,drone_id) REFERENCES drone_components(id,drone_id);
