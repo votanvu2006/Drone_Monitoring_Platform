@@ -1,6 +1,6 @@
 # Drone Monitoring Platform — MySQL Data Pack v2.1.0
 
-**Build ID:** `DRONE-DATA-2.1.0-R4-20261030`
+**Build ID:** `DRONE-DATA-2.1.0-R5-20261106`
 
 This is the active MySQL demo data pack in the repository.
 
@@ -9,8 +9,8 @@ This is the active MySQL demo data pack in the repository.
 - 5 drones, 14 component definitions and 70 installed components.
 - 9 mission records: 5 current missions and 4 historical references.
 - 66 waypoints.
-- 5 flights: 1 active flight and 4 ended flights.
-- 30 sparse synthetic telemetry observations.
+- 5 flights: 1 ready flight for DRONE-003 and 4 ended historical flights.
+- 26 sparse synthetic telemetry observations from historical flights.
 - 3 alerts and 1 component finding.
 - MySQL schema, seed data, procedures, verification SQL, manifest and frontend snapshot.
 
@@ -61,3 +61,27 @@ node .\data\tools\check-snapshot.mjs
 ```
 
 `build-sql.mjs` generates `seed.sql` and `init/00-frontend-demo.sql`. The initialization SQL is intended for an empty MySQL volume.
+
+
+## R5 initial state and activation scenarios
+
+All five drones start OFFLINE with 100% battery. Fleet cards remain visible
+so each drone can be powered on. The mission, alert, live flight and flight
+history pages must only expose records for powered-on drones. Records are
+retained while a drone is off. This visibility rule belongs to the API/UI
+integration; the raw seed and generated snapshot retain the scenario records.
+
+| Drone | Status after Power ON | Current mission |
+| --- | --- | --- |
+| DRONE-001 | AVAILABLE | READY |
+| DRONE-002 | MAINTENANCE | WARNING |
+| DRONE-003 | IN_FLIGHT | IN_PROGRESS |
+| DRONE-004 | AVAILABLE | COMPLETED |
+| DRONE-005 | AVAILABLE | FAILED |
+
+DRONE-002 can fly from WARNING only after explicit confirmation and safe
+preflight checks; its drone status then becomes IN_FLIGHT. Mission-005 is
+blocked by dangerous weather and does not create a flight. Turning on
+DRONE-003 must transactionally start FLIGHT-015 and update mission-003.
+Power OFF is prohibited during flight. DRONE-004 and DRONE-005 are
+AVAILABLE after Power ON despite their finished/failed missions.
