@@ -51,6 +51,40 @@ export const openApiDocument = {
         },
       },
     },
+    '/drones/{droneCode}/power': {
+      patch: {
+        tags: ['Fleet'],
+        summary: 'Switch a demo drone power state',
+        description:
+          'R5 demo: powering on DRONE-002 enters maintenance; powering on DRONE-003 starts its ready mission and flight. An in-flight or maintenance drone cannot be switched off.',
+        parameters: [{
+          name: 'droneCode',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', pattern: '^[A-Za-z0-9_-]{1,30}$' },
+        }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['isOn'],
+                properties: {
+                  isOn: { type: 'boolean' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Persisted drone power and status' },
+          '400': { description: 'Invalid drone code or isOn value' },
+          '404': { description: 'Drone not found' },
+          '409': { description: 'Unsafe power transition or changed drone state' },
+        },
+      },
+    },
     '/missions': {
       get: {
         tags: ['Mission'],

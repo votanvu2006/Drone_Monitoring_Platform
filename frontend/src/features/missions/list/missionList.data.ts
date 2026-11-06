@@ -15,6 +15,11 @@ type ApiMission = {
   createdAt: string;
 };
 
+type ApiDrone = {
+  droneCode: string;
+  status: 'OFFLINE' | 'AVAILABLE' | 'MAINTENANCE' | 'IN_FLIGHT';
+};
+
 function toUtcDateTime(value: string): string {
   if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
     throw new Error('Invalid mission creation date from API');
@@ -25,15 +30,28 @@ function toUtcDateTime(value: string): string {
 
 export const missionListDataSource = {
   async loadMissions(): Promise<MissionListItem[]> {
-    const rows = await getAllApiPages<ApiMission>('/missions');
+    const [missions, drones] = await Promise.all([
+      getAllApiPages<ApiMission>('/missions'),
+      getAllApiPages<ApiDrone>('/drones'),
+    ]);
 
-    return rows.map((row) => ({
-      id: row.missionCode,
-      name: row.name,
-      droneCode: row.drone.droneCode,
-      status: row.status,
-      waypointCount: row.waypointCount,
-      createdAt: toUtcDateTime(row.createdAt),
-    }));
+    const poweredDroneCodes = new Set(
+      drones
+        .filter((drone) => drone.status !== 'OFFLINE')
+        .map((drone) => drone.droneCode),
+    );
+
+    return missions
+      .filter((mission) =>
+        poweredDroneCodes.has(mission.drone.droneCode),
+      )
+      .map((mission) => ({
+        id: mission.missionCode,
+        name: mission.name,
+        droneCode: mission.drone.droneCode,
+        status: mission.status,
+        waypointCount: mission.waypointCount,
+        createdAt: toUtcDateTime(mission.createdAt),
+      }));
   },
 };

@@ -13,6 +13,9 @@ type DroneInventorySectionProps = {
   onStatusChange: (value: FleetStatusFilter) => void;
   onModelChange: (value: string) => void;
   onViewDetails: (droneCode: string) => void;
+  onTogglePower: (droneCode: string, isOn: boolean) => Promise<void>;
+  updatingDroneCode: string | null;
+  powerError: { droneCode: string; message: string } | null;
 };
 
 function SearchIcon() {
@@ -34,6 +37,9 @@ export function DroneInventorySection({
   onStatusChange,
   onModelChange,
   onViewDetails,
+  onTogglePower,
+  updatingDroneCode,
+  powerError,
 }: DroneInventorySectionProps) {
   return (
     <section className="inventory-panel" aria-labelledby="inventory-title">
@@ -91,6 +97,14 @@ export function DroneInventorySection({
               key={drone.code}
               drone={drone}
               onViewDetails={onViewDetails}
+              onTogglePower={onTogglePower}
+              powerBusy={updatingDroneCode !== null}
+              isUpdating={updatingDroneCode === drone.code}
+              powerError={
+                powerError?.droneCode === drone.code
+                  ? powerError.message
+                  : undefined
+              }
             />
           ))}
         </div>
