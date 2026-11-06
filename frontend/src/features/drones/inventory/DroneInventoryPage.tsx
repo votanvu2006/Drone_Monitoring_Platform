@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ApiRequestError } from "../../../lib/api";
 import { fleetDataSource } from "./droneInventory.data";
 import type { FleetSnapshot } from "./droneInventory.types";
 import {
@@ -18,6 +19,11 @@ type FleetFilters = {
   searchText: string;
   status: FleetStatusFilter;
   modelName: string;
+};
+
+type PowerError = {
+  droneCode: string;
+  message: string;
 };
 
 function readFiltersFromUrl(): FleetFilters {
@@ -105,6 +111,11 @@ function DroneInventoryPage({ onViewDetails }: DroneInventoryPageProps) {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [requestNumber, setRequestNumber] = useState(0);
   const [filters, setFilters] = useState<FleetFilters>(readFiltersFromUrl);
+  const [updatingDroneCode, setUpdatingDroneCode] = useState<string | null>(
+    null,
+  );
+  const [powerError, setPowerError] = useState<PowerError | null>(null);
+  const powerRequestInFlight = useRef(false);
 
   useEffect(() => {
     let isActive = true;
@@ -177,6 +188,48 @@ function DroneInventoryPage({ onViewDetails }: DroneInventoryPageProps) {
     writeFiltersToUrl(updated, replaceHistory);
   }
 
+  async function togglePower(droneCode: string, isOn: boolean) {
+    if (powerRequestInFlight.current) return;
+
+    powerRequestInFlight.current = true;
+    setUpdatingDroneCode(droneCode);
+    setPowerError(null);
+
+    try {
+      const updated = await fleetDataSource.setPower(droneCode, isOn);
+
+      // Show the saved status immediately.
+      setSnapshot((current) =>
+        current
+          ? {
+              ...current,
+              drones: current.drones.map((drone) =>
+                drone.code === updated.droneCode
+                  ? { ...drone, status: updated.status }
+                  : drone,
+              ),
+            }
+          : current,
+      );
+
+      // Reload related values such as DRONE-003's active mission.
+      const latestSnapshot = await fleetDataSource.loadSnapshot();
+      setSnapshot(latestSnapshot);
+    } catch (error) {
+      console.error("Failed to update drone power:", error);
+
+      const message =
+        error instanceof ApiRequestError && error.status === 409
+          ? "Drone status changed. Refresh the fleet and try again."
+          : "Unable to update power. Try again.";
+
+      setPowerError({ droneCode, message });
+    } finally {
+      powerRequestInFlight.current = false;
+      setUpdatingDroneCode(null);
+    }
+  }
+
   function retry() {
     setSnapshot(null);
     setLoadState("loading");
@@ -238,6 +291,9 @@ function DroneInventoryPage({ onViewDetails }: DroneInventoryPageProps) {
               onStatusChange={(status) => updateFilters({ status })}
               onModelChange={(modelName) => updateFilters({ modelName })}
               onViewDetails={onViewDetails}
+              onTogglePower={togglePower}
+              updatingDroneCode={updatingDroneCode}
+              powerError={powerError}
             />
           </>
         )}

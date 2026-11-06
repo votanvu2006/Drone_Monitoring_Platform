@@ -1,5 +1,5 @@
-    import { render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import MissionListPage from './MissionListPage';
 import { missionListDataSource } from './missionList.data';
 
@@ -20,15 +20,31 @@ const mission = {
   createdAt: '2026-10-21 01:00:00',
 };
 
+beforeEach(() => {
+  window.history.replaceState({}, '', '/?screen=missions');
+});
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe('Missions API page', () => {
-  it('maps the server mission and displays its status and waypoint count', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      reply({ data: [mission], total: 1 }),
-    );
+  it('maps and displays the mission of a powered drone', async () => {
+    const fetchMock = vi.fn(async (input: string) => {
+      if (input === '/api/missions?page=1&pageSize=100') {
+        return reply({ data: [mission], total: 1 });
+      }
+
+      if (input === '/api/drones?page=1&pageSize=100') {
+        return reply({
+          data: [{ droneCode: 'DRONE-002', status: 'MAINTENANCE' }],
+          total: 1,
+        });
+      }
+
+      throw new Error(`Unexpected request: ${input}`);
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const mapped = await missionListDataSource.loadMissions();
@@ -41,14 +57,45 @@ describe('Missions API page', () => {
       waypointCount: 8,
       createdAt: '2026-10-21T01:00:00.000Z',
     }]);
-    expect(fetchMock.mock.calls[0]?.[0])
-      .toBe('/api/missions?page=1&pageSize=100');
 
     render(<MissionListPage />);
 
     expect(await screen.findByText('Mission 002')).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: 'DRONE-002' })).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: '8' })).toBeInTheDocument();
+  });
+
+  it('hides an offline drone mission until that drone is powered on', async () => {
+    let status: 'OFFLINE' | 'MAINTENANCE' = 'OFFLINE';
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string) => {
+        if (input === '/api/missions?page=1&pageSize=100') {
+          return reply({ data: [mission], total: 1 });
+        }
+
+        if (input === '/api/drones?page=1&pageSize=100') {
+          return reply({
+            data: [{ droneCode: 'DRONE-002', status }],
+            total: 1,
+          });
+        }
+
+        throw new Error(`Unexpected request: ${input}`);
+      }),
+    );
+
+    const firstView = render(<MissionListPage />);
+
+    expect(await screen.findByText('No missions found')).toBeInTheDocument();
+    expect(screen.queryByText('Mission 002')).not.toBeInTheDocument();
+
+    firstView.unmount();
+    status = 'MAINTENANCE';
+    render(<MissionListPage />);
+
+    expect(await screen.findByText('Mission 002')).toBeInTheDocument();
   });
 
   it('shows a server error without falling back to snapshot missions', async () => {
@@ -69,7 +116,17 @@ describe('Missions API page', () => {
   it('shows the empty state when the server returns no missions', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(reply({ data: [], total: 0 })),
+      vi.fn(async (input: string) => {
+        if (input === '/api/missions?page=1&pageSize=100') {
+          return reply({ data: [], total: 0 });
+        }
+
+        if (input === '/api/drones?page=1&pageSize=100') {
+          return reply({ data: [], total: 0 });
+        }
+
+        throw new Error(`Unexpected request: ${input}`);
+      }),
     );
 
     render(<MissionListPage />);
