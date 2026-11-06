@@ -3,11 +3,11 @@ export const openApiDocument = {
   info: {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
-    description: 'Backend APIs for fleet, mission planning, airspace, demo weather, flight simulation and alert lifecycle management.',
+    description: 'Backend APIs for fleet, missions, flight operations and alerts.',
   },
   servers: [{ url: '/api' }],
   tags: [
-    { name: 'Fleet' }, { name: 'Mission' }, { name: 'Flight Operations' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
+    { name: 'Fleet' }, { name: 'Mission' }, { name: 'Flight Operations' }, { name: 'Alerts' },
   ],
   paths: {
     '/drones': {
@@ -131,34 +131,6 @@ export const openApiDocument = {
         },
       },
     },
-    '/flight-zones': {
-      get: { tags: ['Airspace'], summary: 'List active flight zones as GeoJSON', responses: { '200': { description: 'GeoJSON FeatureCollection' } } },
-    },
-    '/missions/{id}/validate': {
-      post: {
-        tags: ['Airspace'], summary: 'Validate a persisted mission route',
-        parameters: [{ $ref: '#/components/parameters/Id' }],
-        responses: { '200': { description: 'Route validation result' }, '404': { $ref: '#/components/responses/NotFound' } },
-      },
-    },
-    '/weather/current': {
-      get: {
-        tags: ['Weather'], summary: 'Read the assigned simulated weather profile',
-        parameters: [
-          { name: 'lat', in: 'query', required: true, schema: { type: 'number', minimum: -90, maximum: 90 } },
-          { name: 'lng', in: 'query', required: true, schema: { type: 'number', minimum: -180, maximum: 180 } },
-          { name: 'droneId', in: 'query', required: true, schema: { type: 'integer', minimum: 1 } },
-        ],
-        responses: { '200': { description: 'Current DEMO weather' }, '409': { $ref: '#/components/responses/Conflict' } },
-      },
-    },
-    '/missions/{id}/weather-check': {
-      post: {
-        tags: ['Weather'], summary: 'Create fresh START/MID/DEST weather snapshots',
-        parameters: [{ $ref: '#/components/parameters/Id' }],
-        responses: { '200': { description: 'Route weather decision' }, '409': { $ref: '#/components/responses/Conflict' } },
-      },
-    },
     '/alerts': {
       get: {
         tags: ['Alerts'], summary: 'List and filter alerts',
@@ -180,15 +152,6 @@ export const openApiDocument = {
         requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ResolveAlert' } } } },
         responses: { '200': { description: 'Resolved alert' }, '409': { $ref: '#/components/responses/Conflict' } },
       },
-    },
-    '/flights/{id}/simulation/start': {
-      post: { tags: ['Simulation'], summary: 'Start a READY flight simulation', parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '202': { description: 'Simulation started' }, '409': { $ref: '#/components/responses/Conflict' } } },
-    },
-    '/flights/{id}/simulation/stop': {
-      post: { tags: ['Simulation'], summary: 'Stop an active flight simulation', parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { description: 'Simulation stopped' }, '409': { $ref: '#/components/responses/Conflict' } } },
-    },
-    '/flights/{id}/simulation/status': {
-      get: { tags: ['Simulation'], summary: 'Get flight and latest telemetry state', parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { description: 'Simulation state' }, '404': { $ref: '#/components/responses/NotFound' } } },
     },
   },
   components: {

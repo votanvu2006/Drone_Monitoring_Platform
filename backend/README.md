@@ -1,20 +1,28 @@
 # Backend API
 
-TypeScript/Express API for the Drone Monitoring Platform. The MySQL database and seed data are defined in `../data/`.
+TypeScript/Express API for the Drone Monitoring Platform. The active MySQL demo data pack is v2.1.0 in `../data/`.
+
+## Demo scope
+
+The enabled backend routes cover Fleet, Missions, Flight Operations, and Alerts. Airspace validation, weather checks, and the flight simulation endpoints are deferred; they are not registered as API routes or listed in OpenAPI.
+
+Interactive API documentation is available at `/api/docs`, and its JSON document is at `/api/openapi.json`. Unknown routes return `404` with:
+
+```json
+{ "error": { "code": "NOT_FOUND", "message": "Route not found" } }
+```
 
 ## Local setup
 
-Use Node.js 24 or later and Docker. From the repository root, start MySQL:
+Use Node.js 24 or later and Docker. From the repository root, start the v2.1.0 MySQL data pack:
 
 ```powershell
-cd data
-docker compose up -d
-cd ..
+docker compose -f .\data\docker-compose.yml up -d --wait --wait-timeout 180
 ```
 
-MySQL initializes from the data pack only when its Docker volume is empty. Do not delete a volume to restart the API.
+MySQL imports the seed only when Docker creates an empty volume. Restarting the container does not re-import it.
 
-In `backend/`, install dependencies and make a local configuration file:
+In `backend/`, install dependencies and create your local configuration:
 
 ```powershell
 cd backend
@@ -22,11 +30,22 @@ npm ci
 Copy-Item .env.example .env
 ```
 
-Edit `.env` and set `DB_PASSWORD` to the `MYSQL_PASSWORD` configured for the `data/` container. The data pack's sample configuration uses `drone_app` and `drone_monitoring`; if you changed them, update `DB_USER` and `DB_NAME` too. `.env` is ignored by Git.
+Edit `.env` to match the running data pack. In particular, set `DB_PORT` to the host port used by Docker (normally `3307`), `DB_NAME` to `drone_monitoring_frontend`, and `DB_PASSWORD` to the configured demo database password. The `.env` file is ignored by Git.
 
-Run `npm run dev`. Open `http://localhost:3000/api/health`; a running API returns `{ "status": "ok" }`. Interactive OpenAPI documentation is available at `http://localhost:3000/api/docs`, with its JSON document at `/api/openapi.json`. The server verifies its database connection before listening. If MySQL is unavailable or credentials are wrong, startup exits with a clear error.
+Check that the database matches the repository's `data/manifest.json`, then start the API:
 
-The backend provides airspace validation, fresh DEMO weather checks, a two-second flight simulation loop, and alert lifecycle APIs. Flight creation remains owned by Flight Operations: create a `READY` flight with a scenario selected through `selectScenarioForDrone`, then call `POST /api/flights/{id}/simulation/start`.
+```powershell
+npm run wait:data-pack
+npm run dev
+```
+
+Open `http://localhost:3000/api/health`. A running API returns:
+
+```json
+{ "status": "ok" }
+```
+
+The server checks its MySQL connection before listening. `/api/health` checks the API process; it is not a database health report.
 
 ## Checks
 
@@ -39,21 +58,13 @@ npm test
 npm run build
 ```
 
-`npm test` runs the unit tests and does not require MySQL. To run the MySQL-backed integration tests, first make sure the v2.0.0 data-pack database is available. From the repository root, start it with:
-
-```powershell
-docker compose -f data/docker-compose.yml up -d --wait
-```
-
-Then, from `backend/`, run:
+The unit tests do not require MySQL. To run the integration tests, first start the v2.1.0 data pack and ensure `.env` points to it. Then run:
 
 ```powershell
 npm run wait:data-pack
 npm run test:integration
 ```
 
-`wait:data-pack` waits for the v2.0.0 build ID and expected seed counts before the tests run. This matters with a fresh database volume: MySQL may respond before the data-pack initialization script has finished. The command does not modify seed data or reset/delete the MySQL volume. The integration tests then load database settings from `.env`, check the Fleet baseline, and read the seeded drone list through the API. If the readiness check times out, inspect the configured database before changing or resetting any local data.
+`wait:data-pack` checks the build ID and expected counts in `data/manifest.json`. It does not reset the database. If it times out, check the configured MySQL instance and Docker volume before changing data.
 
-`npm start` runs the compiled `dist/server.js` after building. Unknown routes return `404` with `{ "error": { "code": "NOT_FOUND", "message": "Route not found" } }`. Malformed JSON returns `400` with code `INVALID_JSON`. Unhandled failures return `500` with code `INTERNAL_ERROR`.
-
-`/api/health` checks whether the API process is responding. It is not a database health report; the database is checked during startup.
+`npm start` runs the compiled `dist/server.js` after `npm run build`. Malformed JSON returns `400` with code `INVALID_JSON`; unhandled failures return `500` with code `INTERNAL_ERROR`.
