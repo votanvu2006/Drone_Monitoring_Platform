@@ -1,3 +1,5 @@
+import { test as apiTest } from '@playwright/test';
+import demoSnapshot from '../../data/frontend.snapshot.json' with { type: 'json' };
 import { test, expect, checkLayout, capture } from './support';
 
 test('shell is readable, logout stays reachable and navigation remains static', async ({ page }, info) => {
@@ -63,7 +65,45 @@ test('theme switch supports the keyboard, persists after refresh and reaches sta
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 });
 
-test('Fleet and Drone Detail retain their flow in both themes', async ({ page }, info) => {
+apiTest('Fleet and Drone Detail retain their flow in both themes', async ({ page }, info) => {
+  await page.route('**/api/drones**', async (route) => {
+    const path = new URL(route.request().url()).pathname;
+
+    if (path === '/api/drones') {
+      const drones = demoSnapshot.fleet.drones.map((drone) => ({
+        droneCode: drone.code,
+        status: drone.status,
+        batteryPercent: 100,
+        model: { modelName: drone.modelName },
+        homeLocation: { label: drone.homeBase },
+        lastKnownLocation: { label: drone.lastKnownLocation },
+        activeMission: drone.activeMission,
+        findings: demoSnapshot.fleet.findings.filter(
+          (finding) => finding.droneCode === drone.code,
+        ),
+      }));
+
+      await route.fulfill({
+        json: { data: drones, page: 1, pageSize: 100, total: drones.length },
+      });
+      return;
+    }
+
+    const droneCode = decodeURIComponent(path.slice('/api/drones/'.length));
+    const detail = demoSnapshot.details.find(
+      (drone) => drone.code === droneCode,
+    );
+
+    await route.fulfill(
+      detail
+        ? { json: { data: { ...detail, batteryPercent: 100 } } }
+        : {
+            status: 404,
+            json: { error: { code: 'DRONE_NOT_FOUND', message: 'Drone not found' } },
+          },
+    );
+  });
+
   await page.goto('/');
   await expect(page.locator('.drone-card')).toHaveCount(5);
   if ((page.viewportSize()?.width ?? 0) >= 1280) {
