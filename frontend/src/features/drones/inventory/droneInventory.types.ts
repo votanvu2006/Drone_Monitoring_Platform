@@ -8,6 +8,7 @@ export type Drone = {
   code: string;
   modelName: string;
   status: DroneStatus;
+  batteryPercent: number;
   homeBase: string;
   lastKnownLocation: string | null;
   activeMission: string | null;

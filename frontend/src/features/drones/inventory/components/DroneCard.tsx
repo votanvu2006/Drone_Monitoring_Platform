@@ -2,8 +2,6 @@ import type { Drone, DroneStatus } from "../droneInventory.types";
 import { DroneIllustration } from "../../shared/DroneIllustration";
 import "../styles/drone-card.css";
 
-const BATTERY_PREVIEW_LEVEL = 100;
-
 type DroneCardProps = {
   drone: Drone;
   onViewDetails: (droneCode: string) => void;
@@ -30,41 +28,45 @@ function ArrowIcon() {
 }
 
 function BatteryMeter({ level }: { level: number }) {
+  const displayLevel = Math.max(0, Math.min(100, level));
+
   return (
     <div
       className="battery-meter"
       role="img"
-      aria-label={`Battery visual placeholder: ${level}%`}
+      aria-label={`Battery: ${displayLevel}%`}
     >
       <div className="battery-body">
-        <span className="battery-fill" style={{ width: `${level}%` }} />
+        <span
+          className="battery-fill"
+          style={{ width: `${displayLevel}%` }}
+        />
       </div>
       <span className="battery-cap" />
     </div>
   );
 }
 
-function PowerSwitch({ droneCode }: { droneCode: string }) {
+function PowerSwitch({ drone }: { drone: Drone }) {
+  const isOn = drone.status === "IN_FLIGHT";
+
   return (
     <button
       className="power-switch"
       type="button"
       disabled
-      aria-label={`${droneCode} power is off`}
-      aria-pressed={false}
+      aria-label={`${drone.code} power is ${isOn ? "on" : "off"}`}
+      aria-pressed={isOn}
     >
       <span className="switch-track">
         <span className="switch-knob" />
       </span>
-      <span className="switch-label">OFF</span>
+      <span className="switch-label">{isOn ? "ON" : "OFF"}</span>
     </button>
   );
 }
 
-export function DroneCard({
-  drone,
-  onViewDetails,
-}: DroneCardProps) {
+export function DroneCard({ drone, onViewDetails }: DroneCardProps) {
   return (
     <article className="drone-card">
       <div className="drone-art">
@@ -87,7 +89,9 @@ export function DroneCard({
       <div className="drone-meta">
         <div>
           <span>Location</span>
-          <strong>{drone.lastKnownLocation ?? "No location reported"}</strong>
+          <strong>
+            {drone.lastKnownLocation ?? "No location reported"}
+          </strong>
         </div>
         <div>
           <span>Active mission</span>
@@ -98,13 +102,13 @@ export function DroneCard({
       <div className="battery-block">
         <div className="battery-label-row">
           <span>Battery</span>
-          <strong>{BATTERY_PREVIEW_LEVEL}%</strong>
+          <strong>{drone.batteryPercent}%</strong>
         </div>
-        <BatteryMeter level={BATTERY_PREVIEW_LEVEL} />
+        <BatteryMeter level={drone.batteryPercent} />
       </div>
 
       <div className="drone-card-actions">
-        <PowerSwitch droneCode={drone.code} />
+        <PowerSwitch drone={drone} />
 
         <button
           className="details-button"
