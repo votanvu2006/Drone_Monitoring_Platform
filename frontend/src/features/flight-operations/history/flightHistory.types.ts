@@ -24,10 +24,10 @@ export type FlightHistoryWaypoint = {
 };
 
 export type FlightTelemetrySummary = {
-  startBatteryPercent: number;
-  endBatteryPercent: number;
-  maxAltitudeMeters: number;
-  averageSpeedMps: number;
+  startBatteryPercent: number | null;
+  endBatteryPercent: number | null;
+  maxAltitudeMeters: number | null;
+  averageSpeedMps: number | null;
   distanceMeters: number;
 };
 

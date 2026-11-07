@@ -1,5 +1,6 @@
 import MissionListPage from '../features/missions/list/MissionListPage';
-import { AlertsPage } from '../features/alerts/AlertsPage';
+import { ConnectedAlertsPage } from '../features/alerts/ConnectedAlertsPage';
+import FlightHistoryDetailPage from '../features/flight-operations/history/detail/FlightHistoryDetailPage';
 import { AppShell } from "../components/AppShell";
 import type { ModulePage } from "./module-pages";
 
@@ -23,8 +24,10 @@ export function ModulePageView({
         `/alerts?drone=${encodeURIComponent(mission.droneCode)}&mission=${encodeURIComponent(mission.id)}`,
       ) : undefined} />
     : page.id === 'alerts'
-      ? <AlertsPage droneCode={params.get('drone') ?? undefined} missionCode={params.get('mission') ?? undefined} />
-      : <PageComponent />;
+      ? <ConnectedAlertsPage droneCode={params.get('drone') ?? undefined} missionCode={params.get('mission') ?? undefined} />
+      : page.id === 'flight-history' && params.has('flight')
+        ? <FlightHistoryDetailPage key={params.get('flight')} flightCode={params.get('flight')!} />
+        : <PageComponent />;
 
   return (
     <AppShell

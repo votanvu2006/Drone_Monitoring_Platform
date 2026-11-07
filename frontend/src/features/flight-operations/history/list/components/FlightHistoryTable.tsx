@@ -57,7 +57,7 @@ export function FlightHistoryTable({
           {records.map((record) => (
             <tr key={record.flightCode}>
               <td className="flight-history-code">
-                {record.flightCode}
+                <a href={`/flight-history?flight=${encodeURIComponent(record.flightCode)}`}>{record.flightCode}</a>
               </td>
               <td>{formatFlightDateTime(record.startedAt)}</td>
               <td>{formatFlightDuration(record.durationSeconds)}</td>

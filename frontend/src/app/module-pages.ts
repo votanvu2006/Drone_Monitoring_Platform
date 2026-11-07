@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { AlertsPage } from "../features/alerts/AlertsPage";
+import { ConnectedAlertsPage } from "../features/alerts/ConnectedAlertsPage";
 import DroneFleetView from "../features/drones/DroneFleetView";
 import FlightHistoryListPage from "../features/flight-operations/history/list/FlightHistoryListPage";
 import LiveFlightPage from "../features/flight-operations/live/LiveFlightPage";
@@ -46,7 +46,7 @@ export const modulePages = [
   {
     id: "alerts",
     label: "Alerts",
-    component: AlertsPage,
+    component: ConnectedAlertsPage,
     contentHasMain: false,
   },
 ] as const satisfies readonly ModulePageDefinition[];
