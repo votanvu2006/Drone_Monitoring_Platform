@@ -1,10 +1,26 @@
-import snapshot from '../../../../../data/frontend.snapshot.json';
+import { toUtcIso } from '../../../data/format';
+import { getAllApiPages } from '../../../lib/api';
 import type { MissionListItem } from './missionList.types';
 
-const currentMissions = snapshot.missions as MissionListItem[];
+type MissionResponse = {
+  missionCode: string;
+  name: string;
+  drone: { droneCode: string };
+  status: MissionListItem['status'];
+  waypointCount: number;
+  createdAt: string;
+};
 
 export const missionListDataSource = {
   async loadMissions(): Promise<MissionListItem[]> {
-    return currentMissions.map((mission) => ({ ...mission }));
+    const rows = await getAllApiPages<MissionResponse>('/missions?isCurrent=true');
+    return rows.map(row => ({
+      id: row.missionCode,
+      name: row.name,
+      droneCode: row.drone.droneCode,
+      status: row.status,
+      waypointCount: row.waypointCount,
+      createdAt: toUtcIso(row.createdAt),
+    }));
   },
 };

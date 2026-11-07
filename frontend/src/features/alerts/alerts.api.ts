@@ -7,8 +7,12 @@ type AlertResponse = {
   detected_at: string; resolution_note: string | null;
 };
 
-export async function loadAlerts(): Promise<AlertViewModel[]> {
-  const rows = await getAllApiPages<AlertResponse>('/alerts');
+export async function loadAlerts(droneCode?: string, missionCode?: string): Promise<AlertViewModel[]> {
+  const params = new URLSearchParams();
+  if (droneCode) params.set('droneCode', droneCode);
+  if (missionCode) params.set('missionCode', missionCode);
+  const query = params.toString();
+  const rows = await getAllApiPages<AlertResponse>('/alerts' + (query ? '?' + query : ''));
   return rows.map(row => buildAlertView({
     alertCode: row.alert_code, title: row.title, droneCode: row.drone_code,
     missionCode: row.mission_code, problemDescription: row.message,

@@ -12,6 +12,7 @@ function missionRow(overrides: Record<string, unknown> = {}) {
   return {
     id: '7',
     mission_code: 'MSN-007',
+    waypoint_count: '8',
     name: 'Riverside Survey',
     assigned_drone_id: '2',
     assigned_drone_code: 'DRONE-002',
@@ -77,7 +78,7 @@ describe('Missions list API', () => {
     expect(openApiDocument.components.schemas.MissionListItem).toMatchObject({
       type: 'object',
       properties: {
-        status: { enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+        status: { enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
         validationStatus: { enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
       },
     });
@@ -96,6 +97,7 @@ describe('Missions list API', () => {
       data: [{
         id: 7,
         missionCode: 'MSN-007',
+        waypointCount: 8,
         name: 'Riverside Survey',
         drone: { id: 2, droneCode: 'DRONE-002', displayName: 'Drone - 002' },
         status: 'READY',
@@ -126,9 +128,27 @@ describe('Missions list API', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ data: [], page: 2, pageSize: 2, total: 3 });
-    expect(query.mock.calls[0]?.[0]).toContain('WHERE m.drone_id = ? AND m.status = ?');
+    expect(query.mock.calls[0]?.[0]).toContain("WHERE d.status <> 'OFFLINE' AND m.drone_id = ? AND m.status = ?");
     expect(query.mock.calls[0]?.[1]).toEqual([2, 'READY']);
     expect(query.mock.calls[1]?.[1]).toEqual([2, 'READY', 2, 2]);
+  });
+
+  it.each(['true', 'false'])('applies isCurrent=%s and visibility to both queries', async isCurrent => {
+    const query = vi.fn().mockResolvedValueOnce([[{ total: 0 }], []]).mockResolvedValueOnce([[], []]);
+    const response = await request(createTestApp(query)).get('/api/missions?isCurrent=' + isCurrent);
+    expect(response.status).toBe(200);
+    for (const [sql, params] of query.mock.calls) {
+      expect(sql).toContain("d.status <> 'OFFLINE'");
+      expect(sql).toContain('m.is_current = ?');
+      expect(params[0]).toBe(isCurrent === 'true' ? 1 : 0);
+    }
+  });
+
+  it.each(['WARNING', 'IN_PROGRESS'])('accepts the R5 mission status %s', async status => {
+    const query = vi.fn().mockResolvedValueOnce([[{ total: 1 }], []]).mockResolvedValueOnce([[missionRow({ status })], []]);
+    const response = await request(createTestApp(query)).get('/api/missions?status=' + status);
+    expect(response.status).toBe(200);
+    expect(response.body.data[0]).toMatchObject({ status, waypointCount: 8 });
   });
 
   it('returns an empty page and zero total when no missions match', async () => {
@@ -144,6 +164,8 @@ describe('Missions list API', () => {
   });
 
   it.each([
+    '/api/missions?isCurrent=1',
+    '/api/missions?isCurrent=true&isCurrent=false',
     '/api/missions?page=0',
     '/api/missions?page=1.5',
     '/api/missions?page=9007199254740991',

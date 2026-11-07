@@ -135,7 +135,7 @@ export function createAlertsRouter(database: Pool): Router {
       if (pageSize > 100 || !Number.isSafeInteger(offset)) {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'Invalid pagination');
       }
-      const clauses: string[] = [];
+      const clauses: string[] = ["d.status <> 'OFFLINE'"];
       const values: unknown[] = [];
       for (const [queryName, column, allowed] of [
         ['status', 'status', ['ACTIVE', 'RESOLVED']],

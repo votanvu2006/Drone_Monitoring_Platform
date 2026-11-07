@@ -3,7 +3,7 @@ export const openApiDocument = {
   info: {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
-    description: 'Backend APIs for fleet, mission planning, airspace, demo weather, flight simulation and alert lifecycle management.',
+    description: 'Flight, mission and alert reads use data v2.1.0 R5 and expose only powered-on drones. Initial OFFLINE drones have no visible records; stored scenarios and history are retained. Legacy Airspace, Weather and Simulation migrations are separate.',
   },
   servers: [{ url: '/api' }],
   tags: [
@@ -28,12 +28,13 @@ export const openApiDocument = {
     '/missions': {
       get: {
         tags: ['Mission'],
-        summary: 'List missions with pagination and optional drone and status filters',
+        summary: 'List missions for powered-on drones with pagination and optional filters',
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
+          { name: 'isCurrent', in: 'query', schema: { type: 'boolean' } },
           { name: 'droneId', in: 'query', schema: { type: 'integer', minimum: 1 } },
-          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] } },
         ],
         responses: {
           '200': { description: 'Paginated mission list', content: { 'application/json': { schema: { $ref: '#/components/schemas/MissionListResponse' } } } },
@@ -55,7 +56,7 @@ export const openApiDocument = {
     },
     '/flights/active': {
       get: {
-        tags: ['Flight Operations'], summary: 'Read active v2.1.0 flights with their mission waypoints and progress',
+        tags: ['Flight Operations'], summary: 'Read active flights for powered-on drones; READY flights are excluded',
         responses: { '200': { description: 'Active flights', content: { 'application/json': { schema: {
           type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/ActiveFlight' } } },
         } } } } },
@@ -63,7 +64,7 @@ export const openApiDocument = {
     },
     '/flights/history': {
       get: {
-        tags: ['Flight Operations'], summary: 'Read ended flights; blocked preflight attempts have no history record',
+        tags: ['Flight Operations'], summary: 'Read ended flights for powered-on drones; blocked preflight attempts have no history record',
         responses: { '200': { description: 'Flight history', content: { 'application/json': { schema: {
           type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/FlightHistoryRecord' } } },
         } } } } },
@@ -77,14 +78,14 @@ export const openApiDocument = {
           '200': { description: 'Flight details', content: { 'application/json': { schema: { type: 'object', properties: {
             data: { $ref: '#/components/schemas/FlightHistoryDetail' },
           } } } } },
-          '400': { description: 'Invalid flight code' }, '404': { description: 'Historical flight not found' },
+          '400': { description: 'Invalid flight code' }, '404': { description: 'Historical flight not found or its drone is OFFLINE' },
         },
       },
     },
     '/flights': {
       get: {
         tags: ['Flight Operations'],
-        summary: 'List flight attempts with pagination and optional filters',
+        summary: 'List flight attempts for powered-on drones with pagination and optional filters',
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
@@ -129,7 +130,7 @@ export const openApiDocument = {
     },
     '/alerts': {
       get: {
-        tags: ['Alerts'], summary: 'List and filter alerts',
+        tags: ['Alerts'], summary: 'List and filter alerts for powered-on drones',
         parameters: [
           { name: 'droneCode', in: 'query', schema: { type: 'string' } },
           { name: 'missionCode', in: 'query', schema: { type: 'string' } },
@@ -293,7 +294,7 @@ export const openApiDocument = {
               displayName: { type: 'string' },
             },
           },
-          status: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+          status: { type: 'string', enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
           validationStatus: { type: 'string', enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
           validationMessage: { type: 'string', nullable: true },
           plannedAltitudeM: { type: 'number' },
@@ -313,7 +314,7 @@ export const openApiDocument = {
       },
       MissionListItem: {
         type: 'object',
-        required: ['id', 'missionCode', 'name', 'drone', 'status', 'validationStatus', 'progressPercent', 'estimatedDistanceM', 'createdAt'],
+        required: ['id', 'missionCode', 'name', 'drone', 'status', 'validationStatus', 'progressPercent', 'estimatedDistanceM', 'waypointCount', 'createdAt'],
         properties: {
           id: { type: 'integer', format: 'int64' },
           missionCode: { type: 'string' },
@@ -327,10 +328,11 @@ export const openApiDocument = {
               displayName: { type: 'string' },
             },
           },
-          status: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+          status: { type: 'string', enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
           validationStatus: { type: 'string', enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
           progressPercent: { type: 'integer', minimum: 0, maximum: 100 },
           estimatedDistanceM: { type: 'number', minimum: 0 },
+          waypointCount: { type: 'integer', minimum: 0 },
           createdAt: { type: 'string', description: 'Stored database DATETIME in YYYY-MM-DD HH:mm:ss format.' },
         },
       },

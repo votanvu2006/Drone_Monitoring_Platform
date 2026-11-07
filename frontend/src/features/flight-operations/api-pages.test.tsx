@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import snapshot from '../../../../data/frontend.snapshot.json';
-import { apiAlertRows } from '../../test/api-fixtures';
+import { activatedFlight, apiAlertRows } from '../../test/api-fixtures';
 import LiveFlightPage from './live/LiveFlightPage';
 import FlightHistoryListPage from './history/list/FlightHistoryListPage';
 import FlightHistoryDetailPage from './history/detail/FlightHistoryDetailPage';
@@ -38,7 +38,7 @@ describe('runtime pages read backend data', () => {
   });
 
   it('renders server route and progress instead of the bundled live flight', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(response([{ ...snapshot.activeFlights[0], routeName: 'API route', routeProgressPercent: 61 }]));
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(response([{ ...activatedFlight, routeName: 'API route', routeProgressPercent: 61 }]));
     render(<LiveFlightPage />);
     expect(await screen.findByRole('heading', { name: 'API route' })).toBeVisible();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '61');

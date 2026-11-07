@@ -62,32 +62,37 @@ END$$
 CREATE PROCEDURE verify_frontend_demo()
 SQL SECURITY INVOKER
 BEGIN
-  IF (SELECT build_id FROM data_pack_metadata WHERE id=1)<>'DRONE-DATA-2.1.0-R4-20261030' THEN
+  IF (SELECT build_id FROM data_pack_metadata WHERE id=1)<>'DRONE-DATA-2.1.0-R5-20261106' THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Wrong data pack';
   END IF;
   IF (SELECT COUNT(*) FROM drones)<>5 OR (SELECT COUNT(*) FROM drone_components)<>70
       OR (SELECT COUNT(*) FROM missions WHERE is_current=1)<>5 OR (SELECT COUNT(*) FROM missions)<>9
       OR (SELECT COUNT(*) FROM waypoints)<>66 OR (SELECT COUNT(*) FROM flights)<>5
-      OR (SELECT COUNT(*) FROM telemetry)<>30 OR (SELECT COUNT(*) FROM alerts)<>3
+      OR (SELECT COUNT(*) FROM telemetry)<>26 OR (SELECT COUNT(*) FROM alerts)<>3
       OR (SELECT COUNT(*) FROM component_findings)<>1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Frontend demo record counts do not match';
   END IF;
-  IF EXISTS(SELECT 1 FROM flights WHERE mission_id IN (2,5)) THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='A blocked preflight attempt must not have a flight';
+  IF EXISTS(SELECT 1 FROM flights WHERE mission_id=5) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='A failed preflight attempt must not have a flight';
   END IF;
   IF EXISTS(SELECT 1 FROM missions WHERE is_current=1 AND status<>CASE id
-      WHEN 1 THEN 'READY' WHEN 2 THEN 'WARNING' WHEN 3 THEN 'IN_PROGRESS'
+      WHEN 1 THEN 'READY' WHEN 2 THEN 'WARNING' WHEN 3 THEN 'READY'
       WHEN 4 THEN 'COMPLETED' WHEN 5 THEN 'FAILED' END) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Mission demonstration roles do not match';
   END IF;
   IF EXISTS(SELECT 1 FROM drones WHERE battery_percent<>100) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Current drone batteries must be 100 percent';
   END IF;
-  IF (SELECT COUNT(*) FROM flights WHERE status='FLYING' AND drone_id=3 AND mission_id=3 AND route_progress_percent=43)<>1
-     OR (SELECT COUNT(*) FROM drones WHERE status='IN_FLIGHT')<>1
-     OR (SELECT COUNT(*) FROM drones WHERE status='OFFLINE')<>4
-     OR (SELECT status FROM drones WHERE id=3)<>'IN_FLIGHT' THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Active flight and drone state do not agree';
+  IF (SELECT COUNT(*) FROM drones WHERE status='OFFLINE')<>5
+     OR (SELECT COUNT(*) FROM flights WHERE status IN ('FLYING','PAUSED','RETURNING'))<>0
+     OR (SELECT COUNT(*) FROM flights WHERE id=15 AND drone_id=3 AND mission_id=3
+       AND status='READY' AND started_at IS NULL AND ended_at IS NULL
+       AND duration_sec=0 AND distance_m=0 AND route_progress_percent=0)<>1
+     OR EXISTS(SELECT 1 FROM telemetry WHERE flight_id=15)
+     OR EXISTS(SELECT 1 FROM flight_events WHERE flight_id=15)
+     OR (SELECT preflight_blocked FROM missions WHERE id=2)<>0
+     OR (SELECT preflight_blocked FROM missions WHERE id=5)<>1 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Initial power and flight states do not agree';
   END IF;
   IF (SELECT COUNT(*) FROM flights WHERE ended_at IS NOT NULL)<>4
      OR EXISTS(SELECT 1 FROM flights WHERE ended_at IS NOT NULL AND
@@ -106,6 +111,6 @@ BEGIN
       AND wind_speed_10m_mps>10 AND visibility_m<2000)<>1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Weather incident measurements do not support the failure';
   END IF;
-  SELECT 'PASS' AS verification, 'DRONE-DATA-2.1.0-R4-20261030' AS build_id;
+  SELECT 'PASS' AS verification, 'DRONE-DATA-2.1.0-R5-20261106' AS build_id;
 END$$
 DELIMITER ;

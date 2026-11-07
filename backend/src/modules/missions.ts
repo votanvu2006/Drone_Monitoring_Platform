@@ -2,11 +2,12 @@ import { Router } from 'express';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { ApiError } from '../middleware/error-handler';
 
-type MissionStatus = 'DRAFT' | 'READY' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+type MissionStatus = 'DRAFT' | 'READY' | 'WARNING' | 'IN_PROGRESS' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 type ValidationStatus = 'NOT_CHECKED' | 'VALID' | 'INVALID';
 type WaypointType = 'START' | 'INTERMEDIATE' | 'DESTINATION';
 
 interface MissionListRow extends RowDataPacket {
+  waypoint_count: number | string;
   id: number | string;
   mission_code: string;
   name: string;
@@ -55,6 +56,7 @@ interface WaypointRow extends RowDataPacket {
 }
 
 interface MissionListItem {
+  waypointCount: number;
   id: number;
   missionCode: string;
   name: string;
@@ -106,6 +108,8 @@ interface MissionDetail {
 const MISSION_STATUSES: readonly MissionStatus[] = [
   'DRAFT',
   'READY',
+  'WARNING',
+  'IN_PROGRESS',
   'RUNNING',
   'COMPLETED',
   'FAILED',
@@ -127,6 +131,7 @@ function positiveInteger(value: unknown, name: string): number {
 
 function toMissionListItem(row: MissionListRow): MissionListItem {
   return {
+    waypointCount: Number(row.waypoint_count),
     id: Number(row.id),
     missionCode: row.mission_code,
     name: row.name,
@@ -192,7 +197,7 @@ export function createMissionsRouter(database: Pool): Router {
          DATE_FORMAT(m.updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
          FROM missions m
          INNER JOIN drones d ON d.id = m.drone_id
-         WHERE m.id = ?`,
+         WHERE m.id = ? AND d.status <> 'OFFLINE'`,
         [missionId],
       );
       const mission = missionRows[0];
@@ -230,11 +235,19 @@ export function createMissionsRouter(database: Pool): Router {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'page is too large');
       }
 
-      const clauses: string[] = [];
+      const clauses: string[] = ["d.status <> 'OFFLINE'"];
       const values: unknown[] = [];
       if (request.query.droneId !== undefined) {
         clauses.push('m.drone_id = ?');
         values.push(positiveInteger(request.query.droneId, 'droneId'));
+      }
+
+      if (request.query.isCurrent !== undefined) {
+        if (request.query.isCurrent !== 'true' && request.query.isCurrent !== 'false') {
+          throw new ApiError(400, 'INVALID_ARGUMENT', 'isCurrent must be true or false');
+        }
+        clauses.push('m.is_current = ?');
+        values.push(request.query.isCurrent === 'true' ? 1 : 0);
       }
 
       const status = request.query.status;
@@ -248,7 +261,7 @@ export function createMissionsRouter(database: Pool): Router {
 
       const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
       const [countRows] = await database.query<CountRow[]>(
-        `SELECT COUNT(*) AS total FROM missions m ${where}`,
+        `SELECT COUNT(*) AS total FROM missions m INNER JOIN drones d ON d.id = m.drone_id ${where}`,
         values,
       );
       const [rows] = await database.query<MissionListRow[]>(
@@ -256,6 +269,7 @@ export function createMissionsRouter(database: Pool): Router {
          d.id AS assigned_drone_id, d.drone_code AS assigned_drone_code,
          d.display_name AS assigned_drone_display_name, m.status, m.validation_status,
          m.progress_percent, m.estimated_distance_m,
+         (SELECT COUNT(*) FROM waypoints w WHERE w.mission_id = m.id) AS waypoint_count,
          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS created_at
          FROM missions m
          INNER JOIN drones d ON d.id = m.drone_id
