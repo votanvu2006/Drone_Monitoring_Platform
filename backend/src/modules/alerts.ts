@@ -1,25 +1,9 @@
-import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
-import type { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { ApiError } from '../middleware/error-handler';
 
-export type AlertSource = 'ROUTE' | 'WEATHER' | 'TELEMETRY' | 'SYSTEM';
-export type AlertSeverity = 'WARNING' | 'CRITICAL';
-
-export interface AlertObservation {
-  flightId?: number;
-  missionId?: number;
-  componentId?: number;
-  source: AlertSource;
-  ruleCode: string;
-  severity: AlertSeverity;
-  type: string;
-  message: string;
-  metricName?: string;
-  observedValue?: number;
-  thresholdValue?: number;
-  unit?: string;
-}
+type AlertSource = 'ROUTE' | 'WEATHER' | 'TELEMETRY' | 'SYSTEM';
+type AlertSeverity = 'WARNING' | 'CRITICAL';
 
 interface AlertRow extends RowDataPacket {
   id: number;
@@ -49,77 +33,6 @@ function positiveInteger(value: unknown, name: string): number {
     throw new ApiError(400, 'INVALID_ARGUMENT', `${name} must be a positive integer`);
   }
   return parsed;
-}
-
-function alertCode(): string {
-  return `ALT-${Date.now().toString(36)}-${randomUUID().slice(0, 8)}`.toUpperCase();
-}
-
-export async function upsertActiveAlert(
-  connection: PoolConnection,
-  observation: AlertObservation,
-): Promise<number> {
-  if (!observation.flightId && !observation.missionId) {
-    throw new Error('An alert must belong to a flight or mission');
-  }
-
-  const ownerColumn = observation.flightId ? 'flight_id' : 'mission_id';
-  const ownerId = observation.flightId ?? observation.missionId;
-  const [existing] = await connection.query<AlertRow[]>(
-    `SELECT id, observed_value FROM alerts
-     WHERE ${ownerColumn} = ? AND rule_code = ? AND status = 'ACTIVE'
-     ORDER BY id DESC LIMIT 1 FOR UPDATE`,
-    [ownerId, observation.ruleCode],
-  );
-
-  if (existing[0]) {
-    const previous = existing[0].observed_value;
-    const observed = observation.observedValue;
-    const worst = observed === undefined
-      ? previous
-      : previous === null || observation.severity === 'CRITICAL'
-        ? observed
-        : Math.max(previous, observed);
-    await connection.execute(
-      `UPDATE alerts SET severity = ?, message = ?, observed_value = ?,
-       last_observed_at = NOW(3), updated_at = NOW() WHERE id = ?`,
-      [observation.severity, observation.message, worst, existing[0].id],
-    );
-    return existing[0].id;
-  }
-
-  const [result] = await connection.execute<ResultSetHeader>(
-    `INSERT INTO alerts
-      (alert_code, flight_id, mission_id, component_id, source, rule_code, severity, type,
-       message, metric_name, observed_value, threshold_value, unit, status, detected_at,
-       last_observed_at, resolved_at, resolution_note, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', NOW(3), NOW(3), NULL, NULL, NOW(), NOW())`,
-    [
-      alertCode(), observation.flightId ?? null, observation.missionId ?? null,
-      observation.componentId ?? null, observation.source, observation.ruleCode,
-      observation.severity, observation.type, observation.message,
-      observation.metricName ?? null, observation.observedValue ?? null,
-      observation.thresholdValue ?? null, observation.unit ?? null,
-    ],
-  );
-  return result.insertId;
-}
-
-export async function resolveActiveAlerts(
-  connection: PoolConnection,
-  owner: { flightId?: number; missionId?: number },
-  ruleCode: string,
-  note: string,
-): Promise<number> {
-  const ownerColumn = owner.flightId ? 'flight_id' : 'mission_id';
-  const ownerId = owner.flightId ?? owner.missionId;
-  if (!ownerId) throw new Error('An alert owner is required');
-  const [result] = await connection.execute<ResultSetHeader>(
-    `UPDATE alerts SET status = 'RESOLVED', resolved_at = NOW(3), resolution_note = ?, updated_at = NOW()
-     WHERE ${ownerColumn} = ? AND rule_code = ? AND status = 'ACTIVE'`,
-    [note, ownerId, ruleCode],
-  );
-  return result.affectedRows;
 }
 
 export function createAlertsRouter(database: Pool): Router {

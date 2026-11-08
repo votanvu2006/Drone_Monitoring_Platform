@@ -92,6 +92,11 @@ describe('Missions list API', () => {
       total: 1,
     });
     expect(query).toHaveBeenCalledTimes(2);
+    expect(query.mock.calls[0]?.[0]).toContain(
+      'INNER JOIN drones d ON d.id = m.drone_id',
+    );
+    expect(query.mock.calls[0]?.[0]).toContain("d.status <> 'OFFLINE'");
+    expect(query.mock.calls[1]?.[0]).toContain("d.status <> 'OFFLINE'");
     expect(query.mock.calls[0]?.[0]).toContain('WHERE m.is_current = 1');
     expect(query.mock.calls[1]?.[0]).toContain('WHERE m.is_current = 1');
     expect(query.mock.calls[1]?.[0]).toContain(
@@ -101,7 +106,7 @@ describe('Missions list API', () => {
     expect(query.mock.calls[1]?.[1]).toEqual([25, 0]);
   });
 
-  it('applies drone and R4 status filters to both list queries', async () => {
+  it('applies drone and R5 status filters to both list queries', async () => {
     const query = vi.fn()
       .mockResolvedValueOnce([[{ total: 1 }], []])
       .mockResolvedValueOnce([[
@@ -125,10 +130,10 @@ describe('Missions list API', () => {
       data: [{ missionCode: 'mission-003', status: 'IN_PROGRESS' }],
     });
     expect(query.mock.calls[0]?.[0]).toContain(
-      'WHERE m.is_current = 1 AND m.drone_id = ? AND m.status = ?',
+      "WHERE m.is_current = 1 AND d.status <> 'OFFLINE' AND m.drone_id = ? AND m.status = ?",
     );
     expect(query.mock.calls[1]?.[0]).toContain(
-      'WHERE m.is_current = 1 AND m.drone_id = ? AND m.status = ?',
+      "WHERE m.is_current = 1 AND d.status <> 'OFFLINE' AND m.drone_id = ? AND m.status = ?",
     );
     expect(query.mock.calls[0]?.[1]).toEqual([3, 'IN_PROGRESS']);
     expect(query.mock.calls[1]?.[1]).toEqual([3, 'IN_PROGRESS', 1, 1]);
@@ -167,6 +172,7 @@ describe('Missions list API', () => {
       total: 0,
     });
     expect(query.mock.calls[0]?.[0]).toContain('m.is_current = 1');
+    expect(query.mock.calls[0]?.[0]).toContain("d.status <> 'OFFLINE'");
   });
 
   it.each([
