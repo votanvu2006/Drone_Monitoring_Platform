@@ -157,7 +157,10 @@ function toMissionListItem(row: MissionListRow): MissionListItem {
   };
 }
 
-function toMissionDetail(row: MissionDetailRow, waypoints: WaypointRow[]): MissionDetail {
+function toMissionDetail(
+  row: MissionDetailRow,
+  waypoints: WaypointRow[],
+): MissionDetail {
   return {
     id: Number(row.id),
     missionCode: row.mission_code,
@@ -248,7 +251,10 @@ export function createMissionsRouter(database: Pool): Router {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'page is too large');
       }
 
-      const clauses: string[] = ['m.is_current = 1'];
+      const clauses: string[] = [
+        'm.is_current = 1',
+        "d.status <> 'OFFLINE'",
+      ];
       const values: unknown[] = [];
 
       if (request.query.droneId !== undefined) {
@@ -258,7 +264,10 @@ export function createMissionsRouter(database: Pool): Router {
 
       const status = request.query.status;
       if (status !== undefined) {
-        if (typeof status !== 'string' || !MISSION_STATUSES.includes(status as MissionStatus)) {
+        if (
+          typeof status !== 'string'
+          || !MISSION_STATUSES.includes(status as MissionStatus)
+        ) {
           throw new ApiError(400, 'INVALID_ARGUMENT', 'Invalid status');
         }
 
@@ -268,7 +277,10 @@ export function createMissionsRouter(database: Pool): Router {
 
       const where = `WHERE ${clauses.join(' AND ')}`;
       const [countRows] = await database.query<CountRow[]>(
-        `SELECT COUNT(*) AS total FROM missions m ${where}`,
+        `SELECT COUNT(*) AS total
+         FROM missions m
+         INNER JOIN drones d ON d.id = m.drone_id
+         ${where}`,
         values,
       );
       const [rows] = await database.query<MissionListRow[]>(
