@@ -1,115 +1,138 @@
-import { test as apiTest } from '@playwright/test';
-import demoSnapshot from '../../data/frontend.snapshot.json' with { type: 'json' };
-import { test, expect, checkLayout, capture } from './support';
+import { test, expect, checkLayout, capture } from "./support";
 
-test('shell is readable, logout stays reachable and navigation remains static', async ({ page }, info) => {
-  await page.goto('/?screen=shell');
-  const nav = page.getByRole('navigation', { name: 'Primary navigation' });
-  await expect(nav.locator('.nav-item')).toHaveText(['Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']);
-  await expect(nav.getByText('Overview', { exact: true })).toHaveCount(0);
-  await expect(nav.locator('[aria-current="page"]')).toHaveText('Drones');
-  for (const name of ['Drones', 'Missions', 'Live Flight', 'Flight History', 'Alerts']) {
-    await expect(nav.getByText(name, { exact: true })).toBeVisible();
-  }
-  const logout = page.getByRole('button', { name: 'Log out' });
-  await expect(logout).toBeDisabled();
-  await expect(logout).toBeInViewport();
-  const url = page.url();
-  await nav.getByText('Missions', { exact: true }).click();
-  expect(page.url()).toBe(url);
-  await nav.getByText('Alerts', { exact: true }).scrollIntoViewIfNeeded();
-  await expect(nav.getByText('Alerts', { exact: true })).toBeInViewport();
-  await expect(logout).toBeInViewport();
-  await expect(page.getByRole('banner')).toContainText('operator');
-  await expect(page.getByRole('banner')).not.toContainText('Operations');
-  await expect(page.getByText('Workspace', { exact: true })).toHaveCount(0);
-  await expect(page.locator('.ui-page-heading .eyebrow')).toHaveCount(0);
-  const headerBox = (await page.getByRole('banner').boundingBox())!;
-  const actionsBox = (await page.locator('.header-actions').boundingBox())!;
-  const rightInset = headerBox.x + headerBox.width - actionsBox.x - actionsBox.width;
-  expect(rightInset).toBeGreaterThanOrEqual(15);
-  expect(rightInset).toBeLessThanOrEqual(29);
-  await expect(page.locator('footer')).toHaveCount(0);
-  await checkLayout(page);
-  await capture(page, info, 'shell-light');
-});
+test("shell stays readable while navigation changes modules", async ({ page }, info) => {
+  await page.goto("/?screen=shell");
 
-test('theme switch supports the keyboard, persists after refresh and reaches standalone pages', async ({ page }, info) => {
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await page.goto('/?screen=shell');
-  const toggle = page.getByRole('switch', { name: 'Dark theme' });
-  await expect(toggle).toBeEnabled();
-  await expect(toggle).not.toBeChecked();
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  await toggle.focus();
-  await toggle.press('Space');
-  await expect(toggle).toBeChecked();
-  await expect(toggle).toHaveText('Dark');
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(13, 17, 23)');
-  await capture(page, info, 'shell-dark');
-  await page.reload();
-  await expect(toggle).toBeChecked();
-  for (const screen of ['alerts', 'login']) {
-    await page.goto('/?screen=' + screen);
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(13, 17, 23)');
-    await checkLayout(page);
-    await capture(page, info, screen + '-saved-dark');
-  }
-  await page.goto('/?screen=shell');
-  await toggle.focus();
-  await toggle.press('Enter');
-  await expect(toggle).not.toBeChecked();
-  await expect(toggle).toHaveText('Light');
-  await page.reload();
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-});
-
-apiTest('Fleet and Drone Detail retain their flow in both themes', async ({ page }, info) => {
-  await page.route('**/api/drones**', async (route) => {
-    const path = new URL(route.request().url()).pathname;
-
-    if (path === '/api/drones') {
-      const drones = demoSnapshot.fleet.drones.map((drone) => ({
-        droneCode: drone.code,
-        status: drone.status,
-        batteryPercent: 100,
-        model: { modelName: drone.modelName },
-        homeLocation: { label: drone.homeBase },
-        lastKnownLocation: { label: drone.lastKnownLocation },
-        activeMission: drone.activeMission,
-        findings: demoSnapshot.fleet.findings.filter(
-          (finding) => finding.droneCode === drone.code,
-        ),
-      }));
-
-      await route.fulfill({
-        json: { data: drones, page: 1, pageSize: 100, total: drones.length },
-      });
-      return;
-    }
-
-    const droneCode = decodeURIComponent(path.slice('/api/drones/'.length));
-    const detail = demoSnapshot.details.find(
-      (drone) => drone.code === droneCode,
-    );
-
-    await route.fulfill(
-      detail
-        ? { json: { data: { ...detail, batteryPercent: 100 } } }
-        : {
-            status: 404,
-            json: { error: { code: 'DRONE_NOT_FOUND', message: 'Drone not found' } },
-          },
-    );
+  const nav = page.getByRole("navigation", {
+    name: "Primary navigation",
   });
 
-  await page.goto('/');
-  await expect(page.locator('.drone-card')).toHaveCount(5);
+  await expect(nav.locator(".nav-item")).toHaveText([
+    "Drones",
+    "Missions",
+    "Live Flight",
+    "Flight History",
+    "Alerts",
+  ]);
+  await expect(nav.getByText("Overview", { exact: true })).toHaveCount(0);
+  await expect(nav.locator('[aria-current="page"]')).toHaveText("Drones");
+
+  for (const name of [
+    "Drones",
+    "Missions",
+    "Live Flight",
+    "Flight History",
+    "Alerts",
+  ]) {
+    await expect(nav.getByRole("link", { name })).toBeVisible();
+  }
+
+  const logout = page.getByRole("button", { name: "Log out" });
+  await expect(logout).toBeEnabled();
+  await expect(logout).toBeInViewport();
+
+  await nav.getByRole("link", { name: "Missions" }).click();
+
+  await expect(page).toHaveURL(/\/missions$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Missions" }),
+  ).toBeVisible();
+  await expect(nav.locator('[aria-current="page"]')).toHaveText(
+    "Missions",
+  );
+  await expect(logout).toBeInViewport();
+
+  await nav.getByRole("link", { name: "Alerts" }).scrollIntoViewIfNeeded();
+  await expect(
+    nav.getByRole("link", { name: "Alerts" }),
+  ).toBeInViewport();
+
+  await expect(page.getByRole("banner")).toContainText("operator");
+  await expect(page.getByRole("banner")).not.toContainText("Operations");
+  await expect(page.getByText("Workspace", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".ui-page-heading .eyebrow")).toHaveCount(0);
+
+  const headerBox = (await page.getByRole("banner").boundingBox())!;
+  const actionsBox = (await page.locator(".header-actions").boundingBox())!;
+  const rightInset =
+    headerBox.x + headerBox.width - actionsBox.x - actionsBox.width;
+
+  expect(rightInset).toBeGreaterThanOrEqual(15);
+  expect(rightInset).toBeLessThanOrEqual(29);
+
+  await expect(page.locator("footer")).toHaveCount(0);
+  await checkLayout(page);
+  await capture(page, info, "shell-navigation-light");
+});
+
+test("theme switch works by keyboard and persists across pages", async ({ page }, info) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/?screen=shell");
+
+  const toggle = page.getByRole("switch", { name: "Dark theme" });
+
+  await expect(toggle).toBeEnabled();
+  await expect(toggle).not.toBeChecked();
+  await expect(page.locator("body")).toHaveCSS(
+    "background-color",
+    "rgb(255, 255, 255)",
+  );
+
+  await toggle.focus();
+  await toggle.press("Space");
+
+  await expect(toggle).toBeChecked();
+  await expect(toggle).toHaveText("Dark");
+  await expect(page.locator("body")).toHaveCSS(
+    "background-color",
+    "rgb(13, 17, 23)",
+  );
+  await capture(page, info, "shell-dark");
+
+  await page.reload();
+  await expect(toggle).toBeChecked();
+
+  for (const screen of ["alerts", "login"]) {
+    await page.goto(`/?screen=${screen}`);
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-theme",
+      "dark",
+    );
+    await expect(page.locator("body")).toHaveCSS(
+      "background-color",
+      "rgb(13, 17, 23)",
+    );
+    await checkLayout(page);
+    await capture(page, info, `${screen}-saved-dark`);
+  }
+
+  await page.goto("/?screen=shell");
+  await toggle.focus();
+  await toggle.press("Enter");
+
+  await expect(toggle).not.toBeChecked();
+  await expect(toggle).toHaveText("Light");
+
+  await page.reload();
+  await expect(page.locator("body")).toHaveCSS(
+    "background-color",
+    "rgb(255, 255, 255)",
+  );
+});
+
+test("Fleet and Drone Detail retain their flow in both themes", async ({ page }, info) => {
+  await page.goto("/");
+
+  await expect(page.locator(".drone-card")).toHaveCount(5);
+
   if ((page.viewportSize()?.width ?? 0) >= 1280) {
-    const rows = await page.locator('.drone-card').evaluateAll(cards => cards.map(card => card.getBoundingClientRect().top));
+    const rows = await page.locator(".drone-card").evaluateAll(
+      (cards) =>
+        cards.map((card) => card.getBoundingClientRect().top),
+    );
     expect(new Set(rows).size).toBe(1);
   }
+
   await checkLayout(page);
   await capture(page, info, 'fleet-light');
   await page.getByRole('switch', { name: 'Dark theme' }).click();
@@ -129,7 +152,19 @@ apiTest('Fleet and Drone Detail retain their flow in both themes', async ({ page
   await expect(page.locator('.drone-findings-panel')).toContainText('AVX1-MOTOR-FRONT_LEFT');
 });
 
-test('unknown screen and state fall back to the shell', async ({ page }) => {
-  await page.goto('/?screen=unknown&state=missing');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your flight operations workspace');
+test("unknown preview screen falls back to Drones", async ({ page }) => {
+  await page.goto("/?screen=unknown&state=missing");
+
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Drones",
+  );
+  await expect(
+    page
+      .getByRole("navigation", { name: "Primary navigation" })
+      .locator('[aria-current="page"]'),
+  ).toHaveText("Drones");
+});
+// Module checks run with a demo session; login behavior has its own coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('drone-monitoring.demo-session', 'active'));
 });
