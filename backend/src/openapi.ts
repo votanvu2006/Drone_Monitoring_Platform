@@ -56,7 +56,7 @@ export const openApiDocument = {
     },
     '/flights/active': {
       get: {
-        tags: ['Flight Operations'], summary: 'Read active v2.1.0 flights with their mission waypoints and progress',
+        tags: ['Flight Operations'], summary: 'Read active flights for powered-on drones; READY flights are excluded',
         responses: { '200': { description: 'Active flights', content: { 'application/json': { schema: {
           type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/ActiveFlight' } } },
         } } } } },
@@ -64,7 +64,7 @@ export const openApiDocument = {
     },
     '/flights/history': {
       get: {
-        tags: ['Flight Operations'], summary: 'Read ended flights; blocked preflight attempts have no history record',
+        tags: ['Flight Operations'], summary: 'Read ended flights for powered-on drones; blocked preflight attempts have no history record',
         responses: { '200': { description: 'Flight history', content: { 'application/json': { schema: {
           type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/FlightHistoryRecord' } } },
         } } } } },
@@ -78,14 +78,14 @@ export const openApiDocument = {
           '200': { description: 'Flight details', content: { 'application/json': { schema: { type: 'object', properties: {
             data: { $ref: '#/components/schemas/FlightHistoryDetail' },
           } } } } },
-          '400': { description: 'Invalid flight code' }, '404': { description: 'Historical flight not found' },
+          '400': { description: 'Invalid flight code' }, '404': { description: 'Historical flight not found or its drone is OFFLINE' },
         },
       },
     },
     '/flights': {
       get: {
         tags: ['Flight Operations'],
-        summary: 'List flight attempts with pagination and optional filters',
+        summary: 'List flight attempts for powered-on drones with pagination and optional filters',
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },

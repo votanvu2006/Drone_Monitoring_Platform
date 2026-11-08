@@ -102,7 +102,7 @@ describe('Flight Operations list API', () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({ page: 2, pageSize: 2, total: 1 });
     expect(query.mock.calls[0]?.[0]).toContain(
-      'WHERE f.drone_id = ? AND f.mission_id = ? AND f.status = ? AND f.result = ?',
+      "WHERE d.status <> 'OFFLINE' AND f.drone_id = ? AND f.mission_id = ? AND f.status = ? AND f.result = ?",
     );
     expect(query.mock.calls[0]?.[1]).toEqual([2, 4, 'LANDED', 'SUCCESS']);
     expect(query.mock.calls[1]?.[1]).toEqual([2, 4, 'LANDED', 'SUCCESS', 2, 2]);
