@@ -148,3 +148,23 @@ export async function waitFor<T>(
 
   throw new Error(`Condition was not met within ${timeoutMs} ms`);
 }
+
+// Tests use a disposable database and restore visibility without deleting scenario records.
+export async function powerDroneFixture(database: Pool, droneCodes: string[]): Promise<() => Promise<void>> {
+  const [rows] = await database.query<RowDataPacket[]>('SELECT id, drone_code, status FROM drones');
+  const restore = async () => {
+    for (const row of rows) {
+      await database.execute('UPDATE drones SET status = ? WHERE id = ?', [row.status, row.id]);
+    }
+  };
+  try {
+    await database.execute("UPDATE drones SET status = 'OFFLINE'");
+    for (const code of droneCodes) {
+      await database.execute("UPDATE drones SET status = 'AVAILABLE' WHERE drone_code = ?", [code]);
+    }
+    return restore;
+  } catch (error) {
+    await restore();
+    throw error;
+  }
+}

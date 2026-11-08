@@ -7,11 +7,14 @@ import {
   cleanupMissionFixture,
   createIntegrationDatabase,
   createMissionFixture,
+  powerDroneFixture,
 } from './support/database';
 
 const MISSION_STATUSES = [
   'DRAFT',
   'READY',
+  'WARNING',
+  'IN_PROGRESS',
   'RUNNING',
   'COMPLETED',
   'FAILED',
@@ -86,6 +89,7 @@ interface MissionDetailResponse {
 const integrationDatabase = createIntegrationDatabase();
 const app = createApp(integrationDatabase);
 
+let restorePower: (() => Promise<void>) | undefined;
 let sourceMissionId = 0;
 let fixtureMissionId = 0;
 let fixtureDroneId = 0;
@@ -102,6 +106,7 @@ async function getMissionList(path: string): Promise<MissionListResponse> {
 describe('Missions MySQL integration', () => {
   beforeAll(async () => {
     await assertV2DataPack(integrationDatabase);
+    restorePower = await powerDroneFixture(integrationDatabase, ['DRONE-001', 'DRONE-002', 'DRONE-003', 'DRONE-004', 'DRONE-005']);
 
     const [sourceRows] = await integrationDatabase.query<SeedMissionRow[]>(
       `SELECT m.id, m.drone_id
@@ -115,7 +120,7 @@ describe('Missions MySQL integration', () => {
     const sourceMission = sourceRows[0];
 
     if (!sourceMission) {
-      throw new Error('Expected a seeded mission with waypoints in Data Pack v2.0.0.');
+      throw new Error('Expected a seeded mission with waypoints in Data Pack v2.1.0 R5.');
     }
 
     sourceMissionId = Number(sourceMission.id);
@@ -168,6 +173,7 @@ describe('Missions MySQL integration', () => {
         await cleanupMissionFixture(integrationDatabase, fixtureMissionId);
       }
     } finally {
+      await restorePower?.();
       await integrationDatabase.end();
     }
   });
@@ -175,8 +181,8 @@ describe('Missions MySQL integration', () => {
   it('lists seeded missions in stable order and returns the requested page windows', async () => {
     const allMissions = await getMissionList('/api/missions?page=1&pageSize=100');
 
-    expect(allMissions).toMatchObject({ page: 1, pageSize: 100, total: 21 });
-    expect(allMissions.data).toHaveLength(21);
+    expect(allMissions).toMatchObject({ page: 1, pageSize: 100, total: 10 });
+    expect(allMissions.data).toHaveLength(10);
 
     const expectedOrder = [...allMissions.data]
       .sort((left, right) => (
@@ -189,8 +195,8 @@ describe('Missions MySQL integration', () => {
     const firstPage = await getMissionList('/api/missions?page=1&pageSize=7');
     const secondPage = await getMissionList('/api/missions?page=2&pageSize=7');
 
-    expect(firstPage).toMatchObject({ page: 1, pageSize: 7, total: 21 });
-    expect(secondPage).toMatchObject({ page: 2, pageSize: 7, total: 21 });
+    expect(firstPage).toMatchObject({ page: 1, pageSize: 7, total: 10 });
+    expect(secondPage).toMatchObject({ page: 2, pageSize: 7, total: 10 });
     expect(firstPage.data.map(({ id }) => id)).toEqual(
       allMissions.data.slice(0, 7).map(({ id }) => id),
     );
