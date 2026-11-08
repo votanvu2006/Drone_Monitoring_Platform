@@ -5,6 +5,7 @@ import { createApp } from '../../src/app';
 import {
   assertV2DataPack,
   createIntegrationDatabase,
+  powerDroneFixture,
   uniqueIntegrationCode,
 } from './support/database';
 
@@ -27,6 +28,7 @@ const database = createIntegrationDatabase();
 const app = createApp(database);
 let temporaryAlertId: number | null = null;
 let componentSnapshot: AlertOwnerRow | null = null;
+let restorePower: (() => Promise<void>) | undefined;
 
 describe('Alerts MySQL integration', () => {
   beforeAll(async () => {
@@ -34,6 +36,8 @@ describe('Alerts MySQL integration', () => {
   });
 
   afterEach(async () => {
+    await restorePower?.();
+    restorePower = undefined;
     if (temporaryAlertId !== null) {
       await database.execute('DELETE FROM alerts WHERE id = ?', [temporaryAlertId]);
       temporaryAlertId = null;
@@ -57,15 +61,41 @@ describe('Alerts MySQL integration', () => {
     await database.end();
   });
 
-  it('reads and filters the seeded active alerts', async () => {
-    const response = await request(app).get('/api/alerts?status=ACTIVE&pageSize=100');
-
+  it('hides alerts when all drones are offline', async () => {
+    const response = await request(app).get('/api/alerts');
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ page: 1, pageSize: 100, total: 6 });
+    expect(response.body).toMatchObject({ data: [], total: 0 });
+  });
+
+  it('reads the v2.1.0 alerts with correct drone, mission and preflight ownership', async () => {
+    restorePower = await powerDroneFixture(database, ['DRONE-002', 'DRONE-005']);
+    const response = await request(app).get('/api/alerts?status=ACTIVE&pageSize=100');
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ page: 1, pageSize: 100, total: 3 });
+    expect(response.body.data.map((item: { alert_code: string }) => item.alert_code))
+      .toEqual(['DEMO-ALT-003', 'DEMO-ALT-002', 'DEMO-ALT-001']);
     expect(response.body.data).toEqual(expect.arrayContaining([
-      expect.objectContaining({ alert_code: 'ALT-021', status: 'ACTIVE', source: 'ROUTE' }),
-      expect.objectContaining({ alert_code: 'ALT-022', status: 'ACTIVE', source: 'ROUTE' }),
+      expect.objectContaining({ alert_code: 'DEMO-ALT-002', title: 'Motor temperature warning',
+        drone_code: 'DRONE-002', mission_code: 'mission-002', flight_id: null,
+        source_group: 'Components', severity: 'WARNING', component_code: 'AVX1-MOTOR-FRONT_LEFT' }),
+      expect.objectContaining({ alert_code: 'DEMO-ALT-003', title: 'Unsafe weather',
+        drone_code: 'DRONE-005', mission_code: 'mission-005', flight_id: null,
+        source: 'WEATHER', source_group: 'Weather', severity: 'CRITICAL' }),
     ]));
+  });
+
+  it('combines identifying and lifecycle filters and paginates the matched set', async () => {
+    restorePower = await powerDroneFixture(database, ['DRONE-002']);
+    const hidden = await request(app).get('/api/alerts?droneCode=DRONE-005');
+    expect(hidden.body).toMatchObject({ data: [], total: 0 });
+    const warning = await request(app).get('/api/alerts?droneCode=DRONE-002&missionCode=mission-002&severity=WARNING&source=TELEMETRY&status=ACTIVE&pageSize=1');
+    expect(warning.status).toBe(200);
+    expect(warning.body.total).toBe(2);
+    expect(warning.body.data[0].alert_code).toBe('DEMO-ALT-002');
+    const next = await request(app).get('/api/alerts?droneCode=DRONE-002&pageSize=1&page=2');
+    expect(next.body.data[0].alert_code).toBe('DEMO-ALT-001');
+    const empty = await request(app).get('/api/alerts?droneCode=DRONE-005&missionCode=mission-002');
+    expect(empty.body).toMatchObject({ data: [], total: 0 });
   });
 
   it('resolves a manual-inspection alert and persists the component result', async () => {
@@ -75,11 +105,11 @@ describe('Alerts MySQL integration', () => {
        FROM flights f
        JOIN drone_components dc ON dc.drone_id = f.drone_id
        JOIN component_catalog c ON c.id = dc.component_catalog_id
-       WHERE f.flight_code = 'FLT-010' AND c.component_type = 'PROPELLER'
-         AND c.position = f.fault_position LIMIT 1`,
+       WHERE f.flight_code = 'FLIGHT-010' AND c.component_type = 'PROPELLER'
+         AND c.position = 'FRONT_LEFT' LIMIT 1`,
     );
     componentSnapshot = owners[0] ?? null;
-    if (!componentSnapshot) throw new Error('Expected the FLT-010 propeller component fixture');
+    if (!componentSnapshot) throw new Error('Expected the FLIGHT-010 propeller component fixture');
 
     const [insert] = await database.execute<ResultSetHeader>(
       `INSERT INTO alerts

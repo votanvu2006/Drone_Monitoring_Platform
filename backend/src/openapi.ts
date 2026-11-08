@@ -3,11 +3,15 @@ export const openApiDocument = {
   info: {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
-    description: 'Backend APIs for fleet, mission planning, airspace, demo weather, flight simulation and alert lifecycle management.',
+    description:
+      'R5 demo APIs for Fleet, Missions, Flight Operations and Alerts. Mission, flight and alert lists show records for powered-on drones.',
   },
   servers: [{ url: '/api' }],
   tags: [
-    { name: 'Fleet' }, { name: 'Mission' }, { name: 'Flight Operations' }, { name: 'Airspace' }, { name: 'Weather' }, { name: 'Simulation' }, { name: 'Alerts' },
+    { name: 'Fleet' },
+    { name: 'Mission' },
+    { name: 'Flight Operations' },
+    { name: 'Alerts' },
   ],
   paths: {
     '/drones': {
@@ -36,18 +40,9 @@ export const openApiDocument = {
           schema: { type: 'string', pattern: '^[A-Za-z0-9_-]{1,30}$' },
         }],
         responses: {
-          '200': {
-            description: 'Drone details',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/DroneDetailResponse' } } },
-          },
-          '400': {
-            description: 'Invalid drone code',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
-          },
-          '404': {
-            description: 'Drone not found',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } },
-          },
+          '200': { description: 'Drone details', content: { 'application/json': { schema: { $ref: '#/components/schemas/DroneDetailResponse' } } } },
+          '400': { description: 'Invalid drone code', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          '404': { description: 'Drone not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
         },
       },
     },
@@ -70,9 +65,7 @@ export const openApiDocument = {
               schema: {
                 type: 'object',
                 required: ['isOn'],
-                properties: {
-                  isOn: { type: 'boolean' },
-                },
+                properties: { isOn: { type: 'boolean' } },
               },
             },
           },
@@ -88,7 +81,7 @@ export const openApiDocument = {
     '/missions': {
       get: {
         tags: ['Mission'],
-        summary: 'List current missions with pagination and optional drone and status filters',
+        summary: 'List current missions for powered-on drones with pagination and optional filters',
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
@@ -113,10 +106,63 @@ export const openApiDocument = {
         },
       },
     },
+    '/flights/active': {
+      get: {
+        tags: ['Flight Operations'],
+        summary: 'Read active flights for powered-on drones; READY flights are excluded',
+        responses: {
+          '200': {
+            description: 'Active flights',
+            content: { 'application/json': { schema: {
+              type: 'object',
+              properties: { data: { type: 'array', items: { $ref: '#/components/schemas/ActiveFlight' } } },
+            } } },
+          },
+        },
+      },
+    },
+    '/flights/history': {
+      get: {
+        tags: ['Flight Operations'],
+        summary: 'Read ended flights for powered-on drones; blocked preflight attempts have no history record',
+        responses: {
+          '200': {
+            description: 'Flight history',
+            content: { 'application/json': { schema: {
+              type: 'object',
+              properties: { data: { type: 'array', items: { $ref: '#/components/schemas/FlightHistoryRecord' } } },
+            } } },
+          },
+        },
+      },
+    },
+    '/flights/{flightCode}': {
+      get: {
+        tags: ['Flight Operations'],
+        summary: 'Read a historical flight with route, telemetry summary and ordered events',
+        parameters: [{
+          name: 'flightCode',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', pattern: '^[a-zA-Z0-9-]{1,30}$' },
+        }],
+        responses: {
+          '200': {
+            description: 'Flight details',
+            content: { 'application/json': { schema: {
+              type: 'object',
+              properties: { data: { $ref: '#/components/schemas/FlightHistoryDetail' } },
+            } } },
+          },
+          '400': { description: 'Invalid flight code' },
+          '404': { description: 'Historical flight not found or its drone is OFFLINE' },
+        },
+      },
+    },
     '/flights': {
       get: {
         tags: ['Flight Operations'],
-        summary: 'List flight attempts with pagination and optional filters',
+        summary: 'List flight attempts for powered-on drones with pagination and optional filters',
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
@@ -131,38 +177,13 @@ export const openApiDocument = {
         },
       },
     },
-    '/flight-zones': {
-      get: { tags: ['Airspace'], summary: 'List active flight zones as GeoJSON', responses: { '200': { description: 'GeoJSON FeatureCollection' } } },
-    },
-    '/missions/{id}/validate': {
-      post: {
-        tags: ['Airspace'], summary: 'Validate a persisted mission route',
-        parameters: [{ $ref: '#/components/parameters/Id' }],
-        responses: { '200': { description: 'Route validation result' }, '404': { $ref: '#/components/responses/NotFound' } },
-      },
-    },
-    '/weather/current': {
-      get: {
-        tags: ['Weather'], summary: 'Read the assigned simulated weather profile',
-        parameters: [
-          { name: 'lat', in: 'query', required: true, schema: { type: 'number', minimum: -90, maximum: 90 } },
-          { name: 'lng', in: 'query', required: true, schema: { type: 'number', minimum: -180, maximum: 180 } },
-          { name: 'droneId', in: 'query', required: true, schema: { type: 'integer', minimum: 1 } },
-        ],
-        responses: { '200': { description: 'Current DEMO weather' }, '409': { $ref: '#/components/responses/Conflict' } },
-      },
-    },
-    '/missions/{id}/weather-check': {
-      post: {
-        tags: ['Weather'], summary: 'Create fresh START/MID/DEST weather snapshots',
-        parameters: [{ $ref: '#/components/parameters/Id' }],
-        responses: { '200': { description: 'Route weather decision' }, '409': { $ref: '#/components/responses/Conflict' } },
-      },
-    },
     '/alerts': {
       get: {
-        tags: ['Alerts'], summary: 'List and filter alerts',
+        tags: ['Alerts'],
+        summary: 'List and filter alerts for powered-on drones',
         parameters: [
+          { name: 'droneCode', in: 'query', schema: { type: 'string' } },
+          { name: 'missionCode', in: 'query', schema: { type: 'string' } },
           { name: 'status', in: 'query', schema: { type: 'string', enum: ['ACTIVE', 'RESOLVED'] } },
           { name: 'severity', in: 'query', schema: { type: 'string', enum: ['WARNING', 'CRITICAL'] } },
           { name: 'source', in: 'query', schema: { type: 'string', enum: ['ROUTE', 'WEATHER', 'TELEMETRY', 'SYSTEM'] } },
@@ -171,24 +192,26 @@ export const openApiDocument = {
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
         ],
-        responses: { '200': { description: 'Paginated alerts' } },
+        responses: {
+          '200': { description: 'Paginated R5 alerts with drone, mission and incident details; flight_id may be null for blocked preflight alerts.' },
+          '400': { description: 'Invalid pagination or filters' },
+        },
       },
     },
     '/alerts/{id}/resolve': {
       patch: {
-        tags: ['Alerts'], summary: 'Resolve an active alert', parameters: [{ $ref: '#/components/parameters/Id' }],
-        requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ResolveAlert' } } } },
-        responses: { '200': { description: 'Resolved alert' }, '409': { $ref: '#/components/responses/Conflict' } },
+        tags: ['Alerts'],
+        summary: 'Resolve an active alert',
+        parameters: [{ $ref: '#/components/parameters/Id' }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/ResolveAlert' } } },
+        },
+        responses: {
+          '200': { description: 'Resolved alert' },
+          '409': { $ref: '#/components/responses/Conflict' },
+        },
       },
-    },
-    '/flights/{id}/simulation/start': {
-      post: { tags: ['Simulation'], summary: 'Start a READY flight simulation', parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '202': { description: 'Simulation started' }, '409': { $ref: '#/components/responses/Conflict' } } },
-    },
-    '/flights/{id}/simulation/stop': {
-      post: { tags: ['Simulation'], summary: 'Stop an active flight simulation', parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { description: 'Simulation stopped' }, '409': { $ref: '#/components/responses/Conflict' } } },
-    },
-    '/flights/{id}/simulation/status': {
-      get: { tags: ['Simulation'], summary: 'Get flight and latest telemetry state', parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { description: 'Simulation state' }, '404': { $ref: '#/components/responses/NotFound' } } },
     },
   },
   components: {
@@ -215,6 +238,75 @@ export const openApiDocument = {
           name: { type: 'string' },
         },
       },
+      FlightMapWaypoint: {
+        type: 'object',
+        properties: {
+          code: { type: 'string' },
+          label: { type: 'string' },
+          x: { type: 'number', nullable: true },
+          y: { type: 'number', nullable: true },
+        },
+      },
+      ActiveFlight: {
+        type: 'object',
+        properties: {
+          flightCode: { type: 'string' },
+          missionCode: { type: 'string' },
+          droneCode: { type: 'string' },
+          flightStatus: { type: 'string', enum: ['IN_PROGRESS'] },
+          status: { type: 'string', enum: ['FLYING', 'PAUSED', 'RETURNING'] },
+          routeName: { type: 'string' },
+          currentWaypointIndex: { type: 'integer', minimum: 0 },
+          routeProgressPercent: { type: 'integer', minimum: 0, maximum: 100 },
+          waypoints: { type: 'array', items: { $ref: '#/components/schemas/FlightMapWaypoint' } },
+        },
+      },
+      FlightHistoryRecord: {
+        type: 'object',
+        properties: {
+          flightCode: { type: 'string' },
+          missionCode: { type: 'string' },
+          droneCode: { type: 'string' },
+          status: { type: 'string', enum: ['COMPLETED', 'FAILED'] },
+          startedAt: { type: 'string', format: 'date-time', nullable: true, description: 'UTC instant' },
+          durationSeconds: { type: 'integer', minimum: 0 },
+        },
+      },
+      FlightHistoryDetail: {
+        allOf: [
+          { $ref: '#/components/schemas/FlightHistoryRecord' },
+          {
+            type: 'object',
+            properties: {
+              routeName: { type: 'string' },
+              waypoints: { type: 'array', items: { $ref: '#/components/schemas/FlightMapWaypoint' } },
+              telemetry: {
+                type: 'object',
+                properties: {
+                  startBatteryPercent: { type: 'number', nullable: true },
+                  endBatteryPercent: { type: 'number', nullable: true },
+                  maxAltitudeMeters: { type: 'number', nullable: true },
+                  averageSpeedMps: { type: 'number', nullable: true },
+                  distanceMeters: { type: 'number' },
+                },
+              },
+              events: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    occurredAt: { type: 'string', format: 'date-time' },
+                    title: { type: 'string' },
+                    description: { type: 'string' },
+                    severity: { enum: ['INFO', 'WARNING', 'ERROR'] },
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
       FlightListItem: {
         type: 'object',
         required: [
@@ -230,11 +322,13 @@ export const openApiDocument = {
           mission: { $ref: '#/components/schemas/FlightMissionSummary' },
           scenarioCode: { type: 'string' },
           startedAt: {
-            type: 'string', nullable: true,
+            type: 'string',
+            nullable: true,
             description: 'Stored database DATETIME(3) in YYYY-MM-DD HH:mm:ss.ffffff format; no timezone is implied.',
           },
           endedAt: {
-            type: 'string', nullable: true,
+            type: 'string',
+            nullable: true,
             description: 'Stored database DATETIME(3) in YYYY-MM-DD HH:mm:ss.ffffff format; no timezone is implied.',
           },
           durationSec: { type: 'integer', minimum: 0 },
@@ -253,7 +347,10 @@ export const openApiDocument = {
       },
       MissionWaypoint: {
         type: 'object',
-        required: ['id', 'sequenceNumber', 'waypointType', 'latitude', 'longitude', 'altitudeM', 'holdTimeSec'],
+        required: [
+          'id', 'sequenceNumber', 'waypointType', 'latitude', 'longitude',
+          'altitudeM', 'holdTimeSec',
+        ],
         properties: {
           id: { type: 'integer', format: 'int64' },
           sequenceNumber: { type: 'integer', minimum: 1 },
@@ -267,9 +364,10 @@ export const openApiDocument = {
       MissionDetail: {
         type: 'object',
         required: [
-          'id', 'missionCode', 'name', 'description', 'drone', 'status', 'validationStatus',
-          'validationMessage', 'plannedAltitudeM', 'plannedSpeedMps', 'estimatedDistanceM',
-          'estimatedDurationSec', 'progressPercent', 'createdAt', 'updatedAt', 'waypoints',
+          'id', 'missionCode', 'name', 'description', 'drone', 'status',
+          'validationStatus', 'validationMessage', 'plannedAltitudeM',
+          'plannedSpeedMps', 'estimatedDistanceM', 'estimatedDurationSec',
+          'progressPercent', 'createdAt', 'updatedAt', 'waypoints',
         ],
         properties: {
           id: { type: 'integer', format: 'int64' },
@@ -341,7 +439,8 @@ export const openApiDocument = {
         },
       },
       HomeLocation: {
-        type: 'object', required: ['label', 'latitude', 'longitude'],
+        type: 'object',
+        required: ['label', 'latitude', 'longitude'],
         properties: {
           label: { type: 'string' },
           latitude: { type: 'number' },
@@ -349,7 +448,8 @@ export const openApiDocument = {
         },
       },
       LastKnownLocation: {
-        type: 'object', nullable: true,
+        type: 'object',
+        nullable: true,
         required: ['label', 'latitude', 'longitude', 'altitudeM', 'source', 'updatedAt'],
         properties: {
           label: { type: 'string', nullable: true },
@@ -463,14 +563,25 @@ export const openApiDocument = {
         },
       },
       ResolveAlert: {
-        type: 'object', required: ['resolutionNote'],
+        type: 'object',
+        required: ['resolutionNote'],
         properties: {
           resolutionNote: { type: 'string', maxLength: 500 },
           componentHealthStatus: { type: 'string', enum: ['HEALTHY', 'WARNING', 'FAULT', 'MAINTENANCE'] },
         },
       },
       Error: {
-        type: 'object', properties: { error: { type: 'object', properties: { code: { type: 'string' }, message: { type: 'string' }, details: {} } } },
+        type: 'object',
+        properties: {
+          error: {
+            type: 'object',
+            properties: {
+              code: { type: 'string' },
+              message: { type: 'string' },
+              details: {},
+            },
+          },
+        },
       },
     },
     responses: {

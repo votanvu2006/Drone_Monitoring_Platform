@@ -24,3 +24,13 @@ describe('alerts API', () => {
     expect(query).not.toHaveBeenCalled();
   });
 });
+
+describe('v2.1.0 alert query validation', () => {
+  it.each(['page=1.5', 'pageSize=101', 'page=9007199254740991&pageSize=100',
+    'flightId=1&flightId=2', 'droneCode=bad%20code', 'missionCode=x&missionCode=y'])('rejects %s without querying', async queryString => {
+      const query = vi.fn();
+      const response = await request(createApp({ query } as unknown as Pool)).get('/api/alerts?' + queryString);
+      expect(response.status).toBe(400);
+      expect(query).not.toHaveBeenCalled();
+    });
+});

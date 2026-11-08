@@ -116,6 +116,43 @@ describe('Fleet power API with MySQL v2.1.0 R5', () => {
         isActivated: true,
       });
 
+      // Verify the same R5 power change is visible through the read APIs.
+      const currentMissions = await request(app).get('/api/missions');
+      expect(currentMissions.status).toBe(200);
+      expect(currentMissions.body.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            missionCode: 'mission-003',
+            status: 'IN_PROGRESS',
+          }),
+        ]),
+      );
+
+      const activeFlights = await request(app).get('/api/flights/active');
+      expect(activeFlights.status).toBe(200);
+      expect(activeFlights.body.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            flightCode: 'FLIGHT-015',
+            missionCode: 'mission-003',
+            droneCode: 'DRONE-003',
+            status: 'FLYING',
+          }),
+        ]),
+      );
+
+      const drone2Alerts = await request(app)
+        .get('/api/alerts?droneCode=DRONE-002');
+      expect(drone2Alerts.status).toBe(200);
+      expect(drone2Alerts.body.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            alert_code: 'DEMO-ALT-002',
+            drone_code: 'DRONE-002',
+          }),
+        ]),
+      );
+
       const [missionRows] = await connection.query<MissionStatusRow[]>(
         'SELECT status, progress_percent FROM missions WHERE mission_code = ?',
         ['mission-003'],
