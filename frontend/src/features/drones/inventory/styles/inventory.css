@@ -319,3 +319,26 @@
     flex-direction: column;
   }
 }
+
+.fleet-page-message {
+  padding: 22px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background: var(--canvas-default);
+  color: var(--fg-muted);
+  font-size: 14px;
+}
+
+.fleet-page-message p {
+  margin: 0 0 12px;
+}
+
+.fleet-page-message button {
+  padding: 7px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-default);
+  background: var(--canvas-default);
+  color: var(--fg-default);
+  font: inherit;
+  cursor: pointer;
+}
