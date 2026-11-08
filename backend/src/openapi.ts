@@ -28,12 +28,13 @@ export const openApiDocument = {
     '/missions': {
       get: {
         tags: ['Mission'],
-        summary: 'List missions with pagination and optional drone and status filters',
+        summary: 'List missions for powered-on drones with pagination and optional filters',
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
+          { name: 'isCurrent', in: 'query', schema: { type: 'boolean' } },
           { name: 'droneId', in: 'query', schema: { type: 'integer', minimum: 1 } },
-          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] } },
         ],
         responses: {
           '200': { description: 'Paginated mission list', content: { 'application/json': { schema: { $ref: '#/components/schemas/MissionListResponse' } } } },
@@ -291,7 +292,7 @@ export const openApiDocument = {
               displayName: { type: 'string' },
             },
           },
-          status: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+          status: { type: 'string', enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
           validationStatus: { type: 'string', enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
           validationMessage: { type: 'string', nullable: true },
           plannedAltitudeM: { type: 'number' },
@@ -311,7 +312,7 @@ export const openApiDocument = {
       },
       MissionListItem: {
         type: 'object',
-        required: ['id', 'missionCode', 'name', 'drone', 'status', 'validationStatus', 'progressPercent', 'estimatedDistanceM', 'createdAt'],
+        required: ['id', 'missionCode', 'name', 'drone', 'status', 'validationStatus', 'progressPercent', 'estimatedDistanceM', 'waypointCount', 'createdAt'],
         properties: {
           id: { type: 'integer', format: 'int64' },
           missionCode: { type: 'string' },
@@ -325,10 +326,11 @@ export const openApiDocument = {
               displayName: { type: 'string' },
             },
           },
-          status: { type: 'string', enum: ['DRAFT', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
+          status: { type: 'string', enum: ['DRAFT', 'READY', 'WARNING', 'IN_PROGRESS', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'] },
           validationStatus: { type: 'string', enum: ['NOT_CHECKED', 'VALID', 'INVALID'] },
           progressPercent: { type: 'integer', minimum: 0, maximum: 100 },
           estimatedDistanceM: { type: 'number', minimum: 0 },
+          waypointCount: { type: 'integer', minimum: 0 },
           createdAt: { type: 'string', description: 'Stored database DATETIME in YYYY-MM-DD HH:mm:ss format.' },
         },
       },
