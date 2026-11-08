@@ -74,6 +74,8 @@ export function FlightRoutePanel({
     currentIndex,
   );
 
+  const percent = flight.routeProgressPercent ?? progress.percent;
+
   return (
     <section
       className="flight-route-panel"
@@ -98,7 +100,7 @@ export function FlightRoutePanel({
       <div className="flight-route-progress">
         <div className="flight-route-progress-heading">
           <span>Route completed</span>
-          <strong>{progress.percent}%</strong>
+          <strong>{percent}%</strong>
         </div>
 
         <div
@@ -107,9 +109,9 @@ export function FlightRoutePanel({
           aria-label="Route progress"
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={progress.percent}
+          aria-valuenow={percent}
         >
-          <span style={{ width: `${progress.percent}%` }} />
+          <span style={{ width: `${percent}%` }} />
         </div>
 
         <p className="flight-route-progress-note">

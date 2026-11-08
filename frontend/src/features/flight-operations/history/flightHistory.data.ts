@@ -1,15 +1,14 @@
-import snapshot from '../../../../../data/frontend.snapshot.json';
+import { ApiRequestError, getApiData } from '../../../lib/api';
 import type { FlightHistoryDataSource, FlightHistoryDetail, FlightHistoryRecord } from './flightHistory.types';
-
 export const DEFAULT_FLIGHT_CODE = 'FLIGHT-014';
 
-export const staticFlightHistoryDataSource: FlightHistoryDataSource = {
-  async loadRecords() {
-    return structuredClone(snapshot.history) as FlightHistoryRecord[];
-  },
+export const flightHistoryDataSource: FlightHistoryDataSource = {
+  loadRecords: () => getApiData<FlightHistoryRecord[]>('/flights/history'),
   async loadDetail(flightCode) {
-    const flight = snapshot.historyDetails.find(item => item.flightCode === flightCode);
-    return flight ? structuredClone(flight) as FlightHistoryDetail : null;
+    try { return await getApiData<FlightHistoryDetail>('/flights/' + encodeURIComponent(flightCode)); }
+    catch (error) {
+      if (error instanceof ApiRequestError && error.status === 404) return null;
+      throw error;
+    }
   },
 };
-export const flightHistoryDataSource = staticFlightHistoryDataSource;

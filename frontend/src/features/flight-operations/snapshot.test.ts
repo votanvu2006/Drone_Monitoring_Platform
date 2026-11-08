@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import snapshot from '../../../../data/frontend.snapshot.json';
-import { staticLiveFlightDataSource } from './live/liveFlight.data';
-import { staticFlightHistoryDataSource } from './history/flightHistory.data';
+import { staticLiveFlightDataSource } from './live/liveFlight.static';
+import { staticFlightHistoryDataSource } from './history/flightHistory.static';
 import { alertSamples } from '../alerts/alerts.data';
 
 describe('v2.1.0 Flight Operations and Alerts static contract', () => {

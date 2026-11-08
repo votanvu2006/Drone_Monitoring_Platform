@@ -1,3 +1,4 @@
+import type { FlightHistoryDataSource } from "../flightHistory.types";
 import { useEffect, useState } from "react";
 import { flightHistoryDataSource } from "../flightHistory.data";
 import type { FlightHistoryRecord } from "../flightHistory.types";
@@ -10,7 +11,7 @@ type PageState =
   | { kind: "error" }
   | { kind: "ready"; records: FlightHistoryRecord[] };
 
-function FlightHistoryListPage() {
+function FlightHistoryListPage({ dataSource = flightHistoryDataSource }: { dataSource?: FlightHistoryDataSource }) {
   const [pageState, setPageState] = useState<PageState>({
     kind: "loading",
   });
@@ -19,16 +20,15 @@ function FlightHistoryListPage() {
   useEffect(() => {
     let isActive = true;
 
-    flightHistoryDataSource
+    dataSource
       .loadRecords()
       .then((records) => {
         if (isActive) {
           setPageState({ kind: "ready", records });
         }
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (isActive) {
-          console.error("Failed to load flight history:", error);
           setPageState({ kind: "error" });
         }
       });
@@ -36,7 +36,7 @@ function FlightHistoryListPage() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [dataSource]);
 
   return (
     <main className="flight-history-page">

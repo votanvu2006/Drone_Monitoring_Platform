@@ -118,14 +118,13 @@ function AppContent() {
         page={page}
         search={search}
         onNavigate={handleNavigate}
-          onSignOut={signOut}
+        onSignOut={signOut}
       />
     );
   }
 
   return (
-    <AppShell activeNav={null} onNavigate={handleNavigate}
-          onSignOut={signOut}>
+    <AppShell activeNav={null} onNavigate={handleNavigate} onSignOut={signOut}>
       <RouteNotFoundPage />
     </AppShell>
   );
