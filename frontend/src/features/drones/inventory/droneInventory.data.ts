@@ -1,7 +1,8 @@
-import { getAllApiPages } from '../../../lib/api';
+import { getAllApiPages, patchApiData } from '../../../lib/api';
 import type {
   FleetDataSource,
   FleetSnapshot,
+  PowerUpdate,
 } from './droneInventory.types';
 import type { DroneStatus } from '../drone.types';
 
@@ -55,5 +56,15 @@ export const fleetDataSource: FleetDataSource = {
         })),
       ),
     };
+  },
+
+  async setPower(
+    droneCode: string,
+    isOn: boolean,
+  ): Promise<PowerUpdate> {
+    return patchApiData<PowerUpdate>(
+      `/drones/${encodeURIComponent(droneCode)}/power`,
+      { isOn },
+    );
   },
 };

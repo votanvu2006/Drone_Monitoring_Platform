@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { ApiError } from '../middleware/error-handler';
+import { registerFleetPowerRoute } from './fleet-power';
 
 type DroneStatus = 'AVAILABLE' | 'IN_FLIGHT' | 'MAINTENANCE' | 'OFFLINE';
 type LocationSource =
@@ -187,6 +188,7 @@ async function readFindings(database: Pool, droneIds: number[]): Promise<Finding
 
 export function createFleetRouter(database: Pool): Router {
   const router = Router();
+  registerFleetPowerRoute(router, database);
 
   router.get('/drones', async (request, response, next) => {
     try {
@@ -294,7 +296,7 @@ export function createFleetRouter(database: Pool): Router {
           code: drone.drone_code,
           status: drone.status,
           // The write behavior of the Power switch belongs to #90.
-          isActivated: drone.status === 'IN_FLIGHT',
+          isActivated: drone.status !== 'OFFLINE',
           batteryPercent: Number(drone.battery_percent),
           serialNumber: drone.serial_number,
           manufacturer: drone.manufacturer,

@@ -16,9 +16,16 @@ type Envelope<T> = {
   pageSize?: number;
 };
 
-async function read<T>(path: string): Promise<Envelope<T>> {
+async function read<T>(
+  path: string,
+  options?: RequestInit,
+): Promise<Envelope<T>> {
   const response = await fetch(apiBase + path, {
-    headers: { Accept: 'application/json' },
+    headers: {
+      Accept: 'application/json',
+      ...(options?.method ? { 'Content-Type': 'application/json' } : {}),
+    },
+    ...options,
   });
 
   if (!response.ok) {
@@ -36,6 +43,18 @@ async function read<T>(path: string): Promise<Envelope<T>> {
 
 export async function getApiData<T>(path: string): Promise<T> {
   return (await read<T>(path)).data;
+}
+
+export async function patchApiData<T>(
+  path: string,
+  payload: unknown,
+): Promise<T> {
+  return (
+    await read<T>(path, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  ).data;
 }
 
 export async function getAllApiPages<T>(path: string): Promise<T[]> {
