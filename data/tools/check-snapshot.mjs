@@ -6,7 +6,7 @@ const tables = JSON.parse(await readFile(new URL('records.json', root), 'utf8'))
 const snapshot = JSON.parse(await readFile(new URL('frontend.snapshot.json', root), 'utf8'));
 assert.deepEqual(snapshot, buildSnapshot(tables));
 assert.equal(snapshot.missions.length, 5);
-assert.equal(snapshot.activeFlights.length, 1);
+assert.equal(snapshot.activeFlights.length, 0);
 assert.equal(snapshot.history.length, 4);
 assert.equal(snapshot.alerts.length, 3);
 assert.deepEqual(snapshot.history.map(flight => flight.flightCode), [
@@ -22,14 +22,14 @@ assert.deepEqual(featuredFlight.events.map(event => event.title), [
 ]);
 assert.equal(featuredFlight.events.at(-1).occurredAt, '2026-10-16T02:29:00.000Z');
 assert.equal(snapshot.fleet.findings.length, 1);
-assert.equal(snapshot.fleet.drones.filter(drone => drone.status === 'OFFLINE').length, 4);
-assert.equal(snapshot.fleet.drones.find(drone => drone.code === 'DRONE-003').status, 'IN_FLIGHT');
-assert.equal(snapshot.details.find(drone => drone.code === 'DRONE-003').isActivated, true);
+assert.equal(snapshot.fleet.drones.filter(drone => drone.status === 'OFFLINE').length, 5);
+assert.equal(snapshot.fleet.drones.find(drone => drone.code === 'DRONE-003').status, 'OFFLINE');
+assert.equal(snapshot.details.find(drone => drone.code === 'DRONE-003').isActivated, false);
 for (const flight of [...snapshot.activeFlights, ...snapshot.history]) {
   const mission = tables.missions.find(item => item.mission_code === flight.missionCode);
   const drone = tables.drones.find(item => item.drone_code === flight.droneCode);
   assert.equal(Number(mission.drone_id), Number(drone.id));
-  assert(![2, 5].includes(Number(mission.id)));
+  assert.notEqual(Number(mission.id), 5);
 }
 for (const detail of snapshot.historyDetails) {
   const record = snapshot.history.find(item => item.flightCode === detail.flightCode);
@@ -37,13 +37,12 @@ for (const detail of snapshot.historyDetails) {
   assert(detail.events.length >= 2);
   assert((Date.parse(detail.events.at(-1).occurredAt) - Date.parse(detail.startedAt)) / 1000 <= detail.durationSeconds);
 }
-assert.equal(snapshot.activeFlights[0].missionCode, 'mission-003');
+assert.equal(tables.missions.find(item => item.mission_code === 'mission-003').status, 'READY');
+assert.equal(tables.flights.find(item => item.flight_code === 'FLIGHT-015').status, 'READY');
+assert.equal(tables.missions.find(item => item.mission_code === 'mission-002').preflight_blocked, false);
 assert.equal(snapshot.details.find(item => item.code === 'DRONE-002').findings[0].componentCode,
   snapshot.fleet.findings[0].componentCode);
 for (const table of Object.values(tables)) assert(Array.isArray(table));
-const flyingDrone = tables.drones.find(item => Number(item.id) === 3);
-const lastDelivered = tables.telemetry.filter(item => Number(item.flight_id) === 15).sort((a, b) => Number(a.sequence_number) - Number(b.sequence_number)).at(-1);
-assert.equal(Number(flyingDrone.last_known_latitude), Number(lastDelivered.latitude));
-assert.equal(Number(flyingDrone.last_known_longitude), Number(lastDelivered.longitude));
-assert.equal(Number(flyingDrone.last_known_altitude_m), Number(lastDelivered.altitude_m));
+assert.equal(tables.telemetry.some(item => Number(item.flight_id) === 15), false);
+assert.equal(tables.flight_events.some(item => Number(item.flight_id) === 15), false);
 console.log('PASS: frontend snapshot, mission/flight ownership, preflight exclusion and complete history details.');
