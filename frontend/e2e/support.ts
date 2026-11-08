@@ -1,18 +1,18 @@
+import { apiFixture } from '../src/test/api-fixtures';
 import { test as base, expect } from '@playwright/test';
 import type { Page, TestInfo } from '@playwright/test';
 
 export const test = base.extend<{ staticGuard: void }>({
   staticGuard: [async ({ page }, use) => {
     const errors: string[] = [];
-    const dataRequests: string[] = [];
+    if (!process.env.E2E_LIVE_API) await page.route('**/api/**', async route => {
+      const body = apiFixture(route.request().url());
+      await route.fulfill({ status: body ? 200 : 404, json: body });
+    });
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
-    page.on('request', (request) => {
-      if (['fetch', 'xhr'].includes(request.resourceType())) dataRequests.push(request.url());
-    });
     await use();
     expect(errors, 'Browser console must remain free of errors').toEqual([]);
-    expect(dataRequests, 'Static examples must not make API requests').toEqual([]);
   }, { auto: true }],
 });
 export { expect };

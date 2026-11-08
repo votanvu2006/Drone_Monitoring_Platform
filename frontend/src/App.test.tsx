@@ -6,6 +6,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { mockApiFetch } from "./test/api-fixtures";
 import { DEMO_SESSION_KEY } from "./app/demo-session";
 import { App } from "./App";
 import { ThemeProvider } from "./app/ThemeProvider";
@@ -29,6 +30,7 @@ function getNavigation() {
 describe("application shell and module navigation", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.spyOn(globalThis, 'fetch').mockImplementation(mockApiFetch);
     localStorage.clear();
     localStorage.setItem(DEMO_SESSION_KEY, "active");
     document.documentElement.removeAttribute("data-theme");

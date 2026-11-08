@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockApiFetch } from '../test/api-fixtures';
 import { App } from '../App';
 import { DEMO_SESSION_KEY } from './demo-session';
 
 describe('mission alert navigation', () => {
+  beforeEach(() => { vi.spyOn(globalThis, 'fetch').mockImplementation(mockApiFetch); });
   it.each([
     ['DRONE-002', 'mission-002', 'Motor temperature warning'],
     ['DRONE-005', 'mission-005', 'Unsafe weather'],
@@ -16,12 +18,12 @@ describe('mission alert navigation', () => {
     fireEvent.click(within(row).getByRole('button', { name: /View alert/ }));
     expect(window.location.pathname).toBe('/alerts');
     expect(window.location.search).toContain('drone=' + drone);
-    expect(screen.getByRole('table')).toHaveTextContent(title);
+    expect(await screen.findByRole('table')).toHaveTextContent(title);
     expect(screen.getByRole('table')).not.toHaveTextContent(drone === 'DRONE-002' ? 'Unsafe weather' : 'Low battery');
     expect(screen.getByRole('table')).toHaveTextContent(mission);
     view.unmount();
     render(<App />);
-    expect(screen.getByRole('table')).toHaveTextContent(title);
+    expect(await screen.findByRole('table')).toHaveTextContent(title);
   });
 
   it('shows No alert for every other mission status', async () => {
