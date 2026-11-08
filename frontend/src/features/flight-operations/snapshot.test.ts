@@ -5,6 +5,13 @@ import { staticFlightHistoryDataSource } from './history/flightHistory.data';
 import { alertSamples } from '../alerts/alerts.data';
 
 describe('v2.1.0 Flight Operations and Alerts static contract', () => {
+  it('keeps the R5 offline baseline separate from powered-on API fixtures', () => {
+    expect(snapshot.metadata.buildId).toBe('DRONE-DATA-2.1.0-R5-20261106');
+    expect(snapshot.activeFlights).toEqual([]);
+    expect(snapshot.fleet.drones.every(drone => drone.status === 'OFFLINE')).toBe(true);
+    expect(snapshot.history).toHaveLength(4);
+  });
+
   it('shows the exact snapshot sections, with complete details for every historical flight', async () => {
     expect(await staticLiveFlightDataSource.loadActiveFlights()).toEqual(snapshot.activeFlights);
     expect(await staticFlightHistoryDataSource.loadRecords()).toEqual(snapshot.history);
