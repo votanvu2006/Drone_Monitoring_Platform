@@ -3,7 +3,7 @@ export const openApiDocument = {
   info: {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
-    description: 'Backend APIs for fleet, mission planning, airspace, demo weather, flight simulation and alert lifecycle management.',
+    description: 'Flight, mission and alert reads use data v2.1.0 R5 and expose only powered-on drones. Initial OFFLINE drones have no visible records; stored scenarios and history are retained. Legacy Airspace, Weather and Simulation migrations are separate.',
   },
   servers: [{ url: '/api' }],
   tags: [
@@ -130,7 +130,7 @@ export const openApiDocument = {
     },
     '/alerts': {
       get: {
-        tags: ['Alerts'], summary: 'List and filter alerts',
+        tags: ['Alerts'], summary: 'List and filter alerts for powered-on drones',
         parameters: [
           { name: 'droneCode', in: 'query', schema: { type: 'string' } },
           { name: 'missionCode', in: 'query', schema: { type: 'string' } },

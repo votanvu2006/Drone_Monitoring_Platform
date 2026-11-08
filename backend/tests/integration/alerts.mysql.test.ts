@@ -5,6 +5,7 @@ import { createApp } from '../../src/app';
 import {
   assertV2DataPack,
   createIntegrationDatabase,
+  powerDroneFixture,
   uniqueIntegrationCode,
 } from './support/database';
 
@@ -27,6 +28,7 @@ const database = createIntegrationDatabase();
 const app = createApp(database);
 let temporaryAlertId: number | null = null;
 let componentSnapshot: AlertOwnerRow | null = null;
+let restorePower: (() => Promise<void>) | undefined;
 
 describe('Alerts MySQL integration', () => {
   beforeAll(async () => {
@@ -34,6 +36,8 @@ describe('Alerts MySQL integration', () => {
   });
 
   afterEach(async () => {
+    await restorePower?.();
+    restorePower = undefined;
     if (temporaryAlertId !== null) {
       await database.execute('DELETE FROM alerts WHERE id = ?', [temporaryAlertId]);
       temporaryAlertId = null;
@@ -57,7 +61,14 @@ describe('Alerts MySQL integration', () => {
     await database.end();
   });
 
+  it('hides alerts when all drones are offline', async () => {
+    const response = await request(app).get('/api/alerts');
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ data: [], total: 0 });
+  });
+
   it('reads the v2.1.0 alerts with correct drone, mission and preflight ownership', async () => {
+    restorePower = await powerDroneFixture(database, ['DRONE-002', 'DRONE-005']);
     const response = await request(app).get('/api/alerts?status=ACTIVE&pageSize=100');
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({ page: 1, pageSize: 100, total: 3 });
@@ -74,6 +85,9 @@ describe('Alerts MySQL integration', () => {
   });
 
   it('combines identifying and lifecycle filters and paginates the matched set', async () => {
+    restorePower = await powerDroneFixture(database, ['DRONE-002']);
+    const hidden = await request(app).get('/api/alerts?droneCode=DRONE-005');
+    expect(hidden.body).toMatchObject({ data: [], total: 0 });
     const warning = await request(app).get('/api/alerts?droneCode=DRONE-002&missionCode=mission-002&severity=WARNING&source=TELEMETRY&status=ACTIVE&pageSize=1');
     expect(warning.status).toBe(200);
     expect(warning.body.total).toBe(2);
