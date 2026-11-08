@@ -181,7 +181,7 @@ export function createFlightOperationsRouter(database: Pool): Router {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'page is too large');
       }
 
-      const clauses: string[] = [];
+      const clauses: string[] = ["d.status <> 'OFFLINE'"];
       const values: unknown[] = [];
       if (request.query.droneId !== undefined) {
         clauses.push('f.drone_id = ?');
@@ -202,7 +202,7 @@ export function createFlightOperationsRouter(database: Pool): Router {
 
       const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
       const [countRows] = await database.query<CountRow[]>(
-        `SELECT COUNT(*) AS total FROM flights f ${where}`,
+        `SELECT COUNT(*) AS total FROM flights f JOIN drones d ON d.id = f.drone_id ${where}`,
         values,
       );
       const [rows] = await database.query<FlightRow[]>(
@@ -238,7 +238,7 @@ export function createFlightOperationsRouter(database: Pool): Router {
   router.get('/flights/active', async (_request, response, next) => {
     try {
       const [rows] = await database.query<FlightViewRow[]>(
-        `${viewSelect} WHERE f.status IN ('FLYING', 'PAUSED', 'RETURNING')
+        `${viewSelect} WHERE d.status <> 'OFFLINE' AND f.status IN ('FLYING', 'PAUSED', 'RETURNING')
          ORDER BY f.started_at DESC, f.id DESC`,
       );
       const data = await Promise.all(rows.map(async row => ({
@@ -255,7 +255,7 @@ export function createFlightOperationsRouter(database: Pool): Router {
   router.get('/flights/history', async (_request, response, next) => {
     try {
       const [rows] = await database.query<FlightViewRow[]>(
-        `${viewSelect} WHERE f.ended_at IS NOT NULL AND f.result IS NOT NULL
+        `${viewSelect} WHERE d.status <> 'OFFLINE' AND f.ended_at IS NOT NULL AND f.result IS NOT NULL
          ORDER BY f.started_at DESC, f.id DESC`,
       );
       response.json({ data: rows.map(historyRecord) });
@@ -269,7 +269,7 @@ export function createFlightOperationsRouter(database: Pool): Router {
         throw new ApiError(400, 'INVALID_ARGUMENT', 'Invalid flight code');
       }
       const [rows] = await database.query<FlightViewRow[]>(
-        `${viewSelect} WHERE f.flight_code = ? AND f.ended_at IS NOT NULL AND f.result IS NOT NULL`, [code],
+        `${viewSelect} WHERE d.status <> 'OFFLINE' AND f.flight_code = ? AND f.ended_at IS NOT NULL AND f.result IS NOT NULL`, [code],
       );
       const row = rows[0];
       if (!row) throw new ApiError(404, 'FLIGHT_NOT_FOUND', 'Flight record not found');
