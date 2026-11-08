@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { MissionListSection } from "./components/MissionListSection";
 import { missionListDataSource } from "./missionList.data";
-import type {
-  MissionListFilters,
-  MissionListItem,
+import {
+  MISSION_STATUSES,
+  type MissionDateFilter,
+  type MissionListFilters,
+  type MissionListItem,
+  type MissionStatusFilter,
 } from "./missionList.types";
 import {
   filterMissions,
@@ -18,12 +21,56 @@ type MissionListPageProps = {
   onViewAlert?: (mission: MissionListItem) => void;
 };
 
-const initialFilters: MissionListFilters = {
-  searchText: "",
-  status: "ALL",
-  droneCode: "ALL",
-  dateRange: "ALL",
-};
+function readFiltersFromUrl(): MissionListFilters {
+  const params = new URLSearchParams(window.location.search);
+  const requestedStatus = params.get("missionStatus");
+  const requestedDate = params.get("missionDate");
+
+  const status: MissionStatusFilter =
+    requestedStatus &&
+    MISSION_STATUSES.some((item) => item === requestedStatus)
+      ? (requestedStatus as MissionStatusFilter)
+      : "ALL";
+
+  const dateRange: MissionDateFilter =
+    requestedDate === "LAST_7_DAYS" ||
+    requestedDate === "LAST_30_DAYS"
+      ? requestedDate
+      : "ALL";
+
+  return {
+    searchText: params.get("missionSearch") ?? "",
+    status,
+    droneCode: params.get("missionDrone") || "ALL",
+    dateRange,
+  };
+}
+
+function writeFiltersToUrl(
+  filters: MissionListFilters,
+  replaceHistory: boolean,
+) {
+  const url = new URL(window.location.href);
+
+  function setOrDelete(name: string, value: string, defaultValue: string) {
+    if (value === defaultValue) {
+      url.searchParams.delete(name);
+    } else {
+      url.searchParams.set(name, value);
+    }
+  }
+
+  setOrDelete("missionSearch", filters.searchText, "");
+  setOrDelete("missionStatus", filters.status, "ALL");
+  setOrDelete("missionDrone", filters.droneCode, "ALL");
+  setOrDelete("missionDate", filters.dateRange, "ALL");
+
+  if (replaceHistory) {
+    window.history.replaceState({}, "", url);
+  } else {
+    window.history.pushState({}, "", url);
+  }
+}
 
 function CreateMissionControl() {
   return (
@@ -44,13 +91,11 @@ function CreateMissionControl() {
 }
 
 function MissionListPage({ onViewAlert }: MissionListPageProps) {
-  // Load mission data.
   const [missions, setMissions] = useState<MissionListItem[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
-
-  // Keep the selected filters on this page.
-  const [filters, setFilters] =
-    useState<MissionListFilters>(initialFilters);
+  const [filters, setFilters] = useState<MissionListFilters>(
+    readFiltersFromUrl,
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -58,12 +103,10 @@ function MissionListPage({ onViewAlert }: MissionListPageProps) {
     missionListDataSource
       .loadMissions()
       .then((data) => {
-        if (!isActive) {
-          return;
+        if (isActive) {
+          setMissions(data);
+          setLoadState("ready");
         }
-
-        setMissions(data);
-        setLoadState("ready");
       })
       .catch((error: unknown) => {
         console.error("Failed to load missions:", error);
@@ -78,7 +121,13 @@ function MissionListPage({ onViewAlert }: MissionListPageProps) {
     };
   }, []);
 
-  // Derive the values shown in the filters and table.
+  useEffect(() => {
+    const syncFromUrl = () => setFilters(readFiltersFromUrl());
+
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, []);
+
   const droneCodes = useMemo(
     () => getDroneCodes(missions),
     [missions],
@@ -94,11 +143,13 @@ function MissionListPage({ onViewAlert }: MissionListPageProps) {
     [missions, filters],
   );
 
-  function updateFilters(nextFilters: Partial<MissionListFilters>) {
-    setFilters((currentFilters) => ({
-      ...currentFilters,
-      ...nextFilters,
-    }));
+  function updateFilters(
+    nextFilters: Partial<MissionListFilters>,
+    replaceHistory = false,
+  ) {
+    const updated = { ...filters, ...nextFilters };
+    setFilters(updated);
+    writeFiltersToUrl(updated, replaceHistory);
   }
 
   return (
@@ -132,7 +183,7 @@ function MissionListPage({ onViewAlert }: MissionListPageProps) {
             droneCodes={droneCodes}
             filters={filters}
             onSearchTextChange={(searchText) =>
-              updateFilters({ searchText })
+              updateFilters({ searchText }, true)
             }
             onStatusChange={(status) =>
               updateFilters({ status })

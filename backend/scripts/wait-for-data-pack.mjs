@@ -1,49 +1,35 @@
 import 'dotenv/config';
+import { readFile } from 'node:fs/promises';
 import mysql from 'mysql2/promise';
+import { URL } from 'node:url';
+
+const manifest = JSON.parse(
+  await readFile(new URL('../../data/manifest.json', import.meta.url), 'utf8'),
+);
+
+if (manifest.version !== '2.1.0') {
+  throw new Error(`Expected data pack v2.1.0, found ${manifest.version}`);
+}
 
 const expectedMetadata = {
-  packVersion: '2.0.0',
-  dataRevision: 1,
-  buildId: 'DRONE-DATA-2.0.0-R1-20260919',
+  packVersion: manifest.version,
+  dataRevision: manifest.dataRevision,
+  buildId: manifest.buildId,
 };
 
-const expectedCounts = {
-  drones: 5,
-  drone_components: 70,
-  flight_zones: 8,
-  simulation_scenarios: 9,
-  missions: 20,
-  waypoints: 90,
-  flights: 20,
-  telemetry: 6000,
-  alerts: 24,
-};
-
+const expectedCounts = manifest.counts;
 const maxAttempts = 60;
 const retryDelayMs = 2000;
 
 const pool = mysql.createPool({
   host: globalThis.process.env.DB_HOST ?? '127.0.0.1',
-  port: Number(globalThis.process.env.DB_PORT ?? 3306),
-  database: globalThis.process.env.DB_NAME ?? 'drone_monitoring',
+  port: Number(globalThis.process.env.DB_PORT ?? 3307),
+  database: globalThis.process.env.DB_NAME ?? 'drone_monitoring_frontend',
   user: globalThis.process.env.DB_USER ?? 'drone_app',
   password: globalThis.process.env.DB_PASSWORD ?? 'drone_app_password',
   connectionLimit: 1,
   connectTimeout: 3000,
 });
-
-const countQuery = `
-  SELECT
-    (SELECT COUNT(*) FROM drones) AS drones,
-    (SELECT COUNT(*) FROM drone_components) AS drone_components,
-    (SELECT COUNT(*) FROM flight_zones) AS flight_zones,
-    (SELECT COUNT(*) FROM simulation_scenarios) AS simulation_scenarios,
-    (SELECT COUNT(*) FROM missions) AS missions,
-    (SELECT COUNT(*) FROM waypoints) AS waypoints,
-    (SELECT COUNT(*) FROM flights) AS flights,
-    (SELECT COUNT(*) FROM telemetry) AS telemetry,
-    (SELECT COUNT(*) FROM alerts) AS alerts
-`;
 
 async function readPackReadiness() {
   const [metadataRows] = await pool.query(
@@ -53,10 +39,14 @@ async function readPackReadiness() {
   const metadata = metadataRows[0];
 
   if (!metadata) {
-    return { ready: false, reason: 'data-pack metadata has not been imported yet' };
+    return {
+      ready: false,
+      reason: 'data-pack metadata has not been imported yet',
+    };
   }
 
-  const metadataMatches = metadata.pack_version === expectedMetadata.packVersion
+  const metadataMatches =
+    metadata.pack_version === expectedMetadata.packVersion
     && Number(metadata.data_revision) === expectedMetadata.dataRevision
     && metadata.build_id === expectedMetadata.buildId;
 
@@ -67,11 +57,20 @@ async function readPackReadiness() {
     };
   }
 
-  const [countRows] = await pool.query(countQuery);
-  const actualCounts = countRows[0];
-  const mismatches = Object.entries(expectedCounts)
-    .filter(([table, expected]) => Number(actualCounts[table]) !== expected)
-    .map(([table, expected]) => `${table}: ${actualCounts[table]} (expected ${expected})`);
+  const mismatches = [];
+
+  for (const [table, expected] of Object.entries(expectedCounts)) {
+    if (!/^[a-z_]+$/.test(table)) {
+      throw new Error(`Invalid table name in data manifest: ${table}`);
+    }
+
+    const [rows] = await pool.query(`SELECT COUNT(*) AS total FROM \`${table}\``);
+    const actual = Number(rows[0]?.total ?? 0);
+
+    if (actual !== expected) {
+      mismatches.push(`${table}: ${actual} (expected ${expected})`);
+    }
+  }
 
   return mismatches.length === 0
     ? { ready: true, reason: '' }
@@ -90,7 +89,9 @@ try {
       const readiness = await readPackReadiness();
 
       if (readiness.ready) {
-        globalThis.console.log(`Data pack ${expectedMetadata.buildId} is fully initialized.`);
+        globalThis.console.log(
+          `Data pack ${expectedMetadata.buildId} is fully initialized.`,
+        );
         globalThis.process.exitCode = 0;
         break;
       }
@@ -109,7 +110,9 @@ try {
     }
 
     if (attempt === 1 || attempt % 10 === 0) {
-      globalThis.console.log(`Waiting for v2.0.0 MySQL data import (${attempt}/${maxAttempts}): ${lastReason}`);
+      globalThis.console.log(
+        `Waiting for v2.1.0 MySQL data import (${attempt}/${maxAttempts}): ${lastReason}`,
+      );
     }
 
     await delay(retryDelayMs);

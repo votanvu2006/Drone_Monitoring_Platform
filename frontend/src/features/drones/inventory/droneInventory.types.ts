@@ -8,6 +8,7 @@ export type Drone = {
   code: string;
   modelName: string;
   status: DroneStatus;
+  batteryPercent: number;
   homeBase: string;
   lastKnownLocation: string | null;
   activeMission: string | null;
@@ -26,6 +27,13 @@ export type FleetSnapshot = {
   findings: ComponentFinding[];
 };
 
+export type PowerUpdate = {
+  droneCode: string;
+  status: DroneStatus;
+  isActivated: boolean;
+};
+
 export type FleetDataSource = {
   loadSnapshot: () => Promise<FleetSnapshot>;
+  setPower: (droneCode: string, isOn: boolean) => Promise<PowerUpdate>;
 };
