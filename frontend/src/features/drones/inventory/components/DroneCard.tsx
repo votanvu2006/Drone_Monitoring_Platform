@@ -2,11 +2,13 @@ import type { Drone, DroneStatus } from "../droneInventory.types";
 import { DroneIllustration } from "../../shared/DroneIllustration";
 import "../styles/drone-card.css";
 
-const BATTERY_PREVIEW_LEVEL = 100;
-
 type DroneCardProps = {
   drone: Drone;
   onViewDetails: (droneCode: string) => void;
+  onTogglePower: (droneCode: string, isOn: boolean) => Promise<void>;
+  powerBusy: boolean;
+  isUpdating: boolean;
+  powerError?: string;
 };
 
 function formatStatus(status: DroneStatus) {
@@ -30,33 +32,74 @@ function ArrowIcon() {
 }
 
 function BatteryMeter({ level }: { level: number }) {
+  const displayLevel = Math.max(0, Math.min(100, level));
+
   return (
     <div
       className="battery-meter"
       role="img"
-      aria-label={`Battery visual placeholder: ${level}%`}
+      aria-label={`Battery: ${displayLevel}%`}
     >
       <div className="battery-body">
-        <span className="battery-fill" style={{ width: `${level}%` }} />
+        <span
+          className="battery-fill"
+          style={{ width: `${displayLevel}%` }}
+        />
       </div>
       <span className="battery-cap" />
     </div>
   );
 }
 
-function PowerSwitch({ droneCode }: { droneCode: string }) {
+function PowerSwitch({
+  drone,
+  onTogglePower,
+  powerBusy,
+  isUpdating,
+}: {
+  drone: Drone;
+  onTogglePower: (droneCode: string, isOn: boolean) => Promise<void>;
+  powerBusy: boolean;
+  isUpdating: boolean;
+}) {
+  const isOn = drone.status !== "OFFLINE";
+  const isLocked =
+    drone.status === "IN_FLIGHT" || drone.status === "MAINTENANCE";
+
   return (
     <button
       className="power-switch"
       type="button"
-      disabled
-      aria-label={`${droneCode} power is off`}
-      aria-pressed={false}
+      disabled={powerBusy || isLocked}
+      aria-label={`${drone.code} power is ${isOn ? "on" : "off"}`}
+      aria-pressed={isOn}
+      aria-busy={isUpdating}
+      title={
+        isLocked
+          ? "Power unavailable while in flight or maintenance"
+          : undefined
+      }
+      style={{
+        cursor: isLocked ? "not-allowed" : "pointer",
+      }}
+      onClick={() => {
+        void onTogglePower(drone.code, !isOn);
+      }}
     >
-      <span className="switch-track">
-        <span className="switch-knob" />
+      <span
+        className="switch-track"
+        style={{
+          background: isOn ? "var(--button-primary)" : undefined,
+        }}
+      >
+        <span
+          className="switch-knob"
+          style={{
+            transform: isOn ? "translateX(11px)" : undefined,
+          }}
+        />
       </span>
-      <span className="switch-label">OFF</span>
+      <span className="switch-label">{isOn ? "ON" : "OFF"}</span>
     </button>
   );
 }
@@ -64,6 +107,10 @@ function PowerSwitch({ droneCode }: { droneCode: string }) {
 export function DroneCard({
   drone,
   onViewDetails,
+  onTogglePower,
+  powerBusy,
+  isUpdating,
+  powerError,
 }: DroneCardProps) {
   return (
     <article className="drone-card">
@@ -87,7 +134,9 @@ export function DroneCard({
       <div className="drone-meta">
         <div>
           <span>Location</span>
-          <strong>{drone.lastKnownLocation ?? "No location reported"}</strong>
+          <strong>
+            {drone.lastKnownLocation ?? "No location reported"}
+          </strong>
         </div>
         <div>
           <span>Active mission</span>
@@ -98,13 +147,18 @@ export function DroneCard({
       <div className="battery-block">
         <div className="battery-label-row">
           <span>Battery</span>
-          <strong>{BATTERY_PREVIEW_LEVEL}%</strong>
+          <strong>{drone.batteryPercent}%</strong>
         </div>
-        <BatteryMeter level={BATTERY_PREVIEW_LEVEL} />
+        <BatteryMeter level={drone.batteryPercent} />
       </div>
 
       <div className="drone-card-actions">
-        <PowerSwitch droneCode={drone.code} />
+        <PowerSwitch
+          drone={drone}
+          onTogglePower={onTogglePower}
+          powerBusy={powerBusy}
+          isUpdating={isUpdating}
+        />
 
         <button
           className="details-button"
@@ -116,6 +170,20 @@ export function DroneCard({
           <ArrowIcon />
         </button>
       </div>
+
+      {powerError && (
+        <p
+          role="alert"
+          style={{
+            margin: "10px 0 0",
+            color: "var(--danger-fg, #cf222e)",
+            fontSize: "12px",
+            lineHeight: 1.4,
+          }}
+        >
+          {powerError}
+        </p>
+      )}
     </article>
   );
 }
