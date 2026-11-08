@@ -11,6 +11,7 @@ export type LiveFlightSnapshot = {
   droneCode: string;
   flightStatus: "IN_PROGRESS";
   routeName: string;
+  routeProgressPercent?: number;
   currentWaypointIndex: number;
   waypoints: FlightWaypoint[];
 };
