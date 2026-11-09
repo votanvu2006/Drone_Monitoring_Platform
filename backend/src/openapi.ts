@@ -4,7 +4,7 @@ export const openApiDocument = {
     title: 'Drone Monitoring Platform API',
     version: '0.2.0',
     description:
-      'R5 demo APIs for Fleet, Missions, Flight Operations and Alerts. Mission, flight and alert lists show records for powered-on drones.',
+      'R6 demo APIs for Fleet, Missions, Flight Operations and Alerts. Mission, flight and alert lists show records for powered-on drones.',
   },
   servers: [{ url: '/api' }],
   tags: [
@@ -51,7 +51,7 @@ export const openApiDocument = {
         tags: ['Fleet'],
         summary: 'Switch a demo drone power state',
         description:
-          'R5 demo: powering on DRONE-002 enters maintenance; powering on DRONE-003 starts its ready mission and flight. An in-flight or maintenance drone cannot be switched off.',
+          'R6 demo: powering on DRONE-002 enters maintenance; powering on DRONE-003 starts its ready mission and flight. An in-flight or maintenance drone cannot be switched off.',
         parameters: [{
           name: 'droneCode',
           in: 'path',
@@ -193,7 +193,7 @@ export const openApiDocument = {
           { name: 'pageSize', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
         ],
         responses: {
-          '200': { description: 'Paginated R5 alerts with drone, mission and incident details; flight_id may be null for blocked preflight alerts.' },
+          '200': { description: 'Paginated R6 alerts with drone, mission and incident details; flight_id may be null for blocked preflight alerts.' },
           '400': { description: 'Invalid pagination or filters' },
         },
       },
@@ -364,7 +364,7 @@ export const openApiDocument = {
       MissionDetail: {
         type: 'object',
         required: [
-          'id', 'missionCode', 'name', 'description', 'drone', 'status',
+          'id', 'missionCode', 'flightCode', 'name', 'description', 'drone', 'status',
           'validationStatus', 'validationMessage', 'plannedAltitudeM',
           'plannedSpeedMps', 'estimatedDistanceM', 'estimatedDurationSec',
           'progressPercent', 'createdAt', 'updatedAt', 'waypoints',
@@ -372,6 +372,11 @@ export const openApiDocument = {
         properties: {
           id: { type: 'integer', format: 'int64' },
           missionCode: { type: 'string' },
+          flightCode: {
+            type: 'string',
+            nullable: true,
+            description: 'Flight code when a flight has started or completed; null when no flight has taken off.',
+          },
           name: { type: 'string' },
           description: { type: 'string', nullable: true },
           drone: {
@@ -404,12 +409,17 @@ export const openApiDocument = {
       MissionListItem: {
         type: 'object',
         required: [
-          'id', 'missionCode', 'name', 'drone', 'status', 'validationStatus',
+          'id', 'missionCode', 'flightCode', 'name', 'drone', 'status', 'validationStatus',
           'progressPercent', 'estimatedDistanceM', 'waypointCount', 'createdAt',
         ],
         properties: {
           id: { type: 'integer', format: 'int64' },
           missionCode: { type: 'string' },
+          flightCode: {
+            type: 'string',
+            nullable: true,
+            description: 'Flight code when a flight has started or completed; null when no flight has taken off.',
+          },
           name: { type: 'string' },
           drone: {
             type: 'object',

@@ -18,6 +18,7 @@ type WaypointType = 'START' | 'INTERMEDIATE' | 'DESTINATION';
 interface MissionListRow extends RowDataPacket {
   id: number | string;
   mission_code: string;
+  flight_code: string | null;
   name: string;
   assigned_drone_id: number | string;
   assigned_drone_code: string;
@@ -37,6 +38,7 @@ interface CountRow extends RowDataPacket {
 interface MissionDetailRow extends RowDataPacket {
   id: number | string;
   mission_code: string;
+  flight_code: string | null;
   name: string;
   description: string | null;
   assigned_drone_id: number | string;
@@ -67,6 +69,7 @@ interface WaypointRow extends RowDataPacket {
 interface MissionListItem {
   id: number;
   missionCode: string;
+  flightCode: string | null;
   name: string;
   drone: {
     id: number;
@@ -94,6 +97,7 @@ interface MissionWaypoint {
 interface MissionDetail {
   id: number;
   missionCode: string;
+  flightCode: string | null;
   name: string;
   description: string | null;
   drone: {
@@ -142,6 +146,7 @@ function toMissionListItem(row: MissionListRow): MissionListItem {
   return {
     id: Number(row.id),
     missionCode: row.mission_code,
+    flightCode: row.flight_code,
     name: row.name,
     drone: {
       id: Number(row.assigned_drone_id),
@@ -164,6 +169,7 @@ function toMissionDetail(
   return {
     id: Number(row.id),
     missionCode: row.mission_code,
+    flightCode: row.flight_code,
     name: row.name,
     description: row.description,
     drone: {
@@ -201,6 +207,9 @@ export function createMissionsRouter(database: Pool): Router {
       const missionId = positiveInteger(request.params.missionId, 'missionId');
       const [missionRows] = await database.query<MissionDetailRow[]>(
         `SELECT m.id, m.mission_code, m.name, m.description,
+         (SELECT f.flight_code FROM flights f WHERE f.mission_id = m.id
+           AND f.status IN ('FLYING', 'PAUSED', 'RETURNING', 'LANDED', 'ABORTED')
+           ORDER BY f.id DESC LIMIT 1) AS flight_code,
          d.id AS assigned_drone_id, d.drone_code AS assigned_drone_code,
          d.display_name AS assigned_drone_display_name, m.status, m.validation_status,
          m.validation_message, m.planned_altitude_m, m.planned_speed_mps,
@@ -285,6 +294,9 @@ export function createMissionsRouter(database: Pool): Router {
       );
       const [rows] = await database.query<MissionListRow[]>(
         `SELECT m.id, m.mission_code, m.name,
+         (SELECT f.flight_code FROM flights f WHERE f.mission_id = m.id
+           AND f.status IN ('FLYING', 'PAUSED', 'RETURNING', 'LANDED', 'ABORTED')
+           ORDER BY f.id DESC LIMIT 1) AS flight_code,
          d.id AS assigned_drone_id, d.drone_code AS assigned_drone_code,
          d.display_name AS assigned_drone_display_name, m.status, m.validation_status,
          m.progress_percent, m.estimated_distance_m,

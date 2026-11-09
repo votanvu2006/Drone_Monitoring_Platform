@@ -1,7 +1,7 @@
 {
   "version": "2.1.0",
-  "dataRevision": 5,
-  "buildId": "DRONE-DATA-2.1.0-R5-20261106",
+  "dataRevision": 6,
+  "buildId": "DRONE-DATA-2.1.0-R6-20261109",
   "counts": {
     "data_pack_metadata": 1,
     "drone_models": 1,
@@ -9,20 +9,20 @@
     "component_catalog": 14,
     "drone_components": 70,
     "simulation_scenarios": 1,
-    "missions": 9,
-    "waypoints": 66,
+    "missions": 5,
+    "waypoints": 37,
     "weather_demo_profiles": 3,
     "weather_checks": 1,
-    "flights": 5,
-    "telemetry": 26,
+    "flights": 2,
+    "telemetry": 5,
     "alert_rule_catalog": 5,
     "alerts": 3,
     "demo_runs": 1,
-    "flight_events": 9,
+    "flight_events": 2,
     "component_findings": 1
   },
   "currentMissions": 5,
-  "historyRecords": 4,
+  "historyRecords": 1,
   "activeFlights": 0,
   "telemetryKind": "Sparse synthetic route observations; not a two-second playback stream"
 }

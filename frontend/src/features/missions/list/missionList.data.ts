@@ -7,6 +7,7 @@ import type {
 type ApiMission = {
   missionCode: string;
   name: string;
+  flightCode: string | null;
   drone: {
     droneCode: string;
   };
@@ -49,6 +50,7 @@ export const missionListDataSource = {
         id: mission.missionCode,
         name: mission.name,
         droneCode: mission.drone.droneCode,
+        flightCode: mission.flightCode,
         status: mission.status,
         waypointCount: mission.waypointCount,
         createdAt: toUtcDateTime(mission.createdAt),

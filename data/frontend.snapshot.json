@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "buildId": "DRONE-DATA-2.1.0-R5-20261106",
+    "buildId": "DRONE-DATA-2.1.0-R6-20261109",
     "runCode": "INITIAL-MOTOR-FRONT-LEFT"
   },
   "fleet": {
@@ -883,33 +883,9 @@
   "activeFlights": [],
   "history": [
     {
-      "flightCode": "FLIGHT-014",
-      "droneCode": "DRONE-001",
-      "missionCode": "MISSION-014",
-      "status": "COMPLETED",
-      "startedAt": "2026-10-16T02:15:00.000Z",
-      "durationSeconds": 1122
-    },
-    {
-      "flightCode": "FLIGHT-012",
-      "droneCode": "DRONE-005",
-      "missionCode": "MISSION-012",
-      "status": "FAILED",
-      "startedAt": "2026-10-14T01:55:00.000Z",
-      "durationSeconds": 496
-    },
-    {
-      "flightCode": "FLIGHT-011",
-      "droneCode": "DRONE-003",
-      "missionCode": "MISSION-011",
-      "status": "COMPLETED",
-      "startedAt": "2026-10-13T09:10:00.000Z",
-      "durationSeconds": 1380
-    },
-    {
-      "flightCode": "FLIGHT-010",
+      "flightCode": "FLIGHT-004",
       "droneCode": "DRONE-004",
-      "missionCode": "MISSION-010",
+      "missionCode": "mission-004",
       "status": "COMPLETED",
       "startedAt": "2026-10-12T03:05:00.000Z",
       "durationSeconds": 945
@@ -917,238 +893,9 @@
   ],
   "historyDetails": [
     {
-      "flightCode": "FLIGHT-014",
-      "droneCode": "DRONE-001",
-      "missionCode": "MISSION-014",
-      "status": "COMPLETED",
-      "startedAt": "2026-10-16T02:15:00.000Z",
-      "durationSeconds": 1122,
-      "routeName": "North Perimeter Survey",
-      "waypoints": [
-        {
-          "code": "WP-01",
-          "x": 8,
-          "y": 48
-        },
-        {
-          "code": "WP-02",
-          "x": 21,
-          "y": 39
-        },
-        {
-          "code": "WP-03",
-          "x": 33,
-          "y": 48
-        },
-        {
-          "code": "WP-04",
-          "x": 45,
-          "y": 27
-        },
-        {
-          "code": "WP-05",
-          "x": 59,
-          "y": 34
-        },
-        {
-          "code": "WP-06",
-          "x": 70,
-          "y": 15
-        },
-        {
-          "code": "WP-07",
-          "x": 83,
-          "y": 24
-        },
-        {
-          "code": "WP-08",
-          "x": 93,
-          "y": 10
-        }
-      ],
-      "telemetry": {
-        "startBatteryPercent": 100,
-        "endBatteryPercent": 62,
-        "maxAltitudeMeters": 82,
-        "averageSpeedMps": 9.4,
-        "distanceMeters": 3620
-      },
-      "events": [
-        {
-          "id": "event-001",
-          "occurredAt": "2026-10-16T02:15:00.000Z",
-          "title": "Flight started",
-          "description": "The drone began the assigned route.",
-          "severity": "INFO"
-        },
-        {
-          "id": "event-002",
-          "occurredAt": "2026-10-16T02:20:00.000Z",
-          "title": "Waypoint reached",
-          "description": "The drone reached waypoint WP-04.",
-          "severity": "INFO"
-        },
-        {
-          "id": "event-003",
-          "occurredAt": "2026-10-16T02:29:00.000Z",
-          "title": "Route completed",
-          "description": "The drone returned after completing the route.",
-          "severity": "INFO"
-        }
-      ]
-    },
-    {
-      "flightCode": "FLIGHT-012",
-      "droneCode": "DRONE-005",
-      "missionCode": "MISSION-012",
-      "status": "FAILED",
-      "startedAt": "2026-10-14T01:55:00.000Z",
-      "durationSeconds": 496,
-      "routeName": "Historical Demo Route",
-      "waypoints": [
-        {
-          "code": "WP-01",
-          "x": 8,
-          "y": 48
-        },
-        {
-          "code": "WP-02",
-          "x": 21,
-          "y": 39
-        },
-        {
-          "code": "WP-03",
-          "x": 33,
-          "y": 48
-        },
-        {
-          "code": "WP-04",
-          "x": 45,
-          "y": 27
-        },
-        {
-          "code": "WP-05",
-          "x": 59,
-          "y": 34
-        },
-        {
-          "code": "WP-06",
-          "x": 70,
-          "y": 15
-        },
-        {
-          "code": "WP-07",
-          "x": 83,
-          "y": 24
-        },
-        {
-          "code": "WP-08",
-          "x": 93,
-          "y": 10
-        }
-      ],
-      "telemetry": {
-        "startBatteryPercent": 100,
-        "endBatteryPercent": 82,
-        "maxAltitudeMeters": 82,
-        "averageSpeedMps": 3.17,
-        "distanceMeters": 1450
-      },
-      "events": [
-        {
-          "id": "FLIGHT-012-START",
-          "occurredAt": "2026-10-14T01:55:00.000Z",
-          "title": "Flight started",
-          "description": "The drone began the assigned route.",
-          "severity": "INFO"
-        },
-        {
-          "id": "FLIGHT-012-END",
-          "occurredAt": "2026-10-14T02:03:16.000Z",
-          "title": "Flight ended",
-          "description": "The historical flight ended before completing its route.",
-          "severity": "ERROR"
-        }
-      ]
-    },
-    {
-      "flightCode": "FLIGHT-011",
-      "droneCode": "DRONE-003",
-      "missionCode": "MISSION-011",
-      "status": "COMPLETED",
-      "startedAt": "2026-10-13T09:10:00.000Z",
-      "durationSeconds": 1380,
-      "routeName": "Completed Demo Route",
-      "waypoints": [
-        {
-          "code": "WP-01",
-          "x": 8,
-          "y": 48
-        },
-        {
-          "code": "WP-02",
-          "x": 21,
-          "y": 39
-        },
-        {
-          "code": "WP-03",
-          "x": 33,
-          "y": 48
-        },
-        {
-          "code": "WP-04",
-          "x": 45,
-          "y": 27
-        },
-        {
-          "code": "WP-05",
-          "x": 59,
-          "y": 34
-        },
-        {
-          "code": "WP-06",
-          "x": 70,
-          "y": 15
-        },
-        {
-          "code": "WP-07",
-          "x": 83,
-          "y": 24
-        },
-        {
-          "code": "WP-08",
-          "x": 93,
-          "y": 10
-        }
-      ],
-      "telemetry": {
-        "startBatteryPercent": 100,
-        "endBatteryPercent": 65,
-        "maxAltitudeMeters": 82,
-        "averageSpeedMps": 3.33,
-        "distanceMeters": 4600
-      },
-      "events": [
-        {
-          "id": "FLIGHT-011-START",
-          "occurredAt": "2026-10-13T09:10:00.000Z",
-          "title": "Flight started",
-          "description": "The drone began the assigned route.",
-          "severity": "INFO"
-        },
-        {
-          "id": "FLIGHT-011-END",
-          "occurredAt": "2026-10-13T09:33:00.000Z",
-          "title": "Route completed",
-          "description": "The drone completed the route.",
-          "severity": "INFO"
-        }
-      ]
-    },
-    {
-      "flightCode": "FLIGHT-010",
+      "flightCode": "FLIGHT-004",
       "droneCode": "DRONE-004",
-      "missionCode": "MISSION-010",
+      "missionCode": "mission-004",
       "status": "COMPLETED",
       "startedAt": "2026-10-12T03:05:00.000Z",
       "durationSeconds": 945,
@@ -1189,14 +936,14 @@
       },
       "events": [
         {
-          "id": "FLIGHT-010-START",
+          "id": "FLIGHT-004-START",
           "occurredAt": "2026-10-12T03:05:00.000Z",
           "title": "Flight started",
           "description": "The drone began the assigned route.",
           "severity": "INFO"
         },
         {
-          "id": "FLIGHT-010-END",
+          "id": "FLIGHT-004-END",
           "occurredAt": "2026-10-12T03:20:45.000Z",
           "title": "Route completed",
           "description": "The drone completed the route.",
