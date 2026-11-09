@@ -19,6 +19,7 @@ export type MissionListItem = {
   id: string;
   name: string;
   droneCode: string;
+  flightCode: string | null;
   status: MissionStatus;
   waypointCount: number;
   createdAt: string;

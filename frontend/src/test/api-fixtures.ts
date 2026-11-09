@@ -1,22 +1,32 @@
+import records from '../../../data/records.json' with { type: 'json' };
 import snapshot from '../../../data/frontend.snapshot.json' with { type: 'json' };
 import type { LiveFlightSnapshot } from '../features/flight-operations/live/liveFlight.types';
 
-// R5 starts with no active flights. This fixture represents DRONE-003
-// after its demo power scenario has been activated.
+const mission003Waypoints = records.waypoints
+  .filter((point) => point.mission_id === 3)
+  .sort((a, b) => a.sequence_number - b.sequence_number)
+  .map((point) => ({
+    code: `WP-${String(point.sequence_number).padStart(2, '0')}`,
+    label:
+      point.waypoint_type === 'START'
+        ? 'Launch'
+        : point.waypoint_type === 'DESTINATION'
+          ? 'Return'
+          : `Waypoint ${String(point.sequence_number).padStart(2, '0')}`,
+    x: point.map_x,
+    y: point.map_y,
+  }));
+
+// R6 starts offline. This fixture represents DRONE-003 after power ON.
 export const activatedFlight: LiveFlightSnapshot = {
-  flightCode: 'FLIGHT-015',
+  flightCode: 'FLIGHT-003',
   missionCode: 'mission-003',
   droneCode: 'DRONE-003',
   flightStatus: 'IN_PROGRESS',
-  routeName: 'Activated demo route',
+  routeName: 'North Perimeter Survey',
   currentWaypointIndex: 2,
   routeProgressPercent: 25,
-  waypoints: snapshot.historyDetails
-    .find((row) => row.flightCode === 'FLIGHT-014')!
-    .waypoints.map((point, index) => ({
-      ...point,
-      label: index === 0 ? 'Launch' : `Waypoint ${index + 1}`,
-    })),
+  waypoints: mission003Waypoints,
 };
 
 export const apiAlertRows = snapshot.alerts.map((alert, index) => ({
@@ -125,6 +135,12 @@ export function apiFixture(
           id: Number(row.id.split('-')[1]),
           missionCode: row.id,
           name: row.name,
+          flightCode:
+            row.droneCode === 'DRONE-003'
+              ? activatedFlight.flightCode
+              : snapshot.history.find(
+                  (flight) => flight.missionCode === row.id,
+                )?.flightCode ?? null,
           drone: { droneCode: row.droneCode },
           status:
             row.droneCode === 'DRONE-003'

@@ -24,7 +24,7 @@ interface FlightStatusRow extends RowDataPacket {
 
 const database = createIntegrationDatabase();
 
-describe('Fleet power API with MySQL v2.1.0 R5', () => {
+describe('Fleet power API with MySQL v2.1.0 R6', () => {
   beforeAll(async () => {
     await assertV2DataPack(database);
   });
@@ -33,14 +33,14 @@ describe('Fleet power API with MySQL v2.1.0 R5', () => {
     await database.end();
   });
 
-  it('persists R5 power scenarios and blocks unsafe shutdowns', async () => {
+  it('persists R6 power scenarios and blocks unsafe shutdowns', async () => {
     const connection = await database.getConnection();
 
     try {
       await connection.beginTransaction();
 
       // API requests use savepoints inside this test transaction.
-      // The outer rollback restores the original R5 demo data.
+      // The outer rollback restores the original R6 demo data.
       const requestConnection = {
         query: connection.query.bind(connection),
         beginTransaction: async () => {
@@ -116,13 +116,14 @@ describe('Fleet power API with MySQL v2.1.0 R5', () => {
         isActivated: true,
       });
 
-      // Verify the same R5 power change is visible through the read APIs.
+      // Verify the same R6 power change is visible through the read APIs.
       const currentMissions = await request(app).get('/api/missions');
       expect(currentMissions.status).toBe(200);
       expect(currentMissions.body.data).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             missionCode: 'mission-003',
+            flightCode: 'FLIGHT-003',
             status: 'IN_PROGRESS',
           }),
         ]),
@@ -133,7 +134,7 @@ describe('Fleet power API with MySQL v2.1.0 R5', () => {
       expect(activeFlights.body.data).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            flightCode: 'FLIGHT-015',
+            flightCode: 'FLIGHT-003',
             missionCode: 'mission-003',
             droneCode: 'DRONE-003',
             status: 'FLYING',
@@ -165,7 +166,7 @@ describe('Fleet power API with MySQL v2.1.0 R5', () => {
       const [flightRows] = await connection.query<FlightStatusRow[]>(
         `SELECT status, route_progress_percent, started_at
          FROM flights WHERE flight_code = ?`,
-        ['FLIGHT-015'],
+        ['FLIGHT-003'],
       );
       expect(flightRows[0]).toMatchObject({
         status: 'FLYING',

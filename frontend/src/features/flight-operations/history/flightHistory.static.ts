@@ -1,7 +1,7 @@
 import snapshot from '../../../../../data/frontend.snapshot.json';
 import type { FlightHistoryDataSource, FlightHistoryDetail, FlightHistoryRecord } from './flightHistory.types';
 
-export const DEFAULT_FLIGHT_CODE = 'FLIGHT-014';
+export const DEFAULT_FLIGHT_CODE = 'FLIGHT-004';
 
 export const staticFlightHistoryDataSource: FlightHistoryDataSource = {
   async loadRecords() {

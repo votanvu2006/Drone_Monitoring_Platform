@@ -105,11 +105,11 @@ describe('Alerts MySQL integration', () => {
        FROM flights f
        JOIN drone_components dc ON dc.drone_id = f.drone_id
        JOIN component_catalog c ON c.id = dc.component_catalog_id
-       WHERE f.flight_code = 'FLIGHT-010' AND c.component_type = 'PROPELLER'
+       WHERE f.flight_code = 'FLIGHT-004' AND c.component_type = 'PROPELLER'
          AND c.position = 'FRONT_LEFT' LIMIT 1`,
     );
     componentSnapshot = owners[0] ?? null;
-    if (!componentSnapshot) throw new Error('Expected the FLIGHT-010 propeller component fixture');
+    if (!componentSnapshot) throw new Error('Expected the FLIGHT-004 propeller component fixture');
 
     const [insert] = await database.execute<ResultSetHeader>(
       `INSERT INTO alerts

@@ -22,7 +22,7 @@ async function withPoweredDrones(
   }
 }
 
-describe('Missions MySQL v2.1.0 R5 integration', () => {
+describe('Missions MySQL v2.1.0 R6 integration', () => {
   beforeAll(async () => {
     await assertV2DataPack(integrationDatabase);
   });
@@ -43,7 +43,7 @@ describe('Missions MySQL v2.1.0 R5 integration', () => {
     });
   });
 
-  it('lists only the five current R5 missions when all drones are on', async () => {
+  it('lists only the five current R6 missions when all drones are on', async () => {
     await withPoweredDrones(
       ['DRONE-001', 'DRONE-002', 'DRONE-003', 'DRONE-004', 'DRONE-005'],
       async () => {
@@ -55,11 +55,11 @@ describe('Missions MySQL v2.1.0 R5 integration', () => {
           pageSize: 25,
           total: 5,
           data: [
-            { missionCode: 'mission-001', status: 'READY', waypointCount: 6 },
-            { missionCode: 'mission-002', status: 'WARNING', waypointCount: 8 },
-            { missionCode: 'mission-003', status: 'READY', waypointCount: 8 },
-            { missionCode: 'mission-004', status: 'COMPLETED', waypointCount: 5 },
-            { missionCode: 'mission-005', status: 'FAILED', waypointCount: 10 },
+            { missionCode: 'mission-001', status: 'READY', flightCode: null, waypointCount: 6 },
+            { missionCode: 'mission-002', status: 'WARNING', flightCode: null, waypointCount: 8 },
+            { missionCode: 'mission-003', status: 'READY', flightCode: null, waypointCount: 8 },
+            { missionCode: 'mission-004', status: 'COMPLETED', flightCode: 'FLIGHT-004', waypointCount: 5 },
+            { missionCode: 'mission-005', status: 'FAILED', flightCode: null, waypointCount: 10 },
           ],
         });
       },
@@ -103,7 +103,7 @@ describe('Missions MySQL v2.1.0 R5 integration', () => {
     );
   });
 
-  it('filters visible missions by drone and R5 status', async () => {
+  it('filters visible missions by drone and R6 status', async () => {
     await withPoweredDrones(['DRONE-001', 'DRONE-002', 'DRONE-003'], async () => {
       const warning = await request(app)
         .get('/api/missions?droneId=2&status=WARNING');
@@ -149,25 +149,25 @@ describe('Missions MySQL v2.1.0 R5 integration', () => {
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
-  it('keeps historical missions available by detail ID but out of the list', async () => {
+  it('links completed mission 004 to FLIGHT-004 and excludes removed historical missions', async () => {
     await withPoweredDrones(['DRONE-004'], async () => {
-      const detail = await request(app).get('/api/missions/10');
+      const detail = await request(app).get('/api/missions/4');
+      const removed = await request(app).get('/api/missions/10');
       const list = await request(app).get('/api/missions?pageSize=100');
 
       expect(detail.status).toBe(200);
       expect(detail.body.data).toMatchObject({
-        missionCode: 'MISSION-010',
+        missionCode: 'mission-004',
         status: 'COMPLETED',
+        flightCode: 'FLIGHT-004',
       });
       expect(detail.body.data.waypoints).toHaveLength(5);
-
+      expect(removed.status).toBe(404);
       expect(list.status).toBe(200);
-      expect(list.body.total).toBe(1);
-      expect(
-        list.body.data.map(
-          (mission: { missionCode: string }) => mission.missionCode,
-        ),
-      ).not.toContain('MISSION-010');
+      expect(list.body).toMatchObject({
+        total: 1,
+        data: [{ missionCode: 'mission-004', flightCode: 'FLIGHT-004' }],
+      });
     });
   });
 

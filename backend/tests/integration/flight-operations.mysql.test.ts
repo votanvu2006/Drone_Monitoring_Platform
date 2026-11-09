@@ -11,18 +11,18 @@ const database = createIntegrationDatabase();
 const app = createApp(database);
 const droneCodes = snapshot.fleet.drones.map((drone: { code: string }) => drone.code);
 
-describe('Flight Operations MySQL v2.1.0 R5', () => {
+describe('Flight Operations MySQL v2.1.0 R6', () => {
   beforeAll(async () => { await assertV2DataPack(database); });
   afterAll(async () => { await database.end(); });
 
-  it('hides offline records on every read without changing the R5 initial state', async () => {
+  it('hides offline records on every read without changing the R6 initial state', async () => {
     for (const path of ['/flights', '/flights/active', '/flights/history']) {
       const response = await request(app).get('/api' + path);
       expect(response.status).toBe(200);
       expect(response.body.data).toEqual([]);
       if ('total' in response.body) expect(response.body.total).toBe(0);
     }
-    expect((await request(app).get('/api/flights/FLIGHT-014')).status).toBe(404);
+    expect((await request(app).get('/api/flights/FLIGHT-004')).status).toBe(404);
     const [flights] = await database.query<RowDataPacket[]>('SELECT * FROM flights WHERE id = 15');
     expect(flights[0]).toMatchObject({ status: 'READY', started_at: null, ended_at: null, duration_sec: 0, route_progress_percent: 0 });
     for (const table of ['telemetry', 'flight_events']) {
@@ -39,7 +39,7 @@ describe('Flight Operations MySQL v2.1.0 R5', () => {
       expect(response.status).toBe(200);
       expect(response.body.data).toEqual(snapshot.history.filter((row: { droneCode: string }) => row.droneCode === code));
       const all = await request(app).get('/api/flights');
-      expect(all.body.total).toBe(code === 'DRONE-003' ? 2 : code === 'DRONE-002' ? 0 : 1);
+      expect(all.body.total).toBe(code === 'DRONE-003' || code === 'DRONE-004' ? 1 : 0);
       expect(all.body.data.every((row: { drone: { droneCode: string } }) => row.drone.droneCode === code)).toBe(true);
       // Powering on alone does not start the READY flight in a read request.
       expect((await request(app).get('/api/flights/active')).body.data).toEqual([]);
@@ -65,10 +65,10 @@ describe('Flight Operations MySQL v2.1.0 R5', () => {
       const response = await request(app).get('/api/flights/active');
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0]).toMatchObject({ flightCode: 'FLIGHT-015', missionCode: 'mission-003', droneCode: 'DRONE-003', status: 'FLYING', flightStatus: 'IN_PROGRESS', routeProgressPercent: 25, currentWaypointIndex: 2 });
+      expect(response.body.data[0]).toMatchObject({ flightCode: 'FLIGHT-003', missionCode: 'mission-003', droneCode: 'DRONE-003', status: 'FLYING', flightStatus: 'IN_PROGRESS', routeProgressPercent: 25, currentWaypointIndex: 2 });
       expect(response.body.data[0].waypoints).toHaveLength(8);
-      expect((await request(app).get('/api/flights/history')).body.data.map((row: { flightCode: string }) => row.flightCode)).toEqual(['FLIGHT-011']);
-      expect((await request(app).get('/api/flights/FLIGHT-015')).status).toBe(404);
+      expect((await request(app).get('/api/flights/history')).body.data.map((row: { flightCode: string }) => row.flightCode)).toEqual([]);
+      expect((await request(app).get('/api/flights/FLIGHT-003')).status).toBe(404);
     } finally {
       const flight = flights[0]; const mission = missions[0];
       await database.execute('UPDATE flights SET status = ?, started_at = ?, route_progress_percent = ?, current_waypoint_index = ? WHERE id = 15', [flight.status, flight.started_at, flight.route_progress_percent, flight.current_waypoint_index]);
@@ -81,15 +81,15 @@ describe('Flight Operations MySQL v2.1.0 R5', () => {
   it('paginates the visible set and combines filters with the correct totals', async () => {
     const restore = await powerDroneFixture(database, droneCodes);
     try {
-      const first = await request(app).get('/api/flights?pageSize=2');
-      const second = await request(app).get('/api/flights?pageSize=2&page=2');
+      const first = await request(app).get('/api/flights?pageSize=1');
+      const second = await request(app).get('/api/flights?pageSize=1&page=2');
       expect(first.status).toBe(200);
-      expect(first.body).toMatchObject({ total: 5, page: 1, pageSize: 2 });
-      expect(second.body.data).toHaveLength(2);
-      expect(new Set([...first.body.data, ...second.body.data].map(item => item.flightCode)).size).toBe(4);
-      const filtered = await request(app).get('/api/flights?droneId=1&missionId=14&status=LANDED&result=SUCCESS');
+      expect(first.body).toMatchObject({ total: 2, page: 1, pageSize: 1 });
+      expect(second.body.data).toHaveLength(1);
+      expect(new Set([...first.body.data, ...second.body.data].map(item => item.flightCode)).size).toBe(2);
+      const filtered = await request(app).get('/api/flights?droneId=4&missionId=4&status=LANDED&result=SUCCESS');
       expect(filtered.body.total).toBe(1);
-      expect(filtered.body.data[0].flightCode).toBe('FLIGHT-014');
+      expect(filtered.body.data[0].flightCode).toBe('FLIGHT-004');
       expect((await request(app).get('/api/flights?droneId=999999')).body.data).toEqual([]);
       expect((await request(app).get('/api/flights/UNKNOWN')).status).toBe(404);
     } finally { await restore(); }

@@ -17,8 +17,6 @@ function ArrowIcon() {
   );
 }
 
-/* ---------- Mission status ---------- */
-
 function MissionStatusBadge({
   status,
 }: {
@@ -35,8 +33,6 @@ function MissionStatusBadge({
     </span>
   );
 }
-
-/* ---------- Alert cell ---------- */
 
 function MissionAlertCell({
   mission,
@@ -79,8 +75,6 @@ function MissionAlertCell({
   );
 }
 
-/* ---------- Empty state and table ---------- */
-
 export function MissionTable({
   missions,
   onViewAlert,
@@ -101,6 +95,7 @@ export function MissionTable({
           <tr>
             <th scope="col">Mission</th>
             <th scope="col">Drone</th>
+            <th scope="col">Flight</th>
             <th scope="col">Status</th>
             <th scope="col">Waypoints</th>
             <th scope="col">Alert</th>
@@ -120,6 +115,7 @@ export function MissionTable({
                   {mission.droneCode}
                 </span>
               </td>
+              <td>{mission.flightCode ?? "—"}</td>
               <td>
                 <MissionStatusBadge status={mission.status} />
               </td>
