@@ -55,44 +55,67 @@ Unknown routes return:
 
 ```json
 { "error": { "code": "NOT_FOUND", "message": "Route not found" } }
+```
 
-Malformed JSON returns 400 with code INVALID_JSON. Unhandled server failures return 500 with code INTERNAL_ERROR.
-Local setup
+Malformed JSON returns `400` with code `INVALID_JSON`. Unhandled server failures return `500` with code `INTERNAL_ERROR`.
+
+## Local setup
+
 Use Node.js 24 or later and Docker. From the repository root, start the MySQL data pack:
-docker compose -f .\data\docker-compose.yml up -d --wait
 
-The default host port is 3307. MySQL imports the seed only when Docker creates an empty volume; restarting an older volume does not upgrade it to R6.
+```powershell
+docker compose -f .\data\docker-compose.yml up -d --wait
+```
+
+The default host port is `3307`. MySQL imports the seed only when Docker creates an empty volume; restarting an older volume does not upgrade it to R6.
 
 To keep an existing database and start a separate R6 instance, choose an unused host port and a distinct Compose project name:
+
+```powershell
 $env:DEMO_MYSQL_PORT = "3316"
 docker compose -p drone-monitoring-r6-local -f .\data\docker-compose.yml up -d --wait
+```
 
-Set DB_PORT in backend/.env to the selected host port. Install dependencies and create local configuration in backend/:
+Set `DB_PORT` in `backend/.env` to the selected host port. Install dependencies and create local configuration in `backend/`:
+
+```powershell
 cd backend
 npm ci
 if (!(Test-Path .env)) { Copy-Item .env.example .env }
+```
 
-Set DB_HOST, DB_PORT, DB_NAME, DB_USER, and DB_PASSWORD to match the running MySQL instance. The default demo database name is drone_monitoring_frontend. .env is ignored by Git.
+Set `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD` to match the running MySQL instance. The default demo database name is `drone_monitoring_frontend`. `.env` is ignored by Git.
 
 Confirm the database build ID and seed counts, then start the API:
+
+```powershell
 npm run wait:data-pack
 npm run dev
+```
 
-Open http://localhost:3000/api/health. The expected response is:
+Open `http://localhost:3000/api/health`. The expected response is:
+
+```json
 { "status": "ok" }
+```
 
-The server checks its MySQL connection before listening. /api/health checks the API process; it is not a separate database health report.
-Checks
-From backend/, run:
+The server checks its MySQL connection before listening. `/api/health` checks the API process; it is not a separate database health report.
+
+## Checks
+
+From `backend/`, run:
+
+```powershell
 npm run typecheck
 npm run lint
 npm test
 npm run wait:data-pack
 npm run test:integration
 npm run build
+```
 
 Unit tests do not need MySQL. Integration tests require the R6 data pack and a disposable database instance because they exercise power and alert state. The tests restore their fixtures after each scenario.
 
-wait:data-pack checks the build ID and expected table counts from data/manifest.json. It does not reset a volume or modify seed data. If it reports an older build ID, point .env to a separate R6 instance instead of assuming a container restart imported new data.
+`wait:data-pack` checks the build ID and expected table counts from `data/manifest.json`. It does not reset a volume or modify seed data. If it reports an older build ID, point `.env` to a separate R6 instance instead of assuming a container restart imported new data.
 
-npm run build removes stale dist output before compiling. npm start runs the compiled dist/server.js.
+`npm run build` removes stale `dist` output before compiling. `npm start` runs the compiled `dist/server.js`.
