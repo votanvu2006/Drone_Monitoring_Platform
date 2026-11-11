@@ -49,6 +49,10 @@ export function apiFixture(
   poweredCodes = snapshot.fleet.drones.map((drone) => drone.code),
 ) {
   const url = new URL(path, 'http://localhost');
+  // Static browser tests do not run a backend demo session.
+  if (url.pathname === '/api/demo-run') {
+    return { data: { runId: null } };
+  }
   const visible = (code: string) => poweredCodes.includes(code);
 
   const paginated = <T,>(rows: T[]) => {

@@ -13,6 +13,15 @@ export function createApp(database?: Pool): express.Express {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json());
+  // Cho frontend biết đây có phải lần chạy demo mới hay không.
+  app.get('/api/demo-run', (_request, response) => {
+    response.setHeader('Cache-Control', 'no-store');
+    response.json({
+      data: {
+        runId: process.env.DEMO_RUN_ID ?? null,
+      },
+    });
+  });
 
   app.use('/api/health', healthRouter);
   app.get('/api/openapi.json', (_request, response) =>
